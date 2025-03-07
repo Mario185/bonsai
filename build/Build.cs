@@ -132,6 +132,9 @@ partial class Build : NukeBuild
           .SetProperty("InformationalVersion", versionNumber)
         );
 
+        Console.WriteLine (GitHubActions.Instance.GitHubEvent.ToString());
+        Console.WriteLine (GitHubActions.Instance.Token);
+
         var bonsaiExecuteable = ReleaseOutputRoot / "bin";
         var bonsaiZip = ReleaseOutputRoot / "bonsai.zip";
         bonsaiExecuteable.ZipTo (bonsaiZip, path => path.Name == "bonsai.exe");
@@ -142,6 +145,7 @@ partial class Build : NukeBuild
         
           HttpClient client = new();
           client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue ("Bearer", GitHubActions.Instance.Token);
+       
           using (var zipStream = new FileStream (bonsaiZip, FileMode.Open))
           {
             var content = new StreamContent (zipStream);
