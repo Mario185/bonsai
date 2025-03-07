@@ -61,23 +61,24 @@ partial class Build : NukeBuild
  
   Target Publish => d => d
       .DependsOn(Restore)
+      .Produces(ReleaseOutputRoot / "bonsai.exe" )
       .Executes(() =>
       {
         IReadOnlyCollection<Output> result = GitTasks.Git("tag --points-at HEAD").EnsureOnlyStd();
 
         string versionNumber = "0.0.1";
-        if (IsServerBuild)
-        {
-          var matches = result.Select(r => ReleaseVersionTagRegex().Match(r.Text)).Where(m => m.Success).ToArray();
+        //if (IsServerBuild)
+        //{
+        //  var matches = result.Select(r => ReleaseVersionTagRegex().Match(r.Text)).Where(m => m.Success).ToArray();
         
-          if (matches.Length == 0)
-            throw new Exception("No release version tag found. Create a tag in this format \"release_1.2.3\"");
+        //  if (matches.Length == 0)
+        //    throw new Exception("No release version tag found. Create a tag in this format \"release_1.2.3\"");
 
-          if (matches.Length > 1)
-            throw new Exception("Multiple release version tags found. Tags: " + string.Join(", ", matches.Select(m => m.Value.ToString())));
+        //  if (matches.Length > 1)
+        //    throw new Exception("Multiple release version tags found. Tags: " + string.Join(", ", matches.Select(m => m.Value.ToString())));
 
-          versionNumber = matches[0].Groups["version"].Value;
-        }
+        //  versionNumber = matches[0].Groups["version"].Value;
+        //}
 
         DotNetTasks.DotNetPublish(c => c
           .SetProject(Solution.bonsai)
