@@ -146,7 +146,9 @@ partial class Build : NukeBuild
           {
             var content = new StreamContent (zipStream);
             content.Headers.ContentType = MediaTypeHeaderValue.Parse ("application/zip");
-            await client.PostAsync (assetsUrl, content);
+            var response = await client.PostAsync (assetsUrl, content);
+            Console.WriteLine ("Upload response: " + response.StatusCode);
+            Console.WriteLine ("Upload message:" + await response.Content.ReadAsStringAsync());
           }
         }
       });
