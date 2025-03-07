@@ -4,16 +4,49 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Nuke.Common;
 using Nuke.Common.CI.GitHubActions;
+using Nuke.Common.CI.GitHubActions.Configuration;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Git;
+using Nuke.Common.Utilities;
 
-[GitHubActions(
+public class ExtendedGitHubActionsAttribute : GitHubActionsAttribute
+{
+  public ExtendedGitHubActionsAttribute (string name, GitHubActionsImage image, params GitHubActionsImage[] images)
+      : base(name, image, images)
+  {
+  }
+
+  protected override IEnumerable<GitHubActionsDetailedTrigger> GetTriggers ()
+  {
+    if (OnReleasePublished)
+      return base.GetTriggers().Append (new ReleaseGitHubActionsDetailedTrigger());
+
+    return base.GetTriggers();
+  }
+
+  public bool OnReleasePublished { get; set; }
+}
+
+public class ReleaseGitHubActionsDetailedTrigger : GitHubActionsDetailedTrigger
+{
+  public override void Write (CustomFileWriter writer)
+  {
+    writer.WriteLine("release:");
+    using (writer.Indent())
+    {
+      writer.WriteLine ("types: [published]");
+    }
+  }
+}
+
+[ExtendedGitHubActions(
     "release",
     GitHubActionsImage.WindowsLatest,
-    On = new[] { GitHubActionsTrigger.WorkflowDispatch },
+    On = [ GitHubActionsTrigger.WorkflowDispatch ],
+    //OnReleasePublished = true,
     InvokedTargets = new[] { nameof(Publish) })]
 partial class Build : NukeBuild
 {
@@ -52,7 +85,7 @@ partial class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-
+          Console.WriteLine ("YEH");
         });
 
 
@@ -60,8 +93,8 @@ partial class Build : NukeBuild
   [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Nuke Targets are only used implicit")]
  
   Target Publish => d => d
-      .DependsOn(Restore)
-      .Produces(ReleaseOutputRoot / "bonsai.exe" )
+      //.DependsOn(Restore)
+      //.Produces(ReleaseOutputRoot / "bonsai.exe" )
       .Executes(() =>
       {
         IReadOnlyCollection<Output> result = GitTasks.Git("tag --points-at HEAD").EnsureOnlyStd();
@@ -80,16 +113,21 @@ partial class Build : NukeBuild
         //  versionNumber = matches[0].Groups["version"].Value;
         //}
 
-        DotNetTasks.DotNetPublish(c => c
-          .SetProject(Solution.bonsai)
-          .SetConfiguration(Configuration.Release)
-          .SetPublishSingleFile(true)
-          .SetSelfContained(false)
-          .SetOutput(ReleaseOutputRoot)
-          .SetProperty("FileVersion", versionNumber)
-          .SetProperty("AssemblyVersion", versionNumber)
-          .SetProperty("InformationalVersion", versionNumber)
-        );
+        Console.WriteLine ("GITHUBEVENT START");
+        Console.WriteLine (GitHubActions.Instance.GitHubEvent.ToString());
+        Console.WriteLine ("GITHUBEVENTEND");
+        
+
+        //DotNetTasks.DotNetPublish(c => c
+        //  .SetProject(Solution.bonsai)
+        //  .SetConfiguration(Configuration.Release)
+        //  .SetPublishSingleFile(true)
+        //  .SetSelfContained(false)
+        //  .SetOutput(ReleaseOutputRoot)
+        //  .SetProperty("FileVersion", versionNumber)
+        //  .SetProperty("AssemblyVersion", versionNumber)
+        //  .SetProperty("InformationalVersion", versionNumber)
+        //);
       });
 
 }
