@@ -56,6 +56,7 @@ public class ReleaseGitHubActionsDetailedTrigger : GitHubActionsDetailedTrigger
     GitHubActionsImage.WindowsLatest,
     //On = [ GitHubActionsTrigger.WorkflowDispatch ],
     OnReleasePublished = true,
+    WritePermissions = new [] { GitHubActionsPermissions.Contents},
     InvokedTargets = new[] { nameof(Publish) })]
 partial class Build : NukeBuild
 {
