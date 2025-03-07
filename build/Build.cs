@@ -1,7 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
 using Nuke.Common;
 using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.CI.GitHubActions.Configuration;
@@ -11,6 +18,8 @@ using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Git;
 using Nuke.Common.Utilities;
+using Octokit;
+using FileMode = System.IO.FileMode;
 
 public class ExtendedGitHubActionsAttribute : GitHubActionsAttribute
 {
@@ -85,7 +94,6 @@ partial class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-          Console.WriteLine ("YEH");
         });
 
 
@@ -95,7 +103,7 @@ partial class Build : NukeBuild
   Target Publish => d => d
       //.DependsOn(Restore)
       //.Produces(ReleaseOutputRoot / "bonsai.exe" )
-      .Executes(() =>
+      .Executes(async () =>
       {
         IReadOnlyCollection<Output> result = GitTasks.Git("tag --points-at HEAD").EnsureOnlyStd();
 
@@ -103,7 +111,7 @@ partial class Build : NukeBuild
         //if (IsServerBuild)
         //{
         //  var matches = result.Select(r => ReleaseVersionTagRegex().Match(r.Text)).Where(m => m.Success).ToArray();
-        
+
         //  if (matches.Length == 0)
         //    throw new Exception("No release version tag found. Create a tag in this format \"release_1.2.3\"");
 
@@ -113,21 +121,31 @@ partial class Build : NukeBuild
         //  versionNumber = matches[0].Groups["version"].Value;
         //}
 
-        Console.WriteLine ("GITHUBEVENT START");
-        Console.WriteLine (GitHubActions.Instance.GitHubEvent.ToString());
-        Console.WriteLine ("GITHUBEVENTEND");
-        
+        DotNetTasks.DotNetPublish(c => c
+          .SetProject(Solution.bonsai)
+          .SetConfiguration(Configuration.Release)
+          .SetPublishSingleFile(true)
+          .SetSelfContained(false)
+          .SetOutput(ReleaseOutputRoot)
+          .SetProperty("FileVersion", versionNumber)
+          .SetProperty("AssemblyVersion", versionNumber)
+          .SetProperty("InformationalVersion", versionNumber)
+        );
 
-        //DotNetTasks.DotNetPublish(c => c
-        //  .SetProject(Solution.bonsai)
-        //  .SetConfiguration(Configuration.Release)
-        //  .SetPublishSingleFile(true)
-        //  .SetSelfContained(false)
-        //  .SetOutput(ReleaseOutputRoot)
-        //  .SetProperty("FileVersion", versionNumber)
-        //  .SetProperty("AssemblyVersion", versionNumber)
-        //  .SetProperty("InformationalVersion", versionNumber)
-        //);
+        var bonsaiExecuteable = ReleaseOutputRoot / "bonsai.exe";
+        var bonsaiZip = ReleaseOutputRoot / "bonsai.zip";
+        bonsaiExecuteable.ZipTo (bonsaiZip);
+
+        var assetsUrl = GitHubActions.Instance.GitHubEvent["release"]["assets_url"].ToString();
+        
+        HttpClient client = new();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue ("Bearer", GitHubActions.Instance.Token);
+        using (var zipStream = new FileStream (bonsaiZip, FileMode.Open))
+        {
+          var content = new StreamContent (zipStream);
+          content.Headers.ContentType = MediaTypeHeaderValue.Parse ("application/zip");
+          await client.PostAsync (assetsUrl, content);
+        }
       });
 
 }
