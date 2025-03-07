@@ -142,11 +142,13 @@ partial class Build : NukeBuild
 
         if (IsServerBuild)
         {
-          var assetsUrl = GitHubActions.Instance.GitHubEvent["release"]["assets_url"].ToString();
-        
+          var assetsUrl = GitHubActions.Instance.GitHubEvent["release"]["upload_url"].ToString();
+          assetsUrl = assetsUrl.Split ('{')[0] + "?name=bonsai.zip";
+
           HttpClient client = new();
           client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue ("Bearer", GitHubActions.Instance.Token);
-       
+          client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
+          client.DefaultRequestHeaders.Add("User-Agent", "bonsai");
           using (var zipStream = new FileStream (bonsaiZip, FileMode.Open))
           {
             var content = new StreamContent (zipStream);
