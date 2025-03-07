@@ -57,6 +57,7 @@ public class ReleaseGitHubActionsDetailedTrigger : GitHubActionsDetailedTrigger
     //On = [ GitHubActionsTrigger.WorkflowDispatch ],
     OnReleasePublished = true,
     WritePermissions = new [] { GitHubActionsPermissions.Contents},
+    EnableGitHubToken = true,
     InvokedTargets = new[] { nameof(Publish) })]
 partial class Build : NukeBuild
 {
@@ -133,8 +134,8 @@ partial class Build : NukeBuild
           .SetProperty("InformationalVersion", versionNumber)
         );
 
-        Console.WriteLine (GitHubActions.Instance.GitHubEvent.ToString());
-        Console.WriteLine (GitHubActions.Instance.Token);
+        //Console.WriteLine (GitHubActions.Instance.GitHubEvent.ToString());
+        //Console.WriteLine (GitHubActions.Instance.Token);
 
         var bonsaiExecuteable = ReleaseOutputRoot / "bin";
         var bonsaiZip = ReleaseOutputRoot / "bonsai.zip";
