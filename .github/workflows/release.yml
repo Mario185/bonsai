@@ -16,7 +16,9 @@
 
 name: release
 
-on: [workflow_dispatch]
+on:
+  release:
+    types: [published]
 
 jobs:
   windows-latest:

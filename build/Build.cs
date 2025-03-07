@@ -45,8 +45,8 @@ public class ReleaseGitHubActionsDetailedTrigger : GitHubActionsDetailedTrigger
 [ExtendedGitHubActions(
     "release",
     GitHubActionsImage.WindowsLatest,
-    On = [ GitHubActionsTrigger.WorkflowDispatch ],
-    //OnReleasePublished = true,
+    //On = [ GitHubActionsTrigger.WorkflowDispatch ],
+    OnReleasePublished = true,
     InvokedTargets = new[] { nameof(Publish) })]
 partial class Build : NukeBuild
 {
