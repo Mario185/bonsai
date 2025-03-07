@@ -1,0 +1,85 @@
+{
+  "showParentDirectoryInList": true,
+  "maxEntryAgeInDays": 300,
+  "maxIndividualScore": 100,
+  "keyBindings": {
+    "Common": [
+      {
+        "modifier": "None",
+        "key": "Escape",
+        "action": "Exit"
+      },
+      {
+        "modifier": "None",
+        "key": "UpArrow",
+        "action": "ListSelectPreviousItem"
+      },
+      {
+        "modifier": "None",
+        "key": "DownArrow",
+        "action": "ListSelectNextItem"
+      },
+      {
+        "modifier": "None",
+        "key": "PageUp",
+        "action": "ListSelectOnePageUp"
+      },
+      {
+        "modifier": "None",
+        "key": "PageDown",
+        "action": "ListSelectOnePageDown"
+      },
+      {
+        "modifier": "Control",
+        "key": "Home",
+        "action": "ListSelectFirstItem"
+      },
+      {
+        "modifier": "Control",
+        "key": "End",
+        "action": "ListSelectLastItem"
+      }
+    ],
+    "ExplorerApp": [
+      {
+        "modifier": "None",
+        "keyChar": "\r",
+        "action": "OpenDirectory"
+      },
+      {
+        "modifier": "Alt",
+        "key": "UpArrow",
+        "action": "OpenParentDirectory"
+      },
+      {
+        "modifier": "Control",
+        "key": "Enter",
+        "action": "ConfirmSelection"
+      },
+      {
+        "modifier": "Control",
+        "key": "D",
+        "action": "ToggleShowDetailsPanel"
+      },
+      {
+        "modifier": "Control",
+        "key": "I",
+        "action": "ToggleIncludeSubDirectories"
+      },
+      {
+        "modifier": "Control",
+        "key": "R",
+        "action": "ToggleRegexSearch"
+      }
+    ],
+    "NavigationApp": [
+      {
+        "modifier": "None",
+        "key": "Enter",
+        "action": "ConfirmSelection"
+      }
+    ]
+  },
+  "fileCommands": [],
+  "directoryCommands": []
+}
