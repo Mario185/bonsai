@@ -19,6 +19,7 @@ using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Git;
 using Nuke.Common.Utilities;
 using Octokit;
+using Serilog;
 using FileMode = System.IO.FileMode;
 
 public class ExtendedGitHubActionsAttribute : GitHubActionsAttribute
@@ -151,8 +152,15 @@ partial class Build : NukeBuild
             var content = new StreamContent (zipStream);
             content.Headers.ContentType = MediaTypeHeaderValue.Parse ("application/zip");
             var response = await client.PostAsync (assetsUrl, content);
-            Console.WriteLine ("Upload response: " + response.StatusCode);
-            Console.WriteLine ("Upload message:" + await response.Content.ReadAsStringAsync());
+            Log.Information ("Upload response: " + response.StatusCode);
+            Log.Information ("Upload message:" + await response.Content.ReadAsStringAsync());
+            
+            if (!response.IsSuccessStatusCode)
+            {
+              Log.Error ("Upload failed.");
+              throw new Exception ("Uploading assets failed.");
+            }
+
           }
         }
       });
