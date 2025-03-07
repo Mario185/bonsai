@@ -3,12 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Nuke.Common;
+using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Git;
 
+[GitHubActions(
+    "release",
+    GitHubActionsImage.WindowsLatest,
+    On = new[] { GitHubActionsTrigger.WorkflowDispatch },
+    InvokedTargets = new[] { nameof(Publish) })]
 partial class Build : NukeBuild
 {
     public static int Main () => Execute<Build>(x => x.Compile);
@@ -52,6 +58,7 @@ partial class Build : NukeBuild
 
   // ReSharper disable once UnusedMember.Local
   [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Nuke Targets are only used implicit")]
+ 
   Target Publish => d => d
       .DependsOn(Restore)
       .Executes(() =>
