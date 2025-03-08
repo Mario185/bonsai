@@ -128,26 +128,26 @@ partial class Build : NukeBuild
           .SetConfiguration(Configuration.Release)
           .SetPublishSingleFile(true)
           .SetSelfContained(false)
-          .SetOutput(ReleaseOutputRoot / "bin")
+          .SetOutput(ReleaseOutputRoot)
           .SetProperty("FileVersion", versionNumber)
           .SetProperty("AssemblyVersion", versionNumber)
           .SetProperty("InformationalVersion", versionNumber)
         );
 
-        var bonsaiExecuteable = ReleaseOutputRoot / "bin";
-        var bonsaiZip = ReleaseOutputRoot / "bonsai.zip";
-        bonsaiExecuteable.ZipTo (bonsaiZip, path => path.Name == "bonsai.exe");
+        //var bonsaiExecuteable = ReleaseOutputRoot / "bin";
+        //var bonsaiZip = ReleaseOutputRoot / "bonsai.zip";
+        //bonsaiExecuteable.ZipTo (bonsaiZip, path => path.Name == "bonsai.exe");
 
         if (IsServerBuild)
         {
           var assetsUrl = GitHubActions.Instance.GitHubEvent["release"]["upload_url"].ToString();
-          assetsUrl = assetsUrl.Split ('{')[0] + "?name=bonsai.zip";
+          assetsUrl = assetsUrl.Split ('{')[0] + "?name=bonsai.exe";
 
           HttpClient client = new();
           client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue ("Bearer", GitHubActions.Instance.Token);
           client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
           client.DefaultRequestHeaders.Add("User-Agent", "bonsai");
-          using (var zipStream = new FileStream (bonsaiZip, FileMode.Open))
+          using (var zipStream = new FileStream (ReleaseOutputRoot / "bonsai.exe", FileMode.Open))
           {
             var content = new StreamContent (zipStream);
             content.Headers.ContentType = MediaTypeHeaderValue.Parse ("application/zip");
