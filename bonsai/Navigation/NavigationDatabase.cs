@@ -36,13 +36,13 @@ namespace bonsai.Navigation
       UpdateEntry(entry, autoSave);
     }
 
-    public (double recency, double scoreMultiplier, int score) CalculateScore(int value, DateTime lastUsed, DateTime queryTime)
+    public int CalculateScore(int value, DateTime lastUsed, DateTime queryTime)
     {
       // we cast TotalHours to int so we get hourly steps
       double recency = Math.Max(0, c_maxAge - (int)(queryTime - lastUsed).TotalHours);
 
       double scoreMultiplier = Math.Exp(0.018 * recency);
-      return (recency, scoreMultiplier, (int)(value * scoreMultiplier));
+      return (int)(value * scoreMultiplier);
     }
 
     public void CleanUpDatabase()

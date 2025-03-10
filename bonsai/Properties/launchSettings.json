@@ -24,6 +24,11 @@
       "commandName": "Project",
       "commandLineArgs": "writethemes",
       "dotnetRunMessages": true
+    },
+    "Edit Database": {
+      "commandName": "Project",
+      "commandLineArgs": "editdb",
+      "dotnetRunMessages": true
     }
   }
 }

@@ -79,6 +79,28 @@
         "key": "Enter",
         "action": "ConfirmSelection"
       }
+    ],
+    "EditDatabaseApp": [
+      {
+        "modifier": "Control",
+        "key": "UpArrow",
+        "action": "IncrementScore"
+      },
+      {
+        "modifier": "Control",
+        "key": "DownArrow",
+        "action": "DecrementScore"
+      },
+      {
+        "modifier": "Control",
+        "key": "S",
+        "action": "SaveDatabaseChanges"
+      },
+      {
+        "modifier": "None",
+        "key": "Delete",
+        "action": "DeleteDatabaseEntry"
+      }
     ]
   },
   "fileCommands": [],

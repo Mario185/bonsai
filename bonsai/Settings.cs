@@ -178,7 +178,8 @@ namespace bonsai
   {
     Common,
     ExplorerApp,
-    NavigationApp
+    NavigationApp,
+    EditDatabaseApp,
   }
 
   public enum ActionType
@@ -196,6 +197,10 @@ namespace bonsai
     ListSelectLastItem,
     ToggleShowDetailsPanel,
     ToggleIncludeSubDirectories,
-    ToggleRegexSearch
+    ToggleRegexSearch,
+    IncrementScore,
+    DecrementScore,
+    SaveDatabaseChanges,
+    DeleteDatabaseEntry
   }
 }
