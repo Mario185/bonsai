@@ -45,6 +45,12 @@ try
       ThemeManger.WriteResourceThemesToConfigFolder (false);
       return 0;
     
+    case "editdb":
+
+      new EditDatabaseApp().Run();
+
+      return 0;
+
     case "writethemes":
       ThemeManger.WriteResourceThemesToConfigFolder (true);
       return 0;
