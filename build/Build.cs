@@ -134,10 +134,6 @@ partial class Build : NukeBuild
           .SetProperty("InformationalVersion", versionNumber)
         );
 
-        //var bonsaiExecuteable = ReleaseOutputRoot / "bin";
-        //var bonsaiZip = ReleaseOutputRoot / "bonsai.zip";
-        //bonsaiExecuteable.ZipTo (bonsaiZip, path => path.Name == "bonsai.exe");
-
         if (IsServerBuild)
         {
           var assetsUrl = GitHubActions.Instance.GitHubEvent["release"]["upload_url"].ToString();
