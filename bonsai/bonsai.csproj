@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <None Remove="default.json" />
-    <None Remove="Resources\Init_powershell.ps1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,7 +21,7 @@
     <EmbeddedResource Include="Resources\themes\default.json">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Resources\Init_powershell.ps1" />
+    <EmbeddedResource Include="Resources\initialization\init.ps1" />
   </ItemGroup>
 
   <ItemGroup>

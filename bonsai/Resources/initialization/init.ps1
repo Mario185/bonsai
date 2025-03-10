@@ -1,11 +1,14 @@
-
-
 function global:__bonsai_b {
 
   $outputFile = [System.IO.Path]::GetTempFileName()
   
   $currentLocation = Get-Location
-  & bonsai f "$outputFile" "$currentLocation" "$args"
+  if ($args.Count -EQ 0)  {
+	  & bonsai main "$outputFile" "$currentLocation"
+  }
+  else  {
+	  & bonsai nav "$outputFile" "$currentLocation" "$args"
+  }
 
   $result = Get-Content $outputFile -Raw
   Remove-Item $outputFile
@@ -32,4 +35,5 @@ Set-Alias -Name b -Value __bonsai_b -Option AllScope -Scope Global -Force
 Set-Alias -Name b.. -Value __bonsai_dotdot -Option AllScope -Scope Global -Force
 Set-Alias -Name b\ -Value __bonsai_backslash -Option AllScope -Scope Global -Force
 
+# Add the following line to your powershell profile to initialize bonsai
 # Invoke-Expression (& { (bonsai init powershell | Out-String) })

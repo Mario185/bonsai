@@ -1,0 +1,29 @@
+{
+  "profiles": {
+    "Explorer (No Args)": {
+      "commandName": "Project",
+      "commandLineArgs": "",
+      "dotnetRunMessages": true
+    },
+    "Shell Initialization (powershell)": {
+      "commandName": "Project",
+      "commandLineArgs": "init powershell",
+      "dotnetRunMessages": true
+    },
+    "Shell Initialization missing shell type": {
+      "commandName": "Project",
+      "commandLineArgs": "init",
+      "dotnetRunMessages": true
+    },
+    "Shell Initialization invalid shell type": {
+      "commandName": "Project",
+      "commandLineArgs": "init invalidshelltype",
+      "dotnetRunMessages": true
+    },
+    "Write default themes": {
+      "commandName": "Project",
+      "commandLineArgs": "writethemes",
+      "dotnetRunMessages": true
+    }
+  }
+}

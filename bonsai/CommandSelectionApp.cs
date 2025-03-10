@@ -16,20 +16,20 @@ namespace bonsai
     {
       using (var frame = new Frame())
       {
-        Panel p = new Panel(1.AsFraction(), 1.AsFraction());
-        frame.AddControls(p);
-        p.BackgroundColor = ThemeManger.Instance.BackgroundColor;
-        Label l = new Label(1.AsFraction(), 1.AsFixed());
-        l.Text = $"Multiple commands available for {path}";
-        p.AddControls(l);
+        var rootPanel = new Panel(1.AsFraction(), 1.AsFraction());
+        var border = new Border(1.AsFraction(), 1.AsFraction());
+        var list = new ScrollableList<Command>(ThemeManger.Instance.SelectionForegroundColor, ThemeManger.Instance.SelectionBackgroundColor, 1.AsFraction(), 1.AsFraction());
+        var hintLabel = new Label(1.AsFraction(), 1.AsFixed());
 
-        Border b = new Border(1.AsFraction(), 1.AsFraction());
-        b.BorderColor = ThemeManger.Instance.BorderColor;
+        frame.AddControls(rootPanel);
+        
+        rootPanel.BackgroundColor = ThemeManger.Instance.BackgroundColor;
+        hintLabel.Text = $"Multiple commands available for {path}";
+        border.BorderColor = ThemeManger.Instance.BorderColor;
 
-        ScrollableList<Command> list = new ScrollableList<Command>(ThemeManger.Instance.SelectionForegroundColor, ThemeManger.Instance.SelectionBackgroundColor,
-          1.AsFraction(), 1.AsFraction());
-        b.AddControls(list);
-        p.AddControls(b);
+        rootPanel.AddControls(hintLabel);
+        border.AddControls(list);
+        rootPanel.AddControls(border);
 
         list.SetItemList(commands.ToList());
         list.SetFocusedIndex(0);

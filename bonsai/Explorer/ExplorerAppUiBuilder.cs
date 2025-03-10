@@ -112,7 +112,7 @@ namespace bonsai.Explorer
 
       _detailsBorder = new Border(2.AsFraction(), 1.AsFraction());
       _detailsBorder.BorderColor = ThemeManger.Instance.BorderColor;
-
+      _detailsBorder.Visible = false;
 
       DetailsLabel = new MultiLIneLabel(1.AsFraction(), 1.AsFraction());
 

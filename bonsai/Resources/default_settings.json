@@ -1,5 +1,6 @@
 {
   "showParentDirectoryInList": true,
+  "theme": "default.json",
   "maxEntryAgeInDays": 300,
   "maxIndividualScore": 100,
   "keyBindings": {

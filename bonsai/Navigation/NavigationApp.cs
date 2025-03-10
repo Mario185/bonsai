@@ -34,25 +34,7 @@ namespace bonsai.Navigation
 
       using (var frame = new Frame())
       {
-        Panel rootPanel = new Panel(1.AsFraction(), 1.AsFraction());
-        frame.AddControls(rootPanel);
-
-        Label searchTermLabel = new Label(1.AsFraction(), 1.AsFixed());
-
-        Border border = new Border(1.AsFraction(), 1.AsFraction());
-        border.BorderColor = ThemeManger.Instance.BorderColor;
-        searchTermLabel.Text = "Searched  ❯ " + originalArg;
-
-        ScrollableList<FileSystemItem> list = new ScrollableList<FileSystemItem>(ThemeManger.Instance.SelectionForegroundColor, ThemeManger.Instance.SelectionBackgroundColor, 1.AsFraction(), 1.AsFraction());
-        rootPanel.BackgroundColor = ThemeManger.Instance.BackgroundColor;
-        border.AddControls(list);
-
-        rootPanel.AddControls(searchTermLabel, border);
-
-        frame.EnableBufferSizeChangeWatching();
-
-        list.SetItemList(foundEntries);
-        list.SetFocusedIndex(0);
+        var list = CreateUi(originalArg, frame, foundEntries);
 
         frame.RenderComplete();
         bool endLoop = false;
@@ -110,6 +92,30 @@ namespace bonsai.Navigation
       }
 
       return null;
+    }
+
+    private static ScrollableList<FileSystemItem> CreateUi (string originalArg, Frame frame, FileSystemItem[] foundEntries)
+    {
+      var rootPanel = new Panel(1.AsFraction(), 1.AsFraction());
+      frame.AddControls(rootPanel);
+
+      var searchTermLabel = new Label(1.AsFraction(), 1.AsFixed());
+
+      var border = new Border(1.AsFraction(), 1.AsFraction());
+      border.BorderColor = ThemeManger.Instance.BorderColor;
+      searchTermLabel.Text = "Searched  ❯ " + originalArg;
+
+      var list = new ScrollableList<FileSystemItem>(ThemeManger.Instance.SelectionForegroundColor, ThemeManger.Instance.SelectionBackgroundColor, 1.AsFraction(), 1.AsFraction());
+      rootPanel.BackgroundColor = ThemeManger.Instance.BackgroundColor;
+      border.AddControls(list);
+
+      rootPanel.AddControls(searchTermLabel, border);
+
+      frame.EnableBufferSizeChangeWatching();
+
+      list.SetItemList(foundEntries);
+      list.SetFocusedIndex(0);
+      return list;
     }
 
     private static (bool success, string result) IsExistingPath(string currentDirectory, string originalArg)

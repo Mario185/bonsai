@@ -29,13 +29,13 @@ namespace bonsai.Explorer
     private int _currentSpinnerPosition;
     private bool _regexSearchEnabled;
 
-    public string? Run()
+    public string? Run(string currentDirectory)
     {
       using (_uiBuilder = new ExplorerAppUiBuilder())
       {
         _uiBuilder.CreateUi();
         _uiBuilder.EnableBufferSizeChangeWatching();
-        DirectoryInfo directoryInfo = new(Directory.GetCurrentDirectory());
+        DirectoryInfo directoryInfo = new(currentDirectory);
 
         _fileSystemWorker.OnFileSystemInfoLoadingStateChanged += FileSystemWorker_OnFileSystemInfoLoadingStateChanged;
         _uiBuilder.FileSystemList.OnSelectionChanged += FileSystemList_OnSelectionChanged;

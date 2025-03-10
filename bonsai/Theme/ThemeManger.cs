@@ -96,7 +96,7 @@ namespace bonsai.Theme
         Instance = JsonSerializer.Deserialize<ThemeManger>(stream, options)!;
     }
 
-    public static void WriteResourceThemesToConfigFolder()
+    public static void WriteResourceThemesToConfigFolder(bool force)
     {
       AbsolutePath path = KnownPaths.ThemesFolder;
       path.EnsureDirectoryExists();
@@ -106,16 +106,24 @@ namespace bonsai.Theme
 
       foreach (string themeName in resourceThemeNames)
       {
+        var targetFilePath = path / themeName;
+        
+        if (File.Exists (targetFilePath) && !force)
+          continue;
+
         using (Stream defaultThemeStream = GetThemeFromResources(themeName))
-        using (FileStream fileStream = new(path / themeName, FileMode.Create))
+        using (FileStream fileStream = new(targetFilePath, FileMode.Create))
           defaultThemeStream.CopyTo(fileStream);
       }
 
-      new ConsoleWriter()
-        .Style.ForegroundColor(Color.ForestGreen)
-        .Writer.Write($"Themes saved to '{path}'\n")
-        .Style.ResetStyles()
-        .Writer.Flush();
+      if (force)
+      {
+        new ConsoleWriter()
+            .Style.ForegroundColor (Color.ForestGreen)
+            .Writer.Write ($"Themes saved to '{path}'\n")
+            .Style.ResetStyles()
+            .Writer.Flush();
+      }
     }
 
     private static bool DoesResourceContainsTheme(string theme)
