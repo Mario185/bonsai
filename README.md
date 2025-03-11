@@ -1,4 +1,4 @@
-﻿# bonsai
+# bonsai
 
 A simple cli tool that provides a better 'change directory' and file execution experience.
 
@@ -127,31 +127,31 @@ Contents of the folder are:
   | fileCommands | List\<[FileCommand](#filecommand)\> | commands that should be used when selecting files. When not set, the shell decides what to do with file |
   | directoryCommands | List\<[DirectoryCommand](#directorycommand)\> | commands that should be used when selecting directories. When not set change directory to will be executed <br>If you add a directoryCommand you might want to register also the the change directory command for powershell: <br>`{"action": "Set-Location \"[path]\"", "displayName": "Change directory"}` |
 
-  KeyBindingContext{#keybindingcontext}:
+  <a id="keybindingcontext"/>KeyBindingContext:
     ```
     Common,
     ExplorerApp,
     NavigationApp
    ```
 
- FileCommand{#filecommand}
-
- | Property   | Description |
- | ---------- | ------- |
- | extension | the extension (include the . e.g ".ps1") for which the command should be available. "\*" = all files |
- | action | the expression which should be executed =="[path]"== will be replaced with the full qualified name of the file. eg: "code \"[path]\"" will open Visual Studio Code with the given file |
- | displayName | the name which should be displayed if more than one command is available|
-
- DirectoryCommand{#directorycommand}
-
- | Property   | Description |
- | ---------- | ------- |
- | action | the expression which should be executed =="[path]"== will be replaced with the full qualified name of the directory. eg: "ii \"[path]\"" will open the windows explorer |
- | displayName | the name which should be displayed if more than one command is available|
+  <a id="filecommand"/>FileCommand
   
-  KeyBinding{#keybinding}:
-
-
+  | Property   | Description |
+  | ---------- | ------- |
+  | extension | the extension (include the . e.g ".ps1") for which the command should be available. "\*" = all files |
+  | action | the expression which should be executed =="[path]"== will be replaced with the full qualified name of the file. eg: "code \"[path]\"" will open Visual Studio Code with the given file |
+  | displayName | the name which should be displayed if more than one command is available|
+  
+  <a id="directorycommand"/>DirectoryCommand
+  
+  | Property   | Description |
+  | ---------- | ------- |
+  | action | the expression which should be executed =="[path]"== will be replaced with the full qualified name of the directory. eg: "ii \"[path]\"" will open the windows explorer |
+  | displayName | the name which should be displayed if more than one command is available|
+   
+   <a id="keybinding"/>KeyBinding:
+  
+  
   | Property   | Values              | Description |
   | ---------- | ------------------- | ------- |
   | modifier| [ConsoleModifiers](https://learn.microsoft.com/en-us/dotnet/api/system.consolemodifiers?view=net-9.0#fields) | Use "None" if no modifier should be used |
@@ -160,7 +160,7 @@ Contents of the folder are:
   | action| None<br>Exit<br>OpenDirectory<br> OpenParentDirectory<br> ConfirmSelection<br>ListSelectPreviousItem<br> ListSelectNextItem<br> ListSelectOnePageUp<br> ListSelectOnePageDown<br> ListSelectFirstItem<br> ListSelectLastItem<br> ToggleShowDetailsPanel<br> ToggleIncludeSubDirectories<br> ToggleRegexSearch ||
 
 
-* init.ps1 {#init_ps1}
+* <a id="init_ps1"/>init.ps1
 
     This is the script which will be executed when `bonsai init [shell]` is executed.
 * db.json
