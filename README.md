@@ -127,14 +127,14 @@ Contents of the folder are:
   | fileCommands | List\<[FileCommand](#filecommand)\> | commands that should be used when selecting files. When not set, the shell decides what to do with file |
   | directoryCommands | List\<[DirectoryCommand](#directorycommand)\> | commands that should be used when selecting directories. When not set change directory to will be executed <br>If you add a directoryCommand you might want to register also the the change directory command for powershell: <br>`{"action": "Set-Location \"[path]\"", "displayName": "Change directory"}` |
 
-  <a id="keybindingcontext"/>KeyBindingContext:
+  <a id="keybindingcontext"></a>KeyBindingContext:
     ```
     Common,
     ExplorerApp,
     NavigationApp
    ```
 
-  <a id="filecommand"/>FileCommand
+  <a id="filecommand"></a>FileCommand
   
   | Property   | Description |
   | ---------- | ------- |
@@ -142,14 +142,14 @@ Contents of the folder are:
   | action | the expression which should be executed =="[path]"== will be replaced with the full qualified name of the file. eg: "code \"[path]\"" will open Visual Studio Code with the given file |
   | displayName | the name which should be displayed if more than one command is available|
   
-  <a id="directorycommand"/>DirectoryCommand
+  <a id="directorycommand"></a>DirectoryCommand
   
   | Property   | Description |
   | ---------- | ------- |
   | action | the expression which should be executed =="[path]"== will be replaced with the full qualified name of the directory. eg: "ii \"[path]\"" will open the windows explorer |
   | displayName | the name which should be displayed if more than one command is available|
    
-   <a id="keybinding"/>KeyBinding:
+   <a id="keybinding"></a>KeyBinding:
   
   
   | Property   | Values              | Description |
@@ -160,10 +160,10 @@ Contents of the folder are:
   | action| None<br>Exit<br>OpenDirectory<br> OpenParentDirectory<br> ConfirmSelection<br>ListSelectPreviousItem<br> ListSelectNextItem<br> ListSelectOnePageUp<br> ListSelectOnePageDown<br> ListSelectFirstItem<br> ListSelectLastItem<br> ToggleShowDetailsPanel<br> ToggleIncludeSubDirectories<br> ToggleRegexSearch ||
 
 
-* <a id="init_ps1"/>init.ps1
+* <a id="init_ps1"></a>init.ps1
 
     This is the script which will be executed when `bonsai init [shell]` is executed.
 * db.json
-* themes {#themes-folder}
+* <a id="themes-folder"></a>themes
   * default.json
   * justicons.json
