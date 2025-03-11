@@ -76,7 +76,7 @@ Everytime you use bonsai to navigate or execute a file this will be stored in th
 
 ### Default Key Bindings
 
-Key bindings can be modified in [settings.json](#configuration)
+Key bindings can be modified in [settings.json](#settings_json)
 
 #### common
 
@@ -115,7 +115,7 @@ Windows: %userprofile%\\.bonsai
 Contents of the folder are:
 
 
-* settings.json
+* <a id="settings_json"></a>settings.json
  
   | Property   | Values              | Description |
   | ---------- | ------------------- | ------- |
