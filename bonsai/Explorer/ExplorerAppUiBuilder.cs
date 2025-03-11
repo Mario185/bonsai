@@ -142,9 +142,10 @@ namespace bonsai.Explorer
 
       SearchTextBox = new TextBox(1.AsFraction(), 1.AsFixed());
 
-      _regexLabel = new(10.AsFixed(), 1.AsFixed());
+      var text = Settings.Instance.GetInstructionForAction(KeyBindingContext.ExplorerApp, ActionType.ToggleRegexSearch,"regex");
+      _regexLabel = new(text.Length.AsFixed(), 1.AsFixed());
       _regexLabel.TextColor = ThemeManger.Instance.OptionDisabledColor;
-      _regexLabel.Text = "[^R:Regex]";
+      _regexLabel.Text = text;
 
       searchPanel.AddControls(label, SearchTextBox, _regexLabel);
 

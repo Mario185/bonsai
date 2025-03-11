@@ -65,6 +65,32 @@ namespace bonsai
       return result ?? ActionType.None;
     }
 
+    public string GetInstructionForAction(KeyBindingContext keyBindingContext, ActionType action, string description)
+    {
+      if (KeyBindings.TryGetValue(keyBindingContext, out var inner))
+      {
+        var result = inner.Where(k => k.Action == action).OrderByDescending(k=>k.Key != null).FirstOrDefault();
+
+        var modifier = GetModifierText(result.Modifier);
+        var key = (result.Key?.ToString() ?? result.KeyChar.ToString())?.ToLower();
+        return modifier + key + ":" + description;
+      }
+
+      return string.Empty;
+    }
+
+    private static string GetModifierText(ConsoleModifiers modifier)
+    {
+      return modifier switch
+      {
+        ConsoleModifiers.None => "",
+        ConsoleModifiers.Alt => "alt+",
+        ConsoleModifiers.Control => "ctrl+",
+        ConsoleModifiers.Shift => "shift+",
+        _ => ""
+      };
+    }
+
     public static void LoadSettings()
     {
       JsonSerializerOptions options = GetJsonSerializerOptions();
@@ -201,6 +227,6 @@ namespace bonsai
     IncrementScore,
     DecrementScore,
     SaveDatabaseChanges,
-    DeleteDatabaseEntry
+    DeleteDatabaseEntry,
   }
 }
