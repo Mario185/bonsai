@@ -101,9 +101,13 @@ namespace clui.Controls
       return true;
     }
 
+    private readonly Position _cursorPosition = new Position(0, 0);
     public Position GetCursorPosition ()
     {
-      return new Position (Position.X + CursorPosition - _currentVisibleFromIndex, Position.Y);
+      _cursorPosition.X = Position.X + CursorPosition - _currentVisibleFromIndex;
+      _cursorPosition.Y = Position.Y;
+      return _cursorPosition;
+      //return new Position (Position.X + CursorPosition - _currentVisibleFromIndex, Position.Y);
     }
 
     public void SetText (string text)

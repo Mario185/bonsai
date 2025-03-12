@@ -147,9 +147,9 @@ namespace bonsai.Navigation
 
         FileSystemItem fileSystemItem;
         if (entry.IsDirectory)
-          fileSystemItem = new DirectoryItem(new DirectoryInfo(entry.Path), 0, () => true);
+          fileSystemItem = new DirectoryItem(entry.Path, 0, () => true);
         else
-          fileSystemItem = new FileItem(new FileInfo(entry.Path), 0, () => true);
+          fileSystemItem = new FileItem(entry.Path, Path.GetFileName(entry.Path), 0, () => true);
         fileSystemItem.SetSearchMatches(matches);
         foundEntries.Add((fileSystemItem, entry));
       }

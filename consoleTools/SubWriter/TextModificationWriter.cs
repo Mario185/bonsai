@@ -1,12 +1,15 @@
 ﻿using consoleTools.VirtualTerminalSequences;
+using System;
 
 namespace consoleTools.SubWriter
 {
   public class TextModificationWriter : SubWriterBase
   {
+    private readonly Action<string> _writeAction;
     internal TextModificationWriter(ConsoleWriter consoleWriter)
       : base(consoleWriter)
     {
+      _writeAction = s => consoleWriter.Write(s);
     }
 
     /// <summary>
@@ -32,7 +35,8 @@ namespace consoleTools.SubWriter
     /// </summary>
     public TextModificationWriter EraseCharacter(int number = 1)
     {
-      Writer.Write(TextModificationSequences.EraseCharacter(number));
+      TextModificationSequences.EraseCharacter(number, _writeAction);
+      //Writer.Write(TextModificationSequences.EraseCharacter(number));
       return this;
     }
 

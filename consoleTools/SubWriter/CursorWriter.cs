@@ -1,12 +1,16 @@
 ﻿using consoleTools.VirtualTerminalSequences;
+using System;
 
 namespace consoleTools.SubWriter
 {
   public class CursorWriter : SubWriterBase
   {
+    private readonly Action<string> _writeAction;
+
     internal CursorWriter(ConsoleWriter consoleWriter)
       : base(consoleWriter)
     {
+      _writeAction = s => consoleWriter.Write(s);
     }
 
     /// <summary>
@@ -41,7 +45,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public CursorWriter MoveAbsoluteHorizontally(int n)
     {
-      Writer.Write(CursorSequences.MoveAbsoluteHorizontally(n));
+      CursorSequences.MoveAbsoluteHorizontally(n, _writeAction);
       return this;
     }
 
@@ -50,7 +54,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public CursorWriter MoveAbsoluteVertically(int n)
     {
-      Writer.Write(CursorSequences.MoveAbsoluteVertically(n));
+      CursorSequences.MoveAbsoluteVertically(n, _writeAction);
       return this;
     }
 
@@ -59,7 +63,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public CursorWriter MoveDown(int rows = 1)
     {
-      Writer.Write(CursorSequences.MoveDown(rows));
+      CursorSequences.MoveDown(rows, _writeAction);
       return this;
     }
 
@@ -68,7 +72,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public CursorWriter MoveLeft(int columns = 1)
     {
-      Writer.Write(CursorSequences.MoveLeft(columns));
+      CursorSequences.MoveLeft(columns, _writeAction);
       return this;
     }
 
@@ -77,7 +81,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public CursorWriter MoveRight(int columns = 1)
     {
-      Writer.Write(CursorSequences.MoveRight(columns));
+      CursorSequences.MoveRight(columns, _writeAction);
       return this;
     }
 
@@ -86,7 +90,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public CursorWriter MoveTo(int x, int y)
     {
-      Writer.Write(CursorSequences.MoveTo(x, y));
+      CursorSequences.MoveTo(x, y, _writeAction);
       return this;
     }
 
@@ -95,7 +99,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public CursorWriter MoveUp(int rows = 1)
     {
-      Writer.Write(CursorSequences.MoveUp(rows));
+      CursorSequences.MoveUp(rows, _writeAction);
       return this;
     }
 
@@ -140,7 +144,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public CursorWriter SetShape(CursorShape shape)
     {
-      Writer.Write(CursorSequences.SetShape(shape));
+      CursorSequences.SetShape(shape, _writeAction);
       return this;
     }
 

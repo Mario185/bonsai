@@ -1,4 +1,6 @@
-﻿namespace consoleTools.VirtualTerminalSequences
+﻿using System;
+
+namespace consoleTools.VirtualTerminalSequences
 {
   internal class TextModificationSequences
   {
@@ -23,9 +25,14 @@
     ///   Erase <paramref name="number" /> characters from the current cursor position by overwriting them with a space
     ///   character.
     /// </summary>
-    public static string EraseCharacter(int number = 1)
+    public static void EraseCharacter(int number, Action<string> write)
     {
-      return CommonSequences.ESC + $"[{number}X";
+      write(CommonSequences.ESC);
+      write("[");
+      write(number.ToString());
+      write("X");
+
+      //return CommonSequences.ESC + $"[{number}X";
     }
 
     /// <summary>

@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.IO.Enumeration;
+using System.Linq;
 using System.Text;
 using bonsai;
 using bonsai.CommandHandling;
@@ -10,6 +12,7 @@ using consoleTools;
 
 var originalInputEncoding = Console.InputEncoding;
 var originalOutputEncoding = Console.OutputEncoding;
+
 
 try
 {

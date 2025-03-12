@@ -1,13 +1,17 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 using consoleTools.VirtualTerminalSequences;
 
 namespace consoleTools.SubWriter
 {
   public class StyleWriter : SubWriterBase
   {
+    private readonly Action<string> _writeAction;
+
     internal StyleWriter(ConsoleWriter consoleWriter)
       : base(consoleWriter)
     {
+      _writeAction = s => consoleWriter.Write(s);
     }
 
     public StyleWriter BackgroundColor(Color? color)
@@ -15,7 +19,8 @@ namespace consoleTools.SubWriter
       if (!color.HasValue)
         return this;
 
-      Writer.Write(StyleSequences.SetBackgroundColor(color.Value));
+      StyleSequences.SetBackgroundColor(color.Value, _writeAction);
+//      Writer.Write(StyleSequences.SetBackgroundColor(color.Value));
       return this;
     }
 
@@ -33,7 +38,7 @@ namespace consoleTools.SubWriter
       if (!color.HasValue)
         return this;
 
-      Writer.Write(StyleSequences.SetForegroundColor(color.Value));
+      StyleSequences.SetForegroundColor(color.Value, _writeAction);
       return this;
     }
 

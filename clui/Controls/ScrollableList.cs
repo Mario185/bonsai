@@ -176,9 +176,19 @@ namespace clui.Controls
       RootControl.AssociatedFrame.RenderPartial (this);
     }
 
-    public void MoveFocusedIndex (int step)
+    public void MoveFocusedIndex (int step, bool wrapAround)
     {
       int index = FocusedItemIndex + step;
+
+      if (wrapAround && _listItems != null)
+      {
+        if (index < 0)
+          index = _listItems.Count - 1;
+
+        if (index >= _listItems.Count)
+          index = 0;
+      }
+
       SetFocusedIndex (index);
     }
 
@@ -239,32 +249,32 @@ namespace clui.Controls
 
     public void SelectPreviousItem ()
     {
-      MoveFocusedIndex (-1);
+      MoveFocusedIndex (-1, true);
     }
 
     public void SelectNextItem ()
     {
-      MoveFocusedIndex (1);
+      MoveFocusedIndex (1, true);
     }
 
     public void SelectPageUp ()
     {
-      MoveFocusedIndex (-(CalculatedHeight!.Value - 1));
+      MoveFocusedIndex (-(CalculatedHeight!.Value - 1), false);
     }
 
     public void SelectPageDown ()
     {
-      MoveFocusedIndex (CalculatedHeight!.Value - 1);
+      MoveFocusedIndex (CalculatedHeight!.Value - 1, false);
     }
 
     public void SelectFirstItem ()
     {
-      MoveFocusedIndex (-FocusedItemIndex);
+      MoveFocusedIndex (-FocusedItemIndex, false);
     }
 
     public void SelectLastItem ()
     {
-      MoveFocusedIndex (_listItems!.Count - FocusedItemIndex);
+      MoveFocusedIndex (_listItems!.Count - FocusedItemIndex, false);
     }
   }
 

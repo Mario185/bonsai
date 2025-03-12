@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -81,8 +82,6 @@ namespace bonsai.Theme
 
     public static void LoadTheme(string theme)
     {
-      JsonSerializerOptions options = GetJsonSerializerOptions();
-
       AbsolutePath? themeFilePath = KnownPaths.ThemesFolder / theme;
       if (!File.Exists(themeFilePath))
       {
@@ -92,8 +91,11 @@ namespace bonsai.Theme
         themeFilePath = null;
       }
 
+      JsonSerializerOptions options = GetJsonSerializerOptions();
       using (Stream stream = themeFilePath == null ? GetThemeFromResources(theme) : File.OpenRead(themeFilePath))
+      {
         Instance = JsonSerializer.Deserialize<ThemeManger>(stream, options)!;
+      }
     }
 
     public static void WriteResourceThemesToConfigFolder(bool force)

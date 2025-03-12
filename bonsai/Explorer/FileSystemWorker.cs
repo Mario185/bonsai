@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Enumeration;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -163,7 +164,10 @@ namespace bonsai.Explorer
         Func<bool> isFilterActiveFunc = () => IsFilterActive;
 
         if (directoryInfo == null)
+        {
           CreateAndAddFileSystemItems(DriveInfo.GetDrives(), cancellationToken, searchedItem, info => new DriveItem(info, currentDirectoryFullNameLength, isFilterActiveFunc));
+        }
+
         else
         {
           if (Settings.Instance.ShowParentDirectoryInList)
@@ -180,11 +184,15 @@ namespace bonsai.Explorer
             }
           }
 
+          var directorySource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new DirectoryItem(Path.Join(entry.Directory, entry.FileName), currentDirectoryFullNameLength, isFilterActiveFunc), enumerationOptions);
+          directorySource.ShouldIncludePredicate = (ref FileSystemEntry entry) => entry.IsDirectory;
           if (!cancellationToken.IsCancellationRequested)
-            CreateAndAddFileSystemItems(directoryInfo.EnumerateDirectories("*", enumerationOptions), cancellationToken, searchedItem, info => new DirectoryItem(info, currentDirectoryFullNameLength, isFilterActiveFunc));
+            CreateAndAddFileSystemItems(directorySource, cancellationToken, searchedItem, null/*info => new DirectoryItem(info, currentDirectoryFullNameLength, isFilterActiveFunc)*/);
 
+          var fileSource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new FileItem(entry.Directory, entry.FileName, currentDirectoryFullNameLength, isFilterActiveFunc), enumerationOptions);
+          fileSource.ShouldIncludePredicate = (ref FileSystemEntry entry) => !entry.IsDirectory;
           if (!cancellationToken.IsCancellationRequested)
-            CreateAndAddFileSystemItems(directoryInfo.EnumerateFiles("*", enumerationOptions), cancellationToken, searchedItem, info => new FileItem(info, currentDirectoryFullNameLength, isFilterActiveFunc));
+            CreateAndAddFileSystemItems(fileSource, cancellationToken, searchedItem, null /*info => new FileItem(info, currentDirectoryFullNameLength, isFilterActiveFunc)*/);
 
         }
         TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Finished, -1);
@@ -193,6 +201,8 @@ namespace bonsai.Explorer
       {
         _waitForDirectoryLoadingThreadFinished.Set();
       }
+
+
     }
 
     private void CreateAndAddFileSystemItems<T>(IEnumerable<T> source, CancellationToken cancellationToken, string? searchedItem, Func<T, FileSystemItem> itemFactory)
@@ -203,8 +213,9 @@ namespace bonsai.Explorer
       {
         if (cancellationToken.IsCancellationRequested)
           break;
-
-        FileSystemItem listItem = itemFactory(fileSystemInfo);
+        
+        if (!(fileSystemInfo is FileSystemItem listItem))
+          listItem = itemFactory(fileSystemInfo);
 
         _unfilteredList.Add(listItem);
 

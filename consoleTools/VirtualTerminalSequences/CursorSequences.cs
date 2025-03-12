@@ -1,4 +1,7 @@
-﻿namespace consoleTools.VirtualTerminalSequences
+﻿using System;
+using System.ComponentModel;
+
+namespace consoleTools.VirtualTerminalSequences
 {
   internal class CursorSequences
   {
@@ -46,66 +49,92 @@
     /// <summary>
     ///   Cursor moves to <paramref name="n" />th position horizontally in the current line
     /// </summary>
-    public static string MoveAbsoluteHorizontally(int n)
+    public static void MoveAbsoluteHorizontally(int n, Action<string> write)
     {
-      return CommonSequences.ESC + $"[{n}G";
+      write(CommonSequences.ESC);
+      write("[");
+      write(n.ToString());
+      write("G");
     }
 
     /// <summary>
     ///   Cursor moves to the <paramref name="n" />th position vertically in the current column
     /// </summary>
-    public static string MoveAbsoluteVertically(int n)
+    public static void MoveAbsoluteVertically(int n, Action<string> write)
     {
-      return CommonSequences.ESC + $"[{n}d";
+      write(CommonSequences.ESC);
+      write("[");
+      write(n.ToString());
+      write("d");
     }
 
     /// <summary>
     ///   Moves cursor down by <paramref name="rows" />
     /// </summary>
-    public static string MoveDown(int rows = 1)
+    public static void MoveDown(int rows, Action<string> write)
     {
-      return CommonSequences.ESC + $"[{rows}B";
+      write(CommonSequences.ESC);
+      write("[");
+      write(rows.ToString());
+      write("B");
     }
 
     /// <summary>
     ///   Moves cursor left by <paramref name="columns" />
     /// </summary>
-    public static string MoveLeft(int columns = 1)
+    public static void MoveLeft(int columns, Action<string> write)
     {
-      return CommonSequences.ESC + $"[{columns}D";
+      write(CommonSequences.ESC);
+      write("[");
+      write(columns.ToString());
+      write("D");
     }
 
     /// <summary>
     ///   Moves cursor right by <paramref name="columns" />
     /// </summary>
-    public static string MoveRight(int columns = 1)
+    public static void MoveRight(int columns, Action<string> write)
     {
-      return CommonSequences.ESC + $"[{columns}C";
+      write(CommonSequences.ESC);
+      write("[");
+      write(columns.ToString());
+      write("C");
     }
 
     /// <summary>
     ///   Cursor moves to <paramref name="x" />; <paramref name="y" />> coordinate within the viewport, where
     ///   <paramref name="x" /> is the column of the <paramref name="y" /> line
     /// </summary>
-    public static string MoveTo(int x, int y)
+    public static void MoveTo(int x, int y, Action<string> write)
     {
-      return CommonSequences.ESC + $"[{y};{x}H";
+      write(CommonSequences.ESC);
+      write("[");
+      write(y.ToString());
+      write(";");
+      write(x.ToString());
+      write("H");
     }
 
     /// <summary>
     ///   Moves cursor up by <paramref name="rows" />
     /// </summary>
-    public static string MoveUp(int rows = 1)
+    public static void MoveUp(int rows, Action<string> write)
     {
-      return CommonSequences.ESC + $"[{rows}A";
+      write(CommonSequences.ESC);
+      write("[");
+      write(rows.ToString());
+      write("A");
     }
 
     /// <summary>
     ///   Sets the shape of the cursor
     /// </summary>
-    public static string SetShape(CursorShape shape)
+    public static void SetShape(CursorShape shape, Action<string> write)
     {
-      return CommonSequences.ESC + $"[{(int)shape} q";
+      write(CommonSequences.ESC);
+      write("[");
+      write(((int)shape).ToString());
+      write(" q");
     }
   }
 }

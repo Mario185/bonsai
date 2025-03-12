@@ -68,7 +68,7 @@ namespace clui.Layout
           containerRemaining -= control.CalculatedWidth.Value;
         }
 
-        control.Position = CalculatePositionFlowHorizontal(container, positionOffset);
+        CalculatePositionFlowHorizontal(control, container, positionOffset);
         positionOffset += control.CalculatedWidth!.Value;
 
         control.OnLayoutCalculated();
@@ -112,7 +112,7 @@ namespace clui.Layout
           containerRemaining -= control.CalculatedHeight.Value;
         }
 
-        control.Position = CalculatePositionFlowVertical(container, positionOffset);
+        CalculatePositionFlowVertical(control, container, positionOffset);
         positionOffset += control.CalculatedHeight!.Value;
 
         control.OnLayoutCalculated();
@@ -133,14 +133,20 @@ namespace clui.Layout
       return value;
     }
 
-    private Position CalculatePositionFlowHorizontal(ControlBase container, int positionOffset)
+    private void CalculatePositionFlowHorizontal(ControlBase controlToPosition, ControlBase container, int positionOffset)
     {
-      return new Position(container.Position.X + container.Padding.Left + positionOffset, container.Position.Y + container.Padding.Top);
+      controlToPosition.Position.X = container.Position.X + container.Padding.Left + positionOffset;
+      controlToPosition.Position.Y = container.Position.Y + container.Padding.Top;
+      
+      //return new Position(container.Position.X + container.Padding.Left + positionOffset, container.Position.Y + container.Padding.Top);
     }
 
-    private Position CalculatePositionFlowVertical(ControlBase container, int positionOffset)
+    private void CalculatePositionFlowVertical(ControlBase controlToPosition, ControlBase container, int positionOffset)
     {
-      return new Position(container.Position.X + container.Padding.Left, container.Position.Y + container.Padding.Top + positionOffset);
+      controlToPosition.Position.X = container.Position.X + container.Padding.Left;
+      controlToPosition.Position.Y = container.Position.Y + container.Padding.Top + positionOffset;
+
+      // return new Position(container.Position.X + container.Padding.Left, container.Position.Y + container.Padding.Top + positionOffset);
     }
 
     private void CalculateRootControlSize(ControlBase rootControl)

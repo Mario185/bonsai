@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace consoleTools.VirtualTerminalSequences
 {
@@ -44,17 +45,32 @@ namespace consoleTools.VirtualTerminalSequences
     /// <summary>
     ///   Set background color to RGB value specified by <paramref name="color" />
     /// </summary>
-    public static string SetBackgroundColor(Color color)
+    public static void SetBackgroundColor(Color color, Action<string> write)
     {
-      return CommonSequences.ESC + $"[48;2;{color.R};{color.G};{color.B}m";
+      write(CommonSequences.ESC);
+      write("[48;2;");
+      WriteColor(color, write);
+      write("m");
+    }
+
+    private static void WriteColor(Color color, Action<string> write)
+    {
+      write(color.R.ToString());
+      write(";");
+      write(color.G.ToString());
+      write(";");
+      write(color.B.ToString());
     }
 
     /// <summary>
     ///   Set foreground color to RGB value specified by <paramref name="color" />
     /// </summary>
-    public static string SetForegroundColor(Color color)
+    public static void SetForegroundColor(Color color, Action<string> write)
     {
-      return CommonSequences.ESC + $"[38;2;{color.R};{color.G};{color.B}m";
+      write(CommonSequences.ESC);
+      write("[38;2;");
+      WriteColor(color, write);
+      write("m");
     }
   }
 }

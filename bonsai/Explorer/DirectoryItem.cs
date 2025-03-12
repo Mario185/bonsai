@@ -7,24 +7,27 @@ namespace bonsai.Explorer
 {
   internal class DirectoryItem : FileSystemItem
   {
-    private readonly DirectoryInfo _directoryInfo;
+    private readonly string _fullName;
 
-    public DirectoryItem(DirectoryInfo directoryInfo, int currentDirectoryFullNameLength, Func<bool> isFilterActiveFunc, string? displayOverride = null)
+    private readonly string _name;
+
+    public DirectoryItem(ReadOnlySpan<char> fullName, int currentDirectoryFullNameLength, Func<bool> isFilterActiveFunc, string? displayOverride = null)
       : base(currentDirectoryFullNameLength, isFilterActiveFunc, displayOverride)
     {
-      _directoryInfo = directoryInfo;
+      _fullName = fullName.ToString();
+      _name = Path.GetFileName(Path.TrimEndingDirectorySeparator(fullName)).ToString();
     }
 
-    public override string FullName => _directoryInfo.FullName;
+    public override string FullName => _fullName;
 
     protected override string GetIcon()
     {
-      return ThemeManger.Instance.GetFolderIcon(_directoryInfo.Name);
+      return ThemeManger.Instance.GetFolderIcon(_name);
     }
 
     protected override Color? GetTextColor()
     {
-      return ThemeManger.Instance.GetFolderColor(_directoryInfo.Name);
+      return ThemeManger.Instance.GetFolderColor(_name);
     }
   }
 }
