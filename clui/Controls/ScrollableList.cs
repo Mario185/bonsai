@@ -33,6 +33,8 @@ namespace clui.Controls
 
     public int CurrentVisibleFromIndex { get; private set; }
 
+    public IList<T>? Items => _listItems;
+
     public void SetItemList (IList<T> listItems)
     {
       ArgumentNullException.ThrowIfNull (listItems);

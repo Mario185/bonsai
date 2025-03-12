@@ -4,12 +4,13 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using bonsai.Theme;
+using bonsai.Utilities;
 using clui.Controls;
 using consoleTools;
 
 namespace bonsai.Explorer
 {
-  internal abstract class FileSystemItem : IListItem
+  internal abstract class FileSystemItem : IListItem, ISearchableItem
   {
     protected int CurrentDirectoryFullNameLength { get; }
     protected Func<bool> IsFilterActiveFunc { get; }
@@ -83,5 +84,7 @@ namespace bonsai.Explorer
     {
       _searchMatches = null;
     }
+
+    public string SearchableText => GetDisplayName();
   }
 }

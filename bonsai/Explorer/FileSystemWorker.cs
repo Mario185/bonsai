@@ -1,4 +1,5 @@
-﻿using System;
+﻿using bonsai.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -28,7 +29,7 @@ namespace bonsai.Explorer
     private readonly Lock _filterChangeLock = new();
     private readonly ManualResetEventSlim _waitForDeferredApplyFilter = new(true);
     private readonly ManualResetEventSlim _waitForDirectoryLoadingThreadFinished = new(true);
-    private readonly SearchFilterProvider _searchFilterProvider = new();
+    private readonly SearchFilterProvider<FileSystemItem> _searchFilterProvider = new();
     private bool _filterChanged;
     private CancellationTokenSource? _applyFilterCancellationTokenSource;
     private CancellationTokenSource? _directoryLoadingCancellationTokenSource;

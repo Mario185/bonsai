@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace bonsai.Explorer
+namespace bonsai.Utilities
 {
   internal record SearchMatch
   {
@@ -18,14 +18,19 @@ namespace bonsai.Explorer
     }
   }
 
-  internal class SearchFilterProvider
+  public interface ISearchableItem
+  {
+    string SearchableText { get; }
+  }
+  internal class SearchFilterProvider<TItem>
+  where  TItem : ISearchableItem
   {
     private string _currentSearchTerm = string.Empty;
     private bool _wasUsingRegex;
 
     public bool IsFilterActive => !string.IsNullOrWhiteSpace(_currentSearchTerm);
 
-    public (bool filterChanged, Func<FileSystemItem?, SearchMatch[]>? filter, bool canApplyFilterToFilteredList) GetFilter(string searchTerm, bool useRegex)
+    public (bool filterChanged, Func<TItem?, SearchMatch[]>? filter, bool canApplyFilterToFilteredList) GetFilter(string searchTerm, bool useRegex)
     {
       string trimmed = searchTerm.Trim();
       bool searchTermChanged = !string.Equals(trimmed, _currentSearchTerm, StringComparison.OrdinalIgnoreCase) || useRegex != _wasUsingRegex;
@@ -41,7 +46,7 @@ namespace bonsai.Explorer
       if (string.IsNullOrWhiteSpace(trimmed))
         return (wasFilterActive && searchTermChanged, null, false);
 
-      Func<FileSystemItem?, SearchMatch[]> filter;
+      Func<TItem?, SearchMatch[]> filter;
       if (useRegex)
       {
         try
@@ -53,7 +58,7 @@ namespace bonsai.Explorer
             if (fileSystemItem == null)
               return [];
 
-            var displayName = fileSystemItem.GetDisplayName();
+            var displayName = fileSystemItem.SearchableText;
             var match = regex.Match(displayName);
             if (!match.Success)
               return [];
@@ -74,7 +79,7 @@ namespace bonsai.Explorer
           if (fileSystemItem == null)
             return [];
 
-          var displayName = fileSystemItem.GetDisplayName();
+          var displayName = fileSystemItem.SearchableText;
           int lastIndex = 0;
           var matches = new SearchMatch[parts.Length];
           for (int i = 0; i < parts.Length; i++)

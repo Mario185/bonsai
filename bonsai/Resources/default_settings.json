@@ -97,7 +97,7 @@
         "action": "SaveDatabaseChanges"
       },
       {
-        "modifier": "None",
+        "modifier": "Control",
         "key": "Delete",
         "action": "DeleteDatabaseEntry"
       }
