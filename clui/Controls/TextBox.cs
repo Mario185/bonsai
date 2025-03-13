@@ -135,9 +135,7 @@ namespace clui.Controls
           .Text.EraseCharacter (CalculatedWidth!.Value)
           .Writer.WriteTruncated (Text, _currentVisibleFromIndex, Math.Min (Text.Length - _currentVisibleFromIndex, _visibleTextLength));
 
-      consoleWriter.Style.ResetStyles()
-          //.Cursor.MoveTo(Position.X + CursorPosition - _currentVisibleFromIndex, Position.Y)
-          .Writer.Flush();
+      consoleWriter.Style.ResetStyles();
     }
 
     private void UpdateCurrentVisibleIndex ()

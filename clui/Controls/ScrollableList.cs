@@ -141,7 +141,7 @@ namespace clui.Controls
         }
       }
 
-      consoleWriter.Style.ResetStyles().Flush();
+      consoleWriter.Style.ResetStyles();
     }
 
     private void RenderListItem (T item, Color? defaultTextColor, Color? defaultBackgroundColor, ConsoleWriter consoleWriter)

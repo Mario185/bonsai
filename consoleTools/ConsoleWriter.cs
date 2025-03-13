@@ -1,21 +1,21 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using consoleTools.SubWriter;
 
 namespace consoleTools
 {
-  public class ConsoleWriter
+  public class ConsoleWriter : IDisposable
   {
-    private readonly StringBuilder _commandBuffer = new();
-    private StreamWriter _streamWriter;
+    private static readonly Lock s_flushLock = new();
+    private readonly StringBuilder _commandBuffer = new((Console.WindowHeight * Console.WindowWidth) * 4);
+
     public ConsoleWriter ()
     {
       Style = new StyleWriter (this);
       Cursor = new CursorWriter (this);
       Text = new TextModificationWriter (this);
-
-      _streamWriter = new StreamWriter(Console.OpenStandardOutput());
     }
 
     public CursorWriter Cursor { get; }
@@ -27,11 +27,13 @@ namespace consoleTools
     /// </summary>
     public void Flush ()
     {
-      //Console.Write (_commandBuffer);
-
-
-      _streamWriter.Write(_commandBuffer);
-      _streamWriter.Flush();
+      using(s_flushLock.EnterScope())
+      {
+        foreach (ReadOnlyMemory<char> chunk in _commandBuffer.GetChunks())
+          Console.Out.Write(chunk.Span);  
+      
+        Console.Out.Flush();
+      }
 
       ClearCommandBuffer();
     }
@@ -47,22 +49,23 @@ namespace consoleTools
 
     public ConsoleWriter WriteTruncated (string text, int from, int len)
     {
-      if (text == string.Empty)
-        return this;
-
-      int target = Math.Clamp (from + len, 0, text.Length);
-
-      ReadOnlySpan<char> span = text.AsSpan(from, len);
-
-      //Write(span)
-      //for (int i = from; i < target; i++)
-      //  Write (text[i]);
-
-      _commandBuffer.Append(span);
-      return this;
+      return WriteTruncated(text.AsSpan(), from, len);
     }
 
-    public ConsoleWriter Write (params char[] c)
+    public ConsoleWriter WriteTruncated(ReadOnlySpan<char> span, int from, int len)
+    {
+      if (span == string.Empty)
+        return this;
+
+      if (from >= span.Length || len <= 0)
+        return this;
+
+      int clampedLen = Math.Min(len, span.Length - from);
+      
+      _commandBuffer.Append(span.Slice(from, clampedLen));
+      return this;
+    }
+    public ConsoleWriter Write (char[] c)
     {
       _commandBuffer.Append (c);
       return this;
@@ -86,6 +89,11 @@ namespace consoleTools
     public void ClearCommandBuffer ()
     {
       _commandBuffer.Clear();
+    }
+
+    public void Dispose()
+    {
+
     }
   }
 }

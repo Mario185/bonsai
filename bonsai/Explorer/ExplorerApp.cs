@@ -18,8 +18,6 @@ namespace bonsai.Explorer
       public string? SearchText { get; set; }
     }
 
-    private readonly ConsoleWriter _consoleWriter = new();
-
     private readonly FileSystemWorker _fileSystemWorker = new();
     private ExplorerAppUiBuilder? _uiBuilder;
     private readonly Stack<State> _state = new();
@@ -42,11 +40,6 @@ namespace bonsai.Explorer
         _uiBuilder.SearchTextBox.OnTextChanged += SearchTextBox_OnTextChanged;
 
         _uiBuilder.SetFocus(_uiBuilder.SearchTextBox);
-
-        _consoleWriter.Cursor.MoveTo(1, 1).SetShape(CursorShape.UnderlineBlinking).Writer.Flush();
-        var pos = _uiBuilder.SearchTextBox.Position;
-        _consoleWriter.Cursor.MoveTo(pos.X, pos.Y).Flush();
-
 
         var currentStateDirectory = directoryInfo;
         List<State> statesToPush = new List<State>();

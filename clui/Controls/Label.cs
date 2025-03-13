@@ -57,7 +57,7 @@ namespace clui.Controls
           consoleWriter.Write (Text);
       }
 
-      consoleWriter.Style.ResetStyles().Flush();
+      consoleWriter.Style.ResetStyles();
     }
   }
 }

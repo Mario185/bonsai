@@ -23,7 +23,7 @@ namespace clui.Controls
       for (int i = 0; i < CalculatedHeight!; i++)
         consoleWriter.Cursor.MoveTo(Position.X, Position.Y + i).Text.EraseCharacter(CalculatedWidth!.Value!);
 
-      consoleWriter.Style.ResetStyles().Flush();
+      consoleWriter.Style.ResetStyles();
     }
   }
 }

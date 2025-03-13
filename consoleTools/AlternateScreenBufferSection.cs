@@ -19,6 +19,7 @@ namespace consoleTools
     public void Dispose()
     {
       _consoleWriter.Write(AlternateScreenBuffer.SwitchToMain).Flush();
+      _consoleWriter.Dispose();
     }
   }
 }

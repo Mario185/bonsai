@@ -155,7 +155,7 @@ namespace clui.Controls
         consoleWriter.WriteTruncated (Text, 0, possibleUsedSpace);
       }
 
-      consoleWriter.Style.ResetStyles().Flush();
+      consoleWriter.Style.ResetStyles();
     }
   }
 }

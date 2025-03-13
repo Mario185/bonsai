@@ -13,7 +13,7 @@ namespace clui
   public class Frame : IDisposable
   {
     private readonly LayoutCalculator _layoutCalculator = new();
-    private readonly Renderer _renderer = new();
+    
 
     private readonly RootControl _rootControl;
     private BufferSizeChangeCallback? _bufferSizeChangeCallback;
@@ -21,6 +21,8 @@ namespace clui
     public Position Position { get; private set; } = new(1, 1);
     public LayoutSize Width { get; set; } = new FractionSize(1);
     public LayoutSize Height { get; set; } = new FractionSize(1);
+
+    public Renderer Renderer { get; } = new();
 
     private bool _completeLayoutHasBeenCalculatedAtLeastOnce;
 
@@ -63,7 +65,7 @@ namespace clui
 
       _layoutCalculator.CalculateRootControlLayout(_rootControl);
       _completeLayoutHasBeenCalculatedAtLeastOnce = true;
-      _renderer.Render(_rootControl);
+      Renderer.Render(_rootControl);
     }
 
     public void RenderPartial(ControlBase controlToRender)
@@ -78,7 +80,7 @@ namespace clui
         throw new InvalidOperationException($"{nameof(ControlBase.RootControl)} of {nameof(controlToRender)} does not match the root control of this frame");
 
       _layoutCalculator.CalculateChildrenLayout(controlToRender);
-      _renderer.Render(controlToRender);
+      Renderer.Render(controlToRender);
     }
 
     public void SetFocus<T>(T? control)
@@ -87,7 +89,7 @@ namespace clui
       if (_focusedControl != null)
         _focusedControl.OnLostFocus();
 
-      _renderer.SetFocusedControl(control);
+      Renderer.SetFocusedControl(control);
 
       if (control == null)
       {
@@ -109,6 +111,7 @@ namespace clui
     public void Dispose()
     {
       DisableBufferSizeChangeWatching();
+      Renderer.Dispose();
       _alternateScreenBufferSection?.Dispose();
     }
   }

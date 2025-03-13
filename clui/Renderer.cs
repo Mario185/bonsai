@@ -6,7 +6,7 @@ using consoleTools;
 
 namespace clui
 {
-  public class Renderer
+  public class Renderer : IDisposable
   {
     public ICanHaveFocus? FocusedControl { get; private set; }
 
@@ -23,7 +23,7 @@ namespace clui
     {
       using (s_lock.EnterScope())
       {
-        ConsoleWriter.Cursor.Hide().ResetPosition().Flush();
+        ConsoleWriter.Cursor.Hide().ResetPosition();
 
         var controlHasVisibleCursor = FocusedControl as IHaveVisibleCursor;
 
@@ -32,13 +32,15 @@ namespace clui
         if (controlHasVisibleCursor != null)
         {
           var cursorTarget = controlHasVisibleCursor.GetCursorPosition();
-          ConsoleWriter.Cursor.MoveTo(cursorTarget.X, cursorTarget.Y).Flush();
+          ConsoleWriter.Cursor.MoveTo(cursorTarget.X, cursorTarget.Y);
         }
         else
-          ConsoleWriter.Cursor.ResetPosition().Flush();
+          ConsoleWriter.Cursor.ResetPosition();
 
         if (controlHasVisibleCursor != null)
-          ConsoleWriter.Cursor.Show().Flush();
+          ConsoleWriter.Cursor.Show();
+
+        ConsoleWriter.Flush();
       }
     }
 
@@ -56,6 +58,11 @@ namespace clui
     public void SetFocusedControl (ICanHaveFocus? control)
     {
       FocusedControl = control;
+    }
+
+    public void Dispose()
+    {
+      ConsoleWriter.Dispose();
     }
   }
 }

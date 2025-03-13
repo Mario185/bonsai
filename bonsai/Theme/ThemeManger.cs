@@ -120,11 +120,12 @@ namespace bonsai.Theme
 
       if (force)
       {
-        new ConsoleWriter()
-            .Style.ForegroundColor (Color.ForestGreen)
-            .Writer.Write ($"Themes saved to '{path}'\n")
-            .Style.ResetStyles()
-            .Writer.Flush();
+        using (var writer = new ConsoleWriter())
+        {
+          writer.Style.ForegroundColor(Color.ForestGreen)
+            .Writer.Write($"Themes saved to '{path}'\n")
+            .Style.ResetStyles();
+        }
       }
     }
 

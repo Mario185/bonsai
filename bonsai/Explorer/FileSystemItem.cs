@@ -69,7 +69,7 @@ namespace bonsai.Explorer
         }
       }
       else
-        writer.Write(display.Slice(0, maxLengthForText));
+        writer.WriteTruncated(display, 0, maxLengthForText);
     }
 
     private bool IsIndexInMatch(int index)
