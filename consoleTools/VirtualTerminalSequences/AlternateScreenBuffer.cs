@@ -1,4 +1,8 @@
-﻿namespace consoleTools.VirtualTerminalSequences
+﻿using System;
+using System.Linq;
+using System.Xml;
+
+namespace consoleTools.VirtualTerminalSequences
 {
   internal class AlternateScreenBuffer
   {

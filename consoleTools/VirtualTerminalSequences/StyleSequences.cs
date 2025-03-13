@@ -3,7 +3,7 @@ using System.Drawing;
 
 namespace consoleTools.VirtualTerminalSequences
 {
-  internal class StyleSequences
+  internal class StyleSequences : SequenceBase
   {
     /// <summary>
     ///   Adds bold style
@@ -45,32 +45,32 @@ namespace consoleTools.VirtualTerminalSequences
     /// <summary>
     ///   Set background color to RGB value specified by <paramref name="color" />
     /// </summary>
-    public static void SetBackgroundColor(Color color, Action<string> write)
+    public static void SetBackgroundColor(Color color, Action<string> writeTo)
     {
-      write(CommonSequences.ESC);
-      write("[48;2;");
-      WriteColor(color, write);
-      write("m");
+      WriteEsc(writeTo);
+      writeTo("48;2;");
+      WriteColor(color, writeTo);
+      writeTo("m");
     }
 
-    private static void WriteColor(Color color, Action<string> write)
+    private static void WriteColor(Color color, Action<string> writeTo)
     {
-      write(color.R.ToString());
-      write(";");
-      write(color.G.ToString());
-      write(";");
-      write(color.B.ToString());
+      writeTo(color.R.ToString());
+      writeTo(";");
+      writeTo(color.G.ToString());
+      writeTo(";");
+      writeTo(color.B.ToString());
     }
 
     /// <summary>
     ///   Set foreground color to RGB value specified by <paramref name="color" />
     /// </summary>
-    public static void SetForegroundColor(Color color, Action<string> write)
+    public static void SetForegroundColor(Color color, Action<string> writeTo)
     {
-      write(CommonSequences.ESC);
-      write("[38;2;");
-      WriteColor(color, write);
-      write("m");
+      WriteEsc(writeTo);
+      writeTo("38;2;");
+      WriteColor(color, writeTo);
+      writeTo("m");
     }
   }
 }

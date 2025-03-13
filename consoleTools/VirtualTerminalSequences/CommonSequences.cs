@@ -1,25 +1,35 @@
-﻿namespace consoleTools.VirtualTerminalSequences
+﻿using System;
+
+namespace consoleTools.VirtualTerminalSequences
 {
-  internal class CommonSequences
+  internal class CommonSequences : SequenceBase
   {
     /// <summary>
     ///   Escape character to notify the terminal it should treat the value as Virtual Terminal Sequence command
     /// </summary>
     public const string ESC = "\x1b";
 
-    public static string ScrollDown(int n)
+    public static void ScrollDown(int n, Action<string> writeTo)
     {
-      return ESC + $"[{n}T";
+      WriteEsc(writeTo);
+      writeTo(n.ToString());
+      writeTo("T");
     }
 
-    public static string ScrollUp(int n)
+    public static void ScrollUp(int n, Action<string> writeTo)
     {
-      return ESC + $"[{n}S";
+      WriteEsc(writeTo);
+      writeTo(n.ToString());
+      writeTo("S");
     }
 
-    public static string SetScrollingRegion(int top, int bottom)
+    public static void SetScrollingRegion(int top, int bottom, Action<string> writeTo)
     {
-      return ESC + $"[{top};{bottom}r";
+      WriteEsc(writeTo);
+      writeTo(top.ToString());
+      writeTo(";");
+      writeTo(bottom.ToString());
+      writeTo("r");
     }
   }
 }

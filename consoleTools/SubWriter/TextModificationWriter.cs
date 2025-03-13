@@ -17,7 +17,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public TextModificationWriter DeleteCharacter(int number = 1)
     {
-      Writer.Write(TextModificationSequences.DeleteCharacter(number));
+      TextModificationSequences.DeleteCharacter(number, _writeAction);
       return this;
     }
 
@@ -26,7 +26,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public TextModificationWriter DeleteLines(int number = 1)
     {
-      Writer.Write(TextModificationSequences.DeleteLines(number));
+      TextModificationSequences.DeleteLines(number, _writeAction);
       return this;
     }
 
@@ -45,7 +45,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public TextModificationWriter EraseInDisplay(EraseType eraseType)
     {
-      Writer.Write(TextModificationSequences.EraseInDisplay(eraseType));
+      TextModificationSequences.EraseInDisplay(eraseType, _writeAction);
       return this;
     }
 
@@ -54,7 +54,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public TextModificationWriter EraseInLine(EraseType eraseType)
     {
-      Writer.Write(TextModificationSequences.EraseInLine(eraseType));
+      TextModificationSequences.EraseInLine(eraseType, _writeAction);
       return this;
     }
 
@@ -63,7 +63,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public TextModificationWriter InsertCharacter(int number = 1)
     {
-      Writer.Write(TextModificationSequences.InsertCharacter(number));
+      TextModificationSequences.InsertCharacter(number, _writeAction);
       return this;
     }
 
@@ -72,7 +72,7 @@ namespace consoleTools.SubWriter
     /// </summary>
     public TextModificationWriter InsertLine(int number = 1)
     {
-      Writer.Write(TextModificationSequences.InsertLine(number));
+      TextModificationSequences.InsertLine(number, _writeAction);
       return this;
     }
   }

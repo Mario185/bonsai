@@ -2,7 +2,7 @@
 
 namespace clui.Layout
 {
-  public record Position
+  public class Position
   {
     //public static Position operator + (Position position, Position b)
     //{

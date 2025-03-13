@@ -1,9 +1,18 @@
 ﻿using System;
-using System.ComponentModel;
 
 namespace consoleTools.VirtualTerminalSequences
 {
-  internal class CursorSequences
+  internal class SequenceBase
+  {
+    protected static void WriteEsc(Action<string> writeTo, bool addSquareBracket = true)
+    {
+      writeTo(CommonSequences.ESC);
+      if (addSquareBracket)
+        writeTo("[");
+    }
+  }
+
+  internal class CursorSequences : SequenceBase 
   {
     /// <summary>
     ///   Stop blinking the cursor
@@ -49,92 +58,84 @@ namespace consoleTools.VirtualTerminalSequences
     /// <summary>
     ///   Cursor moves to <paramref name="n" />th position horizontally in the current line
     /// </summary>
-    public static void MoveAbsoluteHorizontally(int n, Action<string> write)
+    public static void MoveAbsoluteHorizontally(int n, Action<string> writeTo)
     {
-      write(CommonSequences.ESC);
-      write("[");
-      write(n.ToString());
-      write("G");
+      WriteEsc(writeTo);
+      writeTo(n.ToString());
+      writeTo("G");
     }
 
     /// <summary>
     ///   Cursor moves to the <paramref name="n" />th position vertically in the current column
     /// </summary>
-    public static void MoveAbsoluteVertically(int n, Action<string> write)
+    public static void MoveAbsoluteVertically(int n, Action<string> writeTo)
     {
-      write(CommonSequences.ESC);
-      write("[");
-      write(n.ToString());
-      write("d");
+      WriteEsc(writeTo);
+      writeTo(n.ToString());
+      writeTo("d");
     }
 
     /// <summary>
     ///   Moves cursor down by <paramref name="rows" />
     /// </summary>
-    public static void MoveDown(int rows, Action<string> write)
+    public static void MoveDown(int rows, Action<string> writeTo)
     {
-      write(CommonSequences.ESC);
-      write("[");
-      write(rows.ToString());
-      write("B");
+      WriteEsc(writeTo);
+      writeTo(rows.ToString());
+      writeTo("B");
     }
 
     /// <summary>
     ///   Moves cursor left by <paramref name="columns" />
     /// </summary>
-    public static void MoveLeft(int columns, Action<string> write)
+    public static void MoveLeft(int columns, Action<string> writeTo)
     {
-      write(CommonSequences.ESC);
-      write("[");
-      write(columns.ToString());
-      write("D");
+      WriteEsc(writeTo);
+      writeTo(columns.ToString());
+      writeTo("D");
     }
 
     /// <summary>
     ///   Moves cursor right by <paramref name="columns" />
     /// </summary>
-    public static void MoveRight(int columns, Action<string> write)
+    public static void MoveRight(int columns, Action<string> writeTo)
     {
-      write(CommonSequences.ESC);
-      write("[");
-      write(columns.ToString());
-      write("C");
+      WriteEsc(writeTo);
+      writeTo(columns.ToString());
+      writeTo("C");
     }
 
     /// <summary>
     ///   Cursor moves to <paramref name="x" />; <paramref name="y" />> coordinate within the viewport, where
     ///   <paramref name="x" /> is the column of the <paramref name="y" /> line
     /// </summary>
-    public static void MoveTo(int x, int y, Action<string> write)
+    public static void MoveTo(int x, int y, Action<string> writeTo)
     {
-      write(CommonSequences.ESC);
-      write("[");
-      write(y.ToString());
-      write(";");
-      write(x.ToString());
-      write("H");
+      WriteEsc(writeTo);
+      writeTo(y.ToString());
+      writeTo(";");
+      writeTo(x.ToString());
+      writeTo("H");
     }
 
     /// <summary>
     ///   Moves cursor up by <paramref name="rows" />
     /// </summary>
-    public static void MoveUp(int rows, Action<string> write)
+    public static void MoveUp(int rows, Action<string> writeTo)
     {
-      write(CommonSequences.ESC);
-      write("[");
-      write(rows.ToString());
-      write("A");
+      WriteEsc(writeTo);
+      writeTo(rows.ToString());
+      writeTo("A");
     }
 
     /// <summary>
     ///   Sets the shape of the cursor
     /// </summary>
-    public static void SetShape(CursorShape shape, Action<string> write)
+    public static void SetShape(CursorShape shape, Action<string> writeTo)
     {
-      write(CommonSequences.ESC);
-      write("[");
-      write(((int)shape).ToString());
-      write(" q");
+      WriteEsc(writeTo);
+      writeTo(((int)shape).ToString());
+      writeTo(" q");
     }
   }
 }

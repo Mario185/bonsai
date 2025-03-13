@@ -123,7 +123,7 @@ namespace clui.Controls
     public override void OnLayoutCalculated ()
     {
       base.OnLayoutCalculated();
-      _visibleTextLength = CalculatedWidth!.Value! - 2;
+      _visibleTextLength = CalculatedWidth!.Value - 2;
       UpdateCurrentVisibleIndex();
     }
 
