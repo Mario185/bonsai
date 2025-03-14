@@ -32,7 +32,7 @@ try
   var command = args[0];
 
   string tempFilePath;
-  string? selectedPath;
+  string? selectedCommand;
   string currentDirectory;
 
   switch(command)
@@ -67,7 +67,7 @@ try
       tempFilePath = args[1];
       currentDirectory = args[2];
       var searchArgs = args[3];
-      selectedPath = new NavigationApp(currentDirectory, searchArgs).Run ();
+      selectedCommand = new NavigationApp(currentDirectory, searchArgs).Run ();
       break;
 
     case "main":
@@ -79,7 +79,7 @@ try
 
       tempFilePath = args[1];
       currentDirectory = args[2];
-      selectedPath = new ExplorerApp(currentDirectory).Run();
+      selectedCommand = new ExplorerApp(currentDirectory).Run();
 
       break;
 
@@ -89,24 +89,24 @@ try
   }
 
 
-  if (!string.IsNullOrWhiteSpace (selectedPath))
-  {
-    var commands = CommandHandler.CreateCommands (selectedPath);
-    if (commands.Count == 0)
-      return 0;
+  //if (!string.IsNullOrWhiteSpace (selectedPath))
+  //{
+    //var commands = CommandHandler.CreateCommands (selectedPath);
+    //if (commands.Count == 0)
+    //  return 0;
 
-    var selectedCommand = commands[0].GetExecutableAction();
-    if (commands.Count > 1)
-      selectedCommand = new CommandSelectionApp(commands, selectedPath).Run ();
+    //var selectedCommand = commands[0].GetExecutableAction();
+    //if (commands.Count > 1)
+    //  selectedCommand = new CommandSelectionApp(commands, selectedPath).Run ();
 
-    if (selectedCommand != null)
+    if (!string.IsNullOrWhiteSpace(selectedCommand))
     {
       if (File.Exists (tempFilePath))
         File.WriteAllText (tempFilePath, selectedCommand);
       else
         Console.WriteLine (selectedCommand);
     }
-  }
+  //}
 
   return 0;
 }

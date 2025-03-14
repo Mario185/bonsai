@@ -4,7 +4,9 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using bonsai.CommandHandling;
 using bonsai.Theme;
+using clui;
 using clui.Controls;
 using consoleTools;
 
@@ -95,23 +97,27 @@ namespace bonsai.Explorer
                   break;
                 
                 var focusedItem = _uiBuilder.FileSystemList.FocusedItem;
+                string? result = null;
                 switch (focusedItem)
                 {
                   case DirectoryItem:
                   case DriveItem:
                   case FileItem:
-                    return focusedItem.FullName;
+                    result = CommandHandler.GetCommandAndShowSelectionUiOnDemand(focusedItem.FullName);
+                    break;
                   case ParentDirectoryItem:
-                    var parent = _fileSystemWorker.CurrentDirectory?.Parent;
+                    var parent = _fileSystemWorker.CurrentDirectory?.Parent ?? _fileSystemWorker.CurrentDirectory;
                     if (parent == null)
-                      parent = _fileSystemWorker.CurrentDirectory;
+                      break;
 
-                    if (parent != null)
-                      return parent.FullName;
+                    result = CommandHandler.GetCommandAndShowSelectionUiOnDemand(parent.FullName);
                     break;
                 }
 
-                endLoop = true;
+                if (!string.IsNullOrWhiteSpace(result))
+                  return result;
+                
+                _uiBuilder.RenderComplete();
                 continue;
 
               case ActionType.ListSelectPreviousItem:

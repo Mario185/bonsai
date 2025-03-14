@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System;
+using bonsai.CommandHandling;
 using bonsai.Theme;
 using clui;
 using clui.Controls;
@@ -68,7 +69,7 @@ namespace bonsai.Navigation
               {
                 case DirectoryItem:
                 case FileItem:
-                  return focusedItem.FullName;
+                  return CommandHandler.GetCommandAndShowSelectionUiOnDemand(focusedItem.FullName);
               }
 
               endLoop = true;

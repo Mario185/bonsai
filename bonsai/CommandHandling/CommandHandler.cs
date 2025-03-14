@@ -7,7 +7,7 @@ namespace bonsai.CommandHandling
 {
   public class CommandHandler
   {
-    public static IReadOnlyList<Command> CreateCommands(string path)
+    public static string? GetCommandAndShowSelectionUiOnDemand(string path)
     {
       try
       {
@@ -16,27 +16,32 @@ namespace bonsai.CommandHandling
 
         NavigationDatabase.Instance.AddOrUpdate(path, isDirectory);
 
+        IReadOnlyList<Command> availableCommands;
         if (isDirectory)
         {
-          if (Settings.Instance.DirectoryCommands.Count > 0)
-            return Settings.Instance.DirectoryCommands.Select(c => c.CloneForExecution(path)).ToArray();
-
-          return [new DirectoryCommand(path, "Change location", true)];
+          if (Settings.Instance.DirectoryCommands.Count <= 0)
+            return new DirectoryCommand(path, "Change location", true).GetExecutableAction();
+          availableCommands = Settings.Instance.DirectoryCommands.Select(c => c.CloneForExecution(path)).Cast<Command>().ToList();
+        }
+        else
+        {
+          var extension = Path.GetExtension(path);
+          availableCommands = Settings.Instance.FileCommands.Where(c => c.Extension == extension || c.Extension == "*").Select(f => f.CloneForExecution(path)).Cast<Command>().ToList();
+          if (!availableCommands.Any())
+            return new FileCommand(path, "Shell decides what to do", extension, true).GetExecutableAction();
         }
 
-        var extension = Path.GetExtension(path);
-        var fileCommands = Settings.Instance.FileCommands.Where(c => c.Extension == extension || c.Extension == "*").Select(f => f.CloneForExecution(path)).ToArray();
-        if (fileCommands.Any())
-          return fileCommands.ToArray();
+        if (availableCommands.Count == 1)
+          return availableCommands[0].GetExecutableAction();
 
-        return [new FileCommand(path, "Shell decides what to do", extension, true)];
+        return new CommandSelectionApp(availableCommands, path).Run();
       }
       catch
       {
         // do nothing
       }
 
-      return [];
+      return null;
     }
   }
 }
