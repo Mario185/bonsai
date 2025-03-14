@@ -42,11 +42,16 @@ namespace bonsai.Theme
 
     public string? LoadingSpinnerChars { get; set; }
 
+
+    private readonly Lazy<Dictionary<string, Color?>.AlternateLookup<ReadOnlySpan<char>>> _fileColorExtensionsAlternateLookUp = new (() => Instance.FileColors.Extensions.GetAlternateLookup<ReadOnlySpan<char>>());
+    private readonly Lazy<Dictionary<string, string?>.AlternateLookup<ReadOnlySpan<char>>> _fileIconExtensionsAlternateLookUp = new (() => Instance.FileIcons.Extensions.GetAlternateLookup<ReadOnlySpan<char>>());
+
     public Color? GetFileColor(string fileName)
     {
       if (!FileColors.Named.TryGetValue(fileName, out Color? color))
       {
-        if (!FileColors.Extensions.TryGetValue(Path.GetExtension(fileName), out color))
+        var span = fileName.AsSpan();
+        if (!_fileColorExtensionsAlternateLookUp.Value.TryGetValue(Path.GetExtension(span), out color))
           return FileColors.DefaultColor;
       }
 
@@ -57,7 +62,8 @@ namespace bonsai.Theme
     {
       if (!FileIcons.Named.TryGetValue(fileName, out string? icon))
       {
-        if (!FileIcons.Extensions.TryGetValue(Path.GetExtension(fileName), out icon))
+        var span = fileName.AsSpan();
+        if (!_fileIconExtensionsAlternateLookUp.Value.TryGetValue(Path.GetExtension(span), out icon))
           icon = FileIcons.DefaultIcon;
       }
 

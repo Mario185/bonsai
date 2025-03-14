@@ -10,8 +10,8 @@ namespace bonsai.Explorer
     private readonly string _fileName;
     private readonly string _fullName;
 
-    public FileItem(ReadOnlySpan<char> directory, ReadOnlySpan<char> fileName , int currentDirectoryFullNameLength, Func<bool> isFilterActiveFunc, string? displayOverride = null)
-      : base(currentDirectoryFullNameLength, isFilterActiveFunc, displayOverride)
+    public FileItem(ReadOnlySpan<char> directory, ReadOnlySpan<char> fileName , int currentDirectoryFullNameLength, string? displayOverride = null)
+      : base(currentDirectoryFullNameLength, displayOverride)
     {
       _fullName = Path.Join(directory, fileName);
       _fileName = fileName.ToString();

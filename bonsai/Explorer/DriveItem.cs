@@ -9,8 +9,8 @@ namespace bonsai.Explorer
   {
     private readonly DriveInfo _driveInfo;
 
-    public DriveItem(DriveInfo driveInfo, int currentDirectoryFullNameLength, Func<bool> isFilterActiveFunc)
-      : base(currentDirectoryFullNameLength, isFilterActiveFunc)
+    public DriveItem(DriveInfo driveInfo, int currentDirectoryFullNameLength)
+      : base(currentDirectoryFullNameLength)
     {
       _driveInfo = driveInfo;
     }

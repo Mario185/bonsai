@@ -161,11 +161,10 @@ namespace bonsai.Explorer
         TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Started, -1);
 
         int currentDirectoryFullNameLength = CurrentDirectory?.FullName.Length ?? 0;
-        Func<bool> isFilterActiveFunc = () => IsFilterActive;
 
         if (directoryInfo == null)
         {
-          CreateAndAddFileSystemItems(DriveInfo.GetDrives(), cancellationToken, searchedItem, info => new DriveItem(info, currentDirectoryFullNameLength, isFilterActiveFunc));
+          CreateAndAddFileSystemItems(DriveInfo.GetDrives(), cancellationToken, searchedItem, info => new DriveItem(info, currentDirectoryFullNameLength));
         }
 
         else
@@ -174,22 +173,22 @@ namespace bonsai.Explorer
           {
             if (directoryInfo.Parent != null)
             {
-              var parent = new ParentDirectoryItem(currentDirectoryFullNameLength, isFilterActiveFunc);
+              var parent = new ParentDirectoryItem(currentDirectoryFullNameLength);
               _unfilteredList.Add(parent);
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-              var parent = new ParentDirectoryItem(currentDirectoryFullNameLength, isFilterActiveFunc);
+              var parent = new ParentDirectoryItem(currentDirectoryFullNameLength);
               _unfilteredList.Add(parent);
             }
           }
 
-          var directorySource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new DirectoryItem(Path.Join(entry.Directory, entry.FileName), currentDirectoryFullNameLength, isFilterActiveFunc), enumerationOptions);
+          var directorySource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new DirectoryItem(Path.Join(entry.Directory, entry.FileName), currentDirectoryFullNameLength), enumerationOptions);
           directorySource.ShouldIncludePredicate = (ref FileSystemEntry entry) => entry.IsDirectory;
           if (!cancellationToken.IsCancellationRequested)
             CreateAndAddFileSystemItems(directorySource, cancellationToken, searchedItem, null/*info => new DirectoryItem(info, currentDirectoryFullNameLength, isFilterActiveFunc)*/);
 
-          var fileSource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new FileItem(entry.Directory, entry.FileName, currentDirectoryFullNameLength, isFilterActiveFunc), enumerationOptions);
+          var fileSource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new FileItem(entry.Directory, entry.FileName, currentDirectoryFullNameLength), enumerationOptions);
           fileSource.ShouldIncludePredicate = (ref FileSystemEntry entry) => !entry.IsDirectory;
           if (!cancellationToken.IsCancellationRequested)
             CreateAndAddFileSystemItems(fileSource, cancellationToken, searchedItem, null /*info => new FileItem(info, currentDirectoryFullNameLength, isFilterActiveFunc)*/);

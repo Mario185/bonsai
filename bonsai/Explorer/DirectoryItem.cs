@@ -11,8 +11,8 @@ namespace bonsai.Explorer
 
     private readonly string _name;
 
-    public DirectoryItem(ReadOnlySpan<char> fullName, int currentDirectoryFullNameLength, Func<bool> isFilterActiveFunc, string? displayOverride = null)
-      : base(currentDirectoryFullNameLength, isFilterActiveFunc, displayOverride)
+    public DirectoryItem(ReadOnlySpan<char> fullName, int currentDirectoryFullNameLength, string? displayOverride = null)
+      : base(currentDirectoryFullNameLength, displayOverride)
     {
       _fullName = fullName.ToString();
       _name = Path.GetFileName(Path.TrimEndingDirectorySeparator(fullName)).ToString();

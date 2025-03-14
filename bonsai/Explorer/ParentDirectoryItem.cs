@@ -6,8 +6,8 @@ namespace bonsai.Explorer
 {
   internal class ParentDirectoryItem : FileSystemItem
   {
-    public ParentDirectoryItem(int currentDirectoryFullNameLength, Func<bool> isFilterActiveFunc)
-      : base(currentDirectoryFullNameLength, isFilterActiveFunc, "..")
+    public ParentDirectoryItem(int currentDirectoryFullNameLength)
+      : base(currentDirectoryFullNameLength, "..")
     {
     }
 

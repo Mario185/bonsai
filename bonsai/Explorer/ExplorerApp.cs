@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using bonsai.Theme;
 using clui.Controls;
@@ -9,8 +10,10 @@ using consoleTools;
 
 namespace bonsai.Explorer
 {
-  internal class ExplorerApp
+  internal class ExplorerApp : AppBase, IBonsaiContext
   {
+    private readonly string _initialDirectory;
+
     private class State
     {
       public string? SelectedItem { get; set; }
@@ -27,13 +30,22 @@ namespace bonsai.Explorer
     private int _currentSpinnerPosition;
     private bool _regexSearchEnabled;
 
-    public string? Run(string currentDirectory)
+    public ExplorerApp(string initialDirectory)
+    {
+      _initialDirectory = initialDirectory;
+    }
+
+    public bool IsFilteringActive => _fileSystemWorker.IsFilterActive;
+
+    protected override IBonsaiContext Context => this;
+
+    protected override string? RunInternal()
     {
       using (_uiBuilder = new ExplorerAppUiBuilder())
       {
         _uiBuilder.CreateUi();
         _uiBuilder.EnableBufferSizeChangeWatching();
-        DirectoryInfo directoryInfo = new(currentDirectory);
+        DirectoryInfo directoryInfo = new(_initialDirectory);
 
         _fileSystemWorker.OnFileSystemInfoLoadingStateChanged += FileSystemWorker_OnFileSystemInfoLoadingStateChanged;
         _uiBuilder.FileSystemList.OnSelectionChanged += FileSystemList_OnSelectionChanged;
@@ -397,5 +409,7 @@ namespace bonsai.Explorer
           throw new ArgumentOutOfRangeException(nameof(state), state, null);
       }
     }
+
+   
   }
 }

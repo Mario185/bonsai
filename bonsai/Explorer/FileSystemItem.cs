@@ -12,16 +12,14 @@ namespace bonsai.Explorer
   internal abstract class FileSystemItem : IListItem, ISearchableItem
   {
     protected int CurrentDirectoryFullNameLength { get; }
-    protected Func<bool> IsFilterActiveFunc { get; }
 
     private readonly string? _displayNameOverride;
 
     private SearchMatch[]? _searchMatches = [];
 
-    protected FileSystemItem(int currentDirectoryFullNameLength, Func<bool> isFilterActiveFunc, string? displayNameOverride = null)
+    protected FileSystemItem(int currentDirectoryFullNameLength, string? displayNameOverride = null)
     {
       CurrentDirectoryFullNameLength = currentDirectoryFullNameLength;
-      IsFilterActiveFunc = isFilterActiveFunc;
       _displayNameOverride = displayNameOverride;
     }
 
@@ -56,7 +54,7 @@ namespace bonsai.Explorer
       Color? textColor = isFocusedItem ? ThemeManger.Instance.SelectionForegroundColor : (_textColor ??= GetTextColor());
       writer.Style.ForegroundColor(textColor).Writer.Write(_icon);
 
-      if (IsFilterActiveFunc() && _searchMatches?.Length > 0)
+      if (BonsaiContext.Current!.IsFilteringActive && _searchMatches?.Length > 0)
       {
         for (int i = 0; i < maxLengthForText; i++)
         {

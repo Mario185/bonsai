@@ -9,19 +9,28 @@ using bonsai.Explorer;
 
 namespace bonsai.Navigation
 {
-  public class NavigationApp
+  internal class NavigationApp : AppBase, IBonsaiContext
   {
-    public string? Run(string currentDirectory, string originalArg)
-    {
-      Directory.SetCurrentDirectory(currentDirectory);
+    private readonly string _currentDirectory;
+    private readonly string _originalArg;
 
-      var isExistingPathResult = IsExistingPath(currentDirectory, originalArg);
+    public NavigationApp(string currentDirectory, string originalArg)
+    {
+      _currentDirectory = currentDirectory;
+      _originalArg = originalArg;
+    }
+
+    protected override IBonsaiContext Context => this;
+
+    protected override string? RunInternal()
+    {
+      var isExistingPathResult = IsExistingPath(_currentDirectory, _originalArg);
       if (isExistingPathResult.success)
         return isExistingPathResult.result;
 
       NavigationDatabase.Instance.CleanUpDatabase();
 
-      var foundEntries = NavigationDatabase.Instance.Search(originalArg);
+      var foundEntries = NavigationDatabase.Instance.Search(_originalArg);
 
       if (foundEntries.Length == 0)
         return null;
@@ -34,7 +43,7 @@ namespace bonsai.Navigation
 
       using (var frame = new Frame())
       {
-        var list = CreateUi(originalArg, frame, foundEntries);
+        var list = CreateUi(_originalArg, frame, foundEntries);
 
         frame.RenderComplete();
         bool endLoop = false;
@@ -132,5 +141,7 @@ namespace bonsai.Navigation
 
       return (false, string.Empty);
     }
+
+    public bool IsFilteringActive => true;
   }
 }

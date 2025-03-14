@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using bonsai.Theme;
 using bonsai.Utilities;
 using clui;
@@ -11,7 +12,7 @@ using consoleTools;
 
 namespace bonsai.Navigation
 {
-  public class EditDatabaseApp
+  internal class EditDatabaseApp : AppBase, IBonsaiContext
   {
     private readonly NavigationEntryDescendingSortComparer _navigationEntryComparer = new();
     private readonly SearchFilterProvider<NavigationEntry> _searchFilterProvider = new ();
@@ -20,7 +21,11 @@ namespace bonsai.Navigation
     private TextBox _searchTextBox = null!; 
 
     private List<NavigationEntry> _unfilteredList = null!;
-    public void Run()
+    protected override IBonsaiContext Context => this;
+
+    public bool IsFilteringActive => _searchFilterProvider.IsFilterActive;
+
+    protected override string? RunInternal()
     {
       using (var frame = new Frame())
       {
@@ -126,6 +131,8 @@ namespace bonsai.Navigation
           }
         }
       }
+
+      return null;
     }
 
     private void UpdateBorder()
@@ -225,6 +232,7 @@ namespace bonsai.Navigation
       frame.SetFocus(_searchTextBox);
     }
 
+    
   }
 
   public class NavigationEntryDescendingSortComparer : IComparer<NavigationEntry>

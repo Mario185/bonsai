@@ -25,7 +25,7 @@ try
 
   if (args.Length == 0)
   {
-    Console.WriteLine (new ExplorerApp().Run(Directory.GetCurrentDirectory()));
+    Console.WriteLine(new ExplorerApp(Directory.GetCurrentDirectory()).Run());
     return 0;
   }
 
@@ -67,7 +67,7 @@ try
       tempFilePath = args[1];
       currentDirectory = args[2];
       var searchArgs = args[3];
-      selectedPath = new NavigationApp().Run (currentDirectory, searchArgs);
+      selectedPath = new NavigationApp(currentDirectory, searchArgs).Run ();
       break;
 
     case "main":
@@ -79,7 +79,8 @@ try
 
       tempFilePath = args[1];
       currentDirectory = args[2];
-      selectedPath = new ExplorerApp().Run (currentDirectory);
+      selectedPath = new ExplorerApp(currentDirectory).Run();
+
       break;
 
     default:
@@ -94,16 +95,16 @@ try
     if (commands.Count == 0)
       return 0;
 
-    var selectedCommand = commands[0];
+    var selectedCommand = commands[0].GetExecutableAction();
     if (commands.Count > 1)
-      selectedCommand = new CommandSelectionApp().Run (commands, selectedPath);
+      selectedCommand = new CommandSelectionApp(commands, selectedPath).Run ();
 
     if (selectedCommand != null)
     {
       if (File.Exists (tempFilePath))
-        File.WriteAllText (tempFilePath, selectedCommand.GetExecutableAction());
+        File.WriteAllText (tempFilePath, selectedCommand);
       else
-        Console.WriteLine (selectedCommand.Action);
+        Console.WriteLine (selectedCommand);
     }
   }
 

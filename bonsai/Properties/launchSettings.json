@@ -29,6 +29,11 @@
       "commandName": "Project",
       "commandLineArgs": "editdb",
       "dotnetRunMessages": true
+    },
+    "Navigation": {
+      "commandName": "Project",
+      "commandLineArgs": "nav dummy.txt C:\\ test",
+      "dotnetRunMessages": true
     }
   }
 }

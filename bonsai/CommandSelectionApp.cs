@@ -10,9 +10,20 @@ using consoleTools;
 
 namespace bonsai
 {
-  public class CommandSelectionApp
+  internal class CommandSelectionApp : AppBase, IBonsaiContext
   {
-    public Command? Run(IReadOnlyList<Command> commands, string path)
+    private readonly IReadOnlyList<Command> _commands;
+    private readonly string _path;
+
+    public CommandSelectionApp(IReadOnlyList<Command> commands, string path)
+    {
+      _commands = commands;
+      _path = path;
+    }
+
+    protected override IBonsaiContext Context => this;
+
+    protected override string? RunInternal()
     {
       using (var frame = new Frame())
       {
@@ -24,14 +35,14 @@ namespace bonsai
         frame.AddControls(rootPanel);
         
         rootPanel.BackgroundColor = ThemeManger.Instance.BackgroundColor;
-        hintLabel.Text = $"Multiple commands available for {path}";
+        hintLabel.Text = $"Multiple commands available for {_path}";
         border.BorderColor = ThemeManger.Instance.BorderColor;
 
         rootPanel.AddControls(hintLabel);
         border.AddControls(list);
         rootPanel.AddControls(border);
 
-        list.SetItemList(commands.ToList());
+        list.SetItemList(_commands.ToList());
         list.SetFocusedIndex(0);
 
         frame.RenderComplete();
@@ -50,7 +61,7 @@ namespace bonsai
               continue;
 
             case ActionType.ConfirmSelection:
-              return list.FocusedItem;
+              return list.FocusedItem?.GetExecutableAction();
 
             case ActionType.ListSelectPreviousItem:
               list.SelectPreviousItem();
@@ -80,5 +91,7 @@ namespace bonsai
 
       return null;
     }
+
+    public bool IsFilteringActive => false;
   }
 }
