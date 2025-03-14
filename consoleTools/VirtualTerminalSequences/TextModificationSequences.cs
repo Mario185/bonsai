@@ -42,7 +42,7 @@ namespace consoleTools.VirtualTerminalSequences
     public static void EraseInDisplay(EraseType eraseType, Action<string> writeTo)
     {
       WriteEsc(writeTo);
-      writeTo(eraseType.ToString());
+      writeTo(((int)eraseType).ToString());
       writeTo("J");
     }
 
@@ -52,7 +52,7 @@ namespace consoleTools.VirtualTerminalSequences
     public static void EraseInLine(EraseType eraseType, Action<string> writeTo)
     {
       WriteEsc(writeTo);
-      writeTo(eraseType.ToString());
+      writeTo(((int)eraseType).ToString());
       writeTo("K");
     }
 

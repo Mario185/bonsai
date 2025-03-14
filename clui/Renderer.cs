@@ -23,7 +23,8 @@ namespace clui
     {
       using (s_lock.EnterScope())
       {
-        ConsoleWriter.Cursor.Hide().ResetPosition();
+        // we need to flush the hide first otherwise flashing text occurs
+        ConsoleWriter.Cursor.Hide().ResetPosition().Flush();
 
         var controlHasVisibleCursor = FocusedControl as IHaveVisibleCursor;
 
