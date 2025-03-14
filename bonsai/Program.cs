@@ -31,10 +31,9 @@ try
 
   var command = args[0];
 
-  string tempFilePath;
-  string? selectedCommand;
+  string tempFilePath = string.Empty;
   string currentDirectory;
-
+  AppBase? appToStart = null;
   switch(command)
   {
     case "init":
@@ -49,10 +48,8 @@ try
       return 0;
     
     case "editdb":
-
-      new EditDatabaseApp().Run();
-
-      return 0;
+      appToStart = new EditDatabaseApp();
+      break;
 
     case "writethemes":
       ThemeManger.WriteResourceThemesToConfigFolder (true);
@@ -67,7 +64,7 @@ try
       tempFilePath = args[1];
       currentDirectory = args[2];
       var searchArgs = args[3];
-      selectedCommand = new NavigationApp(currentDirectory, searchArgs).Run ();
+      appToStart = new NavigationApp(currentDirectory, searchArgs);
       break;
 
     case "main":
@@ -79,7 +76,7 @@ try
 
       tempFilePath = args[1];
       currentDirectory = args[2];
-      selectedCommand = new ExplorerApp(currentDirectory).Run();
+      appToStart = new ExplorerApp(currentDirectory);
 
       break;
 
@@ -88,25 +85,15 @@ try
       return 1;
   }
 
+  var result = appToStart.Run();
 
-  //if (!string.IsNullOrWhiteSpace (selectedPath))
-  //{
-    //var commands = CommandHandler.CreateCommands (selectedPath);
-    //if (commands.Count == 0)
-    //  return 0;
-
-    //var selectedCommand = commands[0].GetExecutableAction();
-    //if (commands.Count > 1)
-    //  selectedCommand = new CommandSelectionApp(commands, selectedPath).Run ();
-
-    if (!string.IsNullOrWhiteSpace(selectedCommand))
-    {
-      if (File.Exists (tempFilePath))
-        File.WriteAllText (tempFilePath, selectedCommand);
-      else
-        Console.WriteLine (selectedCommand);
-    }
-  //}
+  if (!string.IsNullOrWhiteSpace(result))
+  {
+    if (File.Exists (tempFilePath))
+      File.WriteAllText (tempFilePath, result);
+    else
+      Console.WriteLine (result);
+  }
 
   return 0;
 }
