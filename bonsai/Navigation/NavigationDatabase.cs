@@ -9,7 +9,7 @@ using bonsai.Utilities;
 
 namespace bonsai.Navigation
 {
-  public class NavigationDatabase
+  internal class NavigationDatabase
   {
     private const int c_maxAge = 336; // 14 days in hours
 
@@ -45,7 +45,7 @@ namespace bonsai.Navigation
       return (int)(value * scoreMultiplier);
     }
 
-    public void CleanUpDatabase()
+    public void CleanUpDatabase(bool forceSave = false)
     {
       double ninetyPercentOfMax = Settings.Instance.MaxIndividualScore * .9;
       double factor = ninetyPercentOfMax / TopScore;
@@ -76,7 +76,7 @@ namespace bonsai.Navigation
         }
       }
 
-      if (hasChanges)
+      if (hasChanges || forceSave)
       {
         TopScore = Entries.Count == 0 ? 0 : Entries.Max(e => e.Score);
         Save();

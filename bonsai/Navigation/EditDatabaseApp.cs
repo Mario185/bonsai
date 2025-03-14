@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using bonsai.Theme;
 using bonsai.Utilities;
 using clui;
@@ -20,7 +21,6 @@ namespace bonsai.Navigation
     private Border _border = null!;
     private TextBox _searchTextBox = null!; 
 
-    private List<NavigationEntry> _unfilteredList = null!;
     protected override IBonsaiContext Context => this;
 
     public bool IsFilteringActive => _searchFilterProvider.IsFilterActive;
@@ -29,17 +29,15 @@ namespace bonsai.Navigation
     {
       using (var frame = new Frame())
       {
-        _unfilteredList = NavigationDatabase.Instance.Entries.Order(_navigationEntryComparer).ToList();
-
         CreateUi (frame);
 
-        _listControl.SetItemList(_unfilteredList);
+        _listControl.SetItemList(NavigationDatabase.Instance.Entries.Order(_navigationEntryComparer).ToList());
         _listControl.SetFocusedIndex(0);
 
         frame.RenderComplete();
 
         _searchTextBox.OnTextChanged += SearchTextBox_OnTextChanged;
-
+        UpdateBorder();
         bool endLoop = false;
         while (!endLoop)
         {
@@ -56,22 +54,10 @@ namespace bonsai.Navigation
 
             case ActionType.IncrementScore:
               ChangeScore(1);
-              //list.FocusedItem.Score++;
-
-              //navigationEntries.Sort (_navigationEntryComparer);
-              //list.SetFocusedIndex (navigationEntries.IndexOf (list.FocusedItem));
-              //frame.RenderPartial (list);
               break;
 
             case ActionType.DecrementScore:
               ChangeScore(-1);
-              //list.FocusedItem.Score--;
-              //if (list.FocusedItem.Score < 0)
-              //  list.FocusedItem.Score = 0;
-
-              //navigationEntries.Sort (_navigationEntryComparer);
-              //list.SetFocusedIndex (navigationEntries.IndexOf (list.FocusedItem));
-              //frame.RenderPartial (list);
               break;
 
             case ActionType.DeleteDatabaseEntry:
@@ -80,30 +66,17 @@ namespace bonsai.Navigation
 
               var index = _listControl.FocusedItemIndex;
               _listControl.Items!.Remove(_listControl.FocusedItem);
-              _unfilteredList.Remove(_listControl.FocusedItem);
+              NavigationDatabase.Instance.Entries.Remove (_listControl.FocusedItem);
               _listControl.SetFocusedIndex (index);
               UpdateBorder();
               frame.RenderPartial(_border);
               break;
             case ActionType.SaveDatabaseChanges:
-              NavigationDatabase.Instance.CleanUpDatabase();
+              NavigationDatabase.Instance.CleanUpDatabase(true);
               
               endLoop = true;
               break;
             case ActionType.ConfirmSelection:
-              //if (list.FocusedItem == null)
-              //  break;
-
-
-              //var focusedItem = list.FocusedItem;
-              //switch (focusedItem)
-              //{
-              //  case DirectoryItem:
-              //  case FileItem:
-              //    return focusedItem.FullName;
-              //}
-
-              //endLoop = true;
               continue;
 
             case ActionType.ListSelectPreviousItem:
@@ -137,7 +110,11 @@ namespace bonsai.Navigation
 
     private void UpdateBorder()
     {
-      _border.Text = $"❮ {_listControl.Items!.Count} / {_unfilteredList.Count} ❯";
+      if (IsFilteringActive)
+        _border.Text = $"❮ {_listControl.Items!.Count} / {NavigationDatabase.Instance.Entries.Count} ❯";
+      else
+        _border.Text = $"❮ {NavigationDatabase.Instance.Entries.Count} ❯";
+
       _border.RootControl.AssociatedFrame.RenderPartial(_border);
     }
 
@@ -149,7 +126,16 @@ namespace bonsai.Navigation
         return;
 
       if (_searchFilterProvider.IsFilterActive)
-        _listControl.SetItemList(NavigationDatabase.Instance.Entries.Where(e => filter(e).Length > 0).Order(_navigationEntryComparer).ToList());
+      {
+        _listControl.SetItemList (
+            NavigationDatabase.Instance.Entries.Where (
+                e =>
+                {
+                  var matches = filter (e);
+                  e.SetSearchMatches (matches);
+                  return matches.Length > 0;
+                }).Order (_navigationEntryComparer).ToList());
+      }
       else
         _listControl.SetItemList(NavigationDatabase.Instance.Entries.Order(_navigationEntryComparer).ToList());
       _listControl.SetFocusedIndex(0);
@@ -206,6 +192,7 @@ namespace bonsai.Navigation
       instructionsLabel.TextColor = Color.CadetBlue;
 
       _listControl = new ScrollableList<NavigationEntry>(ThemeManger.Instance.SelectionForegroundColor, ThemeManger.Instance.SelectionBackgroundColor, 1.AsFraction(), 1.AsFraction());
+
       rootPanel.BackgroundColor = ThemeManger.Instance.BackgroundColor;
 
       Label title = new Label (1.AsFraction(), 1.AsFixed());
@@ -227,15 +214,13 @@ namespace bonsai.Navigation
 
       frame.EnableBufferSizeChangeWatching();
 
-      
-
       frame.SetFocus(_searchTextBox);
     }
 
     
   }
 
-  public class NavigationEntryDescendingSortComparer : IComparer<NavigationEntry>
+  internal class NavigationEntryDescendingSortComparer : IComparer<NavigationEntry>
   {
 
     public int Compare (NavigationEntry? x, NavigationEntry? y)
