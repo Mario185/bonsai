@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Text.Json.Serialization;
 using bonsai.Theme;
 using bonsai.Utilities;
 using clui.Controls;
@@ -86,6 +87,7 @@ namespace bonsai.Navigation
       return _printableText;
     }
 
+    [JsonIgnore]
     public string SearchableText => Path;
 
     public void SetSearchMatches(SearchMatch[] matches)

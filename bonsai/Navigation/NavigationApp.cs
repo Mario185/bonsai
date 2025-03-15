@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System;
+using System.Diagnostics;
 using bonsai.CommandHandling;
 using bonsai.Theme;
 using clui;
@@ -25,9 +26,10 @@ namespace bonsai.Navigation
 
     protected override string? RunInternal()
     {
+      Directory.SetCurrentDirectory (_currentDirectory);
       var isExistingPathResult = IsExistingPath(_currentDirectory, _originalArg);
       if (isExistingPathResult.success)
-        return isExistingPathResult.result;
+        return CommandHandler.GetCommandAndShowSelectionUiOnDemand(isExistingPathResult.result);
 
       NavigationDatabase.Instance.CleanUpDatabase();
 
@@ -39,7 +41,7 @@ namespace bonsai.Navigation
       if (foundEntries.Length == 1)
       {
         var firstEntry = foundEntries[0];
-        return firstEntry.FullName;
+        return CommandHandler.GetCommandAndShowSelectionUiOnDemand(firstEntry.FullName);
       }
 
       using (var frame = new Frame())

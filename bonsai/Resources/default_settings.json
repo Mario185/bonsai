@@ -93,7 +93,7 @@
       },
       {
         "modifier": "Control",
-        "key": "S",
+        "key": "A",
         "action": "SaveDatabaseChanges"
       },
       {

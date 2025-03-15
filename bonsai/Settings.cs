@@ -25,6 +25,8 @@ namespace bonsai
         {
           if (KeyBindings.TryGetValue(context, out var bindings))
             result[context] = BuildKeyBindingDictionary(bindings);
+          else
+            result[context] = new Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)>();
         }
 
         return result;
