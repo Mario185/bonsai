@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using bonsai.CommandHandling;
 using bonsai.Theme;
-using clui;
 using clui.Controls;
 using consoleTools;
 
