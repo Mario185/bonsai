@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Text.Json.Serialization;
+using bonsai.Apps;
 using bonsai.Theme;
 using bonsai.Utilities;
 using clui.Controls;
@@ -8,14 +9,14 @@ using consoleTools;
 
 namespace bonsai.Navigation
 {
-  internal class NavigationEntry : IListItem, ISearchableItem
+  internal class DatabaseEntry : IListItem, ISearchableItem
   {
-    private string? _printableText = null;
+    private string? _printableText;
 
     private SearchMatch[]? _searchMatches = [];
     private int _score;
 
-    public NavigationEntry(string path, bool isDirectory)
+    public DatabaseEntry(string path, bool isDirectory)
     {
       Path = path;
       IsDirectory = isDirectory;

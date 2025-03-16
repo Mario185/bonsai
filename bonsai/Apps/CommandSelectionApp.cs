@@ -8,7 +8,7 @@ using clui.Controls;
 using clui.Extensions;
 using consoleTools;
 
-namespace bonsai
+namespace bonsai.Apps
 {
   internal class CommandSelectionApp : AppBase, IBonsaiContext
   {
@@ -33,7 +33,7 @@ namespace bonsai
         var hintLabel = new Label(1.AsFraction(), 1.AsFixed());
 
         frame.AddControls(rootPanel);
-        
+
         rootPanel.BackgroundColor = ThemeManger.Instance.BackgroundColor;
         hintLabel.Text = $"Multiple commands available for {_path}";
         border.BorderColor = ThemeManger.Instance.BorderColor;

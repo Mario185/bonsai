@@ -2,12 +2,13 @@
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using bonsai.Apps;
 using bonsai.Theme;
 using bonsai.Utilities;
 using clui.Controls;
 using consoleTools;
 
-namespace bonsai.Explorer
+namespace bonsai.FileSystemHandling
 {
   internal abstract class FileSystemItem : IListItem, ISearchableItem
   {

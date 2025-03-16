@@ -3,7 +3,7 @@ using System.Drawing;
 using System.IO;
 using bonsai.Theme;
 
-namespace bonsai.Explorer
+namespace bonsai.FileSystemHandling
 {
   internal class DirectoryItem : FileSystemItem
   {

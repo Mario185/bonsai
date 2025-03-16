@@ -73,6 +73,9 @@ namespace bonsai
       {
         var result = inner.Where(k => k.Action == action).OrderByDescending(k=>k.Key != null).FirstOrDefault();
 
+        if (result == null)
+          return $"[MISSING {keyBindingContext}.{action}]";
+
         var modifier = GetModifierText(result.Modifier);
         var key = (result.Key?.ToString() ?? result.KeyChar.ToString())?.ToLower();
         return modifier + key + ":" + description;

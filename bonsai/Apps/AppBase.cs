@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using clui;
 
-namespace bonsai
+namespace bonsai.Apps
 {
   internal static class BonsaiContext
   {

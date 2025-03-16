@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Drawing;
+using bonsai.FileSystemHandling;
 using bonsai.Theme;
 using clui;
 using clui.Controls;
 using clui.Extensions;
 
-namespace bonsai.Explorer
+namespace bonsai.Apps
 {
   internal class ExplorerAppUiBuilder : Frame
   {
@@ -142,7 +143,7 @@ namespace bonsai.Explorer
 
       SearchTextBox = new TextBox(1.AsFraction(), 1.AsFixed());
 
-      var text = Settings.Instance.GetInstructionForAction(KeyBindingContext.ExplorerApp, ActionType.ToggleRegexSearch,"regex");
+      var text = Settings.Instance.GetInstructionForAction(KeyBindingContext.ExplorerApp, ActionType.ToggleRegexSearch, "regex");
       _regexLabel = new(text.Length.AsFixed(), 1.AsFixed());
       _regexLabel.TextColor = ThemeManger.Instance.OptionDisabledColor;
       _regexLabel.Text = text;

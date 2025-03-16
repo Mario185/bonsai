@@ -2,7 +2,7 @@ using System;
 using System.Drawing;
 using bonsai.Theme;
 
-namespace bonsai.Explorer
+namespace bonsai.FileSystemHandling
 {
   internal class ParentDirectoryItem : FileSystemItem
   {

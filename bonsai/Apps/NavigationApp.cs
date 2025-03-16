@@ -2,14 +2,15 @@
 using System;
 using System.Diagnostics;
 using bonsai.CommandHandling;
+using bonsai.FileSystemHandling;
 using bonsai.Theme;
 using clui;
 using clui.Controls;
 using clui.Extensions;
 using consoleTools;
-using bonsai.Explorer;
+using bonsai.Navigation;
 
-namespace bonsai.Navigation
+namespace bonsai.Apps
 {
   internal class NavigationApp : AppBase, IBonsaiContext
   {
@@ -26,14 +27,14 @@ namespace bonsai.Navigation
 
     protected override string? RunInternal()
     {
-      Directory.SetCurrentDirectory (_currentDirectory);
+      Directory.SetCurrentDirectory(_currentDirectory);
       var isExistingPathResult = IsExistingPath(_currentDirectory, _originalArg);
       if (isExistingPathResult.success)
         return CommandHandler.GetCommandAndShowSelectionUiOnDemand(isExistingPathResult.result);
 
-      NavigationDatabase.Instance.CleanUpDatabase();
+      Database.Instance.CleanUpDatabase();
 
-      var foundEntries = NavigationDatabase.Instance.Search(_originalArg);
+      var foundEntries = Database.Instance.Search(_originalArg);
 
       if (foundEntries.Length == 0)
         return null;
@@ -106,7 +107,7 @@ namespace bonsai.Navigation
       return null;
     }
 
-    private static ScrollableList<FileSystemItem> CreateUi (string originalArg, Frame frame, FileSystemItem[] foundEntries)
+    private static ScrollableList<FileSystemItem> CreateUi(string originalArg, Frame frame, FileSystemItem[] foundEntries)
     {
       var rootPanel = new Panel(1.AsFraction(), 1.AsFraction());
       frame.AddControls(rootPanel);

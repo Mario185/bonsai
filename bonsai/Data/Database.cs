@@ -4,21 +4,21 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using bonsai.Explorer;
+using bonsai.FileSystemHandling;
 using bonsai.Utilities;
 
 namespace bonsai.Navigation
 {
-  internal class NavigationDatabase
+  internal class Database
   {
     private const int c_maxAge = 336; // 14 days in hours
 
-    private static readonly Lazy<NavigationDatabase> s_instance = new(Load);
+    private static readonly Lazy<Database> s_instance = new(Load);
 
-    public static NavigationDatabase Instance => s_instance.Value;
+    public static Database Instance => s_instance.Value;
 
     [JsonInclude]
-    public List<NavigationEntry> Entries { get; private set; } = new();
+    public List<DatabaseEntry> Entries { get; private set; } = new();
 
     [JsonInclude]
     public int TopScore { get; private set; }
@@ -26,10 +26,10 @@ namespace bonsai.Navigation
     public void AddOrUpdate(string fullPath, bool isDirectory, bool autoSave = true)
     {
       string trimmed = fullPath.Trim(Path.DirectorySeparatorChar);
-      NavigationEntry? entry = Entries.FirstOrDefault(e => string.Equals(e.Path, trimmed, StringComparison.OrdinalIgnoreCase));
+      DatabaseEntry? entry = Entries.FirstOrDefault(e => string.Equals(e.Path, trimmed, StringComparison.OrdinalIgnoreCase));
       if (entry == null)
       {
-        entry = new NavigationEntry(trimmed, isDirectory);
+        entry = new DatabaseEntry(trimmed, isDirectory);
         Entries.Add(entry);
       }
 
@@ -55,7 +55,7 @@ namespace bonsai.Navigation
       DateTime cutOfDate = DateTime.UtcNow.AddDays(-Settings.Instance.MaxEntryAgeInDays);
 
       bool hasChanges = false;
-      foreach (NavigationEntry entry in Entries.ToArray())
+      foreach (DatabaseEntry entry in Entries.ToArray())
       {
         if (entry.LastUsed < cutOfDate || !FileOrDirectoryExist(entry))
         {
@@ -89,7 +89,7 @@ namespace bonsai.Navigation
       File.WriteAllText(GetDatabaseFilePath(), JsonSerializer.Serialize(Instance, options));
     }
 
-    public void UpdateEntry(NavigationEntry entry, bool autoSave = true)
+    public void UpdateEntry(DatabaseEntry entry, bool autoSave = true)
     {
       entry.LastUsed = DateTime.UtcNow;
       entry.Score++;
@@ -106,8 +106,8 @@ namespace bonsai.Navigation
       string[] parts = args.Split(' ', StringSplitOptions.RemoveEmptyEntries);
       DateTime queryTime = DateTime.UtcNow;
 
-      List<(FileSystemItem fi, NavigationEntry entry)> foundEntries = new();
-      foreach (NavigationEntry entry in Entries)
+      List<(FileSystemItem fi, DatabaseEntry entry)> foundEntries = new();
+      foreach (DatabaseEntry entry in Entries)
       {
         string displayName = entry.Path;
         int lastIndex = 0;
@@ -158,7 +158,7 @@ namespace bonsai.Navigation
       return foundEntries.OrderByDescending(i => CalculateScore(i.entry.Score, i.entry.LastUsed, queryTime)).ThenByDescending(i => i.entry.LastUsed).Select(i => i.fi).ToArray();
     }
 
-    private bool FileOrDirectoryExist(NavigationEntry entry)
+    private bool FileOrDirectoryExist(DatabaseEntry entry)
     {
       if (entry.IsDirectory)
         return Directory.Exists(entry.Path);
@@ -186,16 +186,16 @@ namespace bonsai.Navigation
       return options;
     }
 
-    private static NavigationDatabase Load()
+    private static Database Load()
     {
       JsonSerializerOptions options = GetJsonSerializerOptions();
 
       AbsolutePath databaseFilePath = GetDatabaseFilePath();
       if (!File.Exists(databaseFilePath))
-        return new NavigationDatabase();
+        return new Database();
 
       using (FileStream stream = File.OpenRead(databaseFilePath))
-        return JsonSerializer.Deserialize<NavigationDatabase>(stream, options)!;
+        return JsonSerializer.Deserialize<Database>(stream, options)!;
     }
   }
 }

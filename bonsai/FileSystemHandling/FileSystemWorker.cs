@@ -1,5 +1,4 @@
-﻿using bonsai.Utilities;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -7,8 +6,9 @@ using System.IO.Enumeration;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using bonsai.Utilities;
 
-namespace bonsai.Explorer
+namespace bonsai.FileSystemHandling
 {
   internal enum FileSystemLoadingState
   {

@@ -4,11 +4,12 @@ using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
 using bonsai.CommandHandling;
+using bonsai.FileSystemHandling;
 using bonsai.Theme;
 using clui.Controls;
 using consoleTools;
 
-namespace bonsai.Explorer
+namespace bonsai.Apps
 {
   internal class ExplorerApp : AppBase, IBonsaiContext
   {
@@ -93,7 +94,7 @@ namespace bonsai.Explorer
               case ActionType.ConfirmSelection:
                 if (_uiBuilder.FileSystemList.FocusedItem == null)
                   break;
-                
+
                 var focusedItem = _uiBuilder.FileSystemList.FocusedItem;
                 string? result = null;
                 switch (focusedItem)
@@ -114,7 +115,7 @@ namespace bonsai.Explorer
 
                 if (!string.IsNullOrWhiteSpace(result))
                   return result;
-                
+
                 _uiBuilder.RenderComplete();
                 continue;
 
@@ -414,6 +415,6 @@ namespace bonsai.Explorer
       }
     }
 
-   
+
   }
 }

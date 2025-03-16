@@ -19,37 +19,16 @@ namespace clui.Controls
   {
     private readonly List<ControlBase> _controls = [];
 
-    //protected ControlBase (
-    //    int desiredWidth = 1,
-    //    int desiredHeight = 1,
-    //    SizeType widthType = SizeType.Fraction,
-    //    SizeType heightType = SizeType.Fraction,
-    //    int? minWidth = null,
-    //    int? minHeight = null,
-    //    int? maxWidth = null,
-    //    int? maxHeight = null)
-    //    : this (
-    //        new LayoutDimension (
-    //            new LayoutSize (desiredWidth, widthType),
-    //            new LayoutSize (desiredHeight, heightType),
-    //            minWidth,
-    //            minHeight,
-    //            maxWidth,
-    //            maxHeight))
-    //{
-    //}
-
-    protected ControlBase(LayoutSize width, LayoutSize height)
+    protected ControlBase (LayoutSize width, LayoutSize height)
     {
       Width = width;
       Height = height;
 
-      Padding = new Padding(0, 0, 0, 0);
-      Position = new Position(0, 0);
+      Padding = new Padding (0, 0, 0, 0);
+      Position = new Position (0, 0);
     }
 
     public IReadOnlyList<ControlBase> Controls => _controls;
-
 
     public RootControl RootControl
     {
@@ -61,18 +40,13 @@ namespace clui.Controls
         return Parent.RootControl;
       }
     }
-    
+
     public LayoutSize Width { get; set; }
     public LayoutSize Height { get; set; }
-
 
     public int? CalculatedWidth { get; internal set; }
     public int? CalculatedHeight { get; internal set; }
 
-    /// <summary>
-    ///   The effective calculated size of the control.
-    /// </summary>
-    //public FixedDimension? EffectiveDimension { get; internal set; }
     public Padding Padding { get; set; }
     public ControlBase? Parent { get; internal set; }
     public Position Position { get; internal set; }
@@ -85,7 +59,7 @@ namespace clui.Controls
     public bool Visible { get; set; } = true;
     public ChildControlFlow Flow { get; set; } = ChildControlFlow.Vertical;
 
-    public virtual void OnLayoutCalculated()
+    public virtual void OnLayoutCalculated ()
     {
     }
 
@@ -93,7 +67,7 @@ namespace clui.Controls
     {
       //if (Renderer.FocusedControl == this)
       //  return FocusedBackgroundColor ?? Parent?.GetEffectiveBackgroundColor();
-      
+
       return BackgroundColor ?? Parent?.GetEffectiveBackgroundColor();
     }
 
@@ -101,7 +75,7 @@ namespace clui.Controls
     {
       //if (Renderer.FocusedControl == this)
       //  return FocusedTextColor ?? Parent?.GetEffectiveTextColor();
-      
+
       return TextColor ?? Parent?.TextColor;
     }
 
@@ -125,7 +99,7 @@ namespace clui.Controls
       foreach (ControlBase? control in controls)
       {
         if (control.Parent != null)
-          throw new InvalidOperationException("Controls already has parent and cannot be added to another hierarchy");
+          throw new InvalidOperationException ("Controls already has parent and cannot be added to another hierarchy");
         control.Parent = this;
         _controls.Add (control);
       }

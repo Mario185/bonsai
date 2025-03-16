@@ -46,10 +46,12 @@ namespace clui.Controls
         if (Text.Length > CalculatedWidth!)
         {
           if (TruncateLeft)
+          {
             consoleWriter.Write ('…').WriteTruncated (
                 Text,
-                Text.Length - CalculatedWidth!.Value! + 1,
-                CalculatedWidth!.Value! - 1);
+                Text.Length - CalculatedWidth!.Value + 1,
+                CalculatedWidth!.Value - 1);
+          }
           else
             consoleWriter.WriteTruncated (Text, 0, CalculatedWidth!.Value - 1).Write ('…');
         }

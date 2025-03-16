@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using bonsai.Apps;
 using bonsai.Navigation;
 
 namespace bonsai.CommandHandling
@@ -14,7 +15,7 @@ namespace bonsai.CommandHandling
         var attributes = File.GetAttributes(path);
         var isDirectory = (attributes & FileAttributes.Directory) != 0;
 
-        NavigationDatabase.Instance.AddOrUpdate(path, isDirectory);
+        Database.Instance.AddOrUpdate(path, isDirectory);
 
         IReadOnlyList<Command> availableCommands;
         if (isDirectory)
