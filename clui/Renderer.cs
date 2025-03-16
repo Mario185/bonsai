@@ -6,7 +6,7 @@ using consoleTools;
 
 namespace clui
 {
-  public class Renderer : IDisposable
+  public sealed class Renderer : IDisposable
   {
     public ICanHaveFocus? FocusedControl { get; private set; }
 
@@ -36,10 +36,14 @@ namespace clui
           ConsoleWriter.Cursor.MoveTo(cursorTarget.X, cursorTarget.Y);
         }
         else
+        {
           ConsoleWriter.Cursor.ResetPosition();
+        }
 
         if (controlHasVisibleCursor != null)
+        {
           ConsoleWriter.Cursor.Show();
+        }
 
         ConsoleWriter.Flush();
       }
@@ -48,12 +52,16 @@ namespace clui
     private void RenderInternal (ControlBase control)
     {
       if (!control.ShouldRenderControl())
+      {
         return;
+      }
 
       control.Render (ConsoleWriter);
 
       foreach (ControlBase child in control.Controls)
+      {
         RenderInternal(child);
+      }
     }
 
     public void SetFocusedControl (ICanHaveFocus? control)

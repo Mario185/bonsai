@@ -16,7 +16,9 @@ namespace consoleTools
     public AlternateScreenBufferSection()
     {
       if (s_isAlternateScreenBufferActive)
+      {
         return;
+      }
 
       s_isAlternateScreenBufferActive = true;
       _instanceActivatedAlternateScreenBuffer = true;
@@ -26,7 +28,9 @@ namespace consoleTools
     public void Dispose()
     {
       if (_instanceActivatedAlternateScreenBuffer)
+      {
         _consoleWriter.Write(AlternateScreenBuffer.SwitchToMain).Flush();
+      }
 
       _consoleWriter.Dispose();
     }

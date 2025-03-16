@@ -23,7 +23,7 @@ namespace clui.Layout
 
           break;
         default:
-          throw new ArgumentOutOfRangeException();
+          throw new ArgumentOutOfRangeException($"{control.Flow} currently not supported.");
       }
     }
 
@@ -54,14 +54,20 @@ namespace clui.Layout
       foreach (ControlBase control in container.Controls)
       {
         if (!control.Visible)
+        {
           continue;
+        }
 
         if (!fixedSizeControls.Contains(control))
         {
           if (control.Width is FractionSize)
+          {
             control.CalculatedWidth = CalculateForFraction(control.Width.Value, containerRemainingForFraction, containerRemaining, sumFractions);
+          }
           else
+          {
             control.CalculatedWidth = Math.Min(containerRemaining, control.Width.Value);
+          }
 
           control.CalculatedHeight = control.Height is FractionSize ? containerInnerHeight : control.Height.Value;
 
@@ -98,14 +104,20 @@ namespace clui.Layout
       foreach (ControlBase control in container.Controls)
       {
         if (!control.Visible)
+        {
           continue;
+        }
 
         if (!fixedSizeControls.Contains(control))
         {
           if (control.Height is FractionSize)
+          {
             control.CalculatedHeight = CalculateForFraction(control.Height.Value, containerRemainingForFraction, containerRemaining, sumFractions);
+          }
           else
+          {
             control.CalculatedHeight = Math.Min(containerRemaining, control.Height.Value);
+          }
 
           control.CalculatedWidth = control.Width is FractionSize ? containerInnerWidth : control.Width.Value;
 
@@ -121,7 +133,7 @@ namespace clui.Layout
       }
     }
     
-    private int CalculateForFraction(int desired,
+    private static int CalculateForFraction(int desired,
       int remainingForFraction,
       int totalRemaining,
       int sumFractions)
@@ -133,7 +145,7 @@ namespace clui.Layout
       return value;
     }
 
-    private void CalculatePositionFlowHorizontal(ControlBase controlToPosition, ControlBase container, int positionOffset)
+    private static void CalculatePositionFlowHorizontal(ControlBase controlToPosition, ControlBase container, int positionOffset)
     {
       controlToPosition.Position.X = container.Position.X + container.Padding.Left + positionOffset;
       controlToPosition.Position.Y = container.Position.Y + container.Padding.Top;
@@ -141,7 +153,7 @@ namespace clui.Layout
       //return new Position(container.Position.X + container.Padding.Left + positionOffset, container.Position.Y + container.Padding.Top);
     }
 
-    private void CalculatePositionFlowVertical(ControlBase controlToPosition, ControlBase container, int positionOffset)
+    private static void CalculatePositionFlowVertical(ControlBase controlToPosition, ControlBase container, int positionOffset)
     {
       controlToPosition.Position.X = container.Position.X + container.Padding.Left;
       controlToPosition.Position.Y = container.Position.Y + container.Padding.Top + positionOffset;
@@ -152,7 +164,9 @@ namespace clui.Layout
     private void CalculateRootControlSize(ControlBase rootControl)
     {
       if (!rootControl.Visible)
+      {
         return;
+      }
 
       var maxWidth = Console.WindowWidth - (rootControl.Position.X - 1);
       var maxHeight = Console.WindowHeight - (rootControl.Position.Y - 1);
@@ -174,7 +188,7 @@ namespace clui.Layout
           CalculateChildrenHorizontalFlow(rootControl);
           break;
         default:
-          throw new ArgumentOutOfRangeException();
+          throw new ArgumentOutOfRangeException($"{rootControl.Flow} currently not supported.");
       }
     }
   }

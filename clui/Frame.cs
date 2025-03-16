@@ -32,17 +32,22 @@ namespace clui
 
     public Frame(bool useAlternateScreenBuffer = true)
     {
-      _rootControl = new RootControl(Width, Height, this);
-      _rootControl.Position = Position;
+      _rootControl = new RootControl(Width, Height, this)
+      {
+        Position = Position
+      };
       if (useAlternateScreenBuffer)
+      {
         _alternateScreenBufferSection = new AlternateScreenBufferSection();
-
+      }
     }
 
     public void EnableBufferSizeChangeWatching()
     {
       if (_bufferSizeChangeCallback != null)
+      {
         return;
+      }
 
       _bufferSizeChangeCallback = (_, _) => RenderComplete();
       ConsoleHandler.RegisterBufferSizeChangeCallback(_bufferSizeChangeCallback);
@@ -51,7 +56,9 @@ namespace clui
     public void DisableBufferSizeChangeWatching()
     {
       if (_bufferSizeChangeCallback == null)
+      {
         return;
+      }
 
       ConsoleHandler.UnregisterBufferSizeChangeCallback(_bufferSizeChangeCallback);
       _bufferSizeChangeCallback = null;
@@ -71,13 +78,19 @@ namespace clui
     public void RenderPartial(ControlBase controlToRender)
     {
       if (!_completeLayoutHasBeenCalculatedAtLeastOnce)
+      {
         return;
+      }
 
       if (_rootControl == null)
+      {
         throw new InvalidOperationException("Root control has not been initialized.");
+      }
 
       if (_rootControl != controlToRender.RootControl)
+      {
         throw new InvalidOperationException($"{nameof(ControlBase.RootControl)} of {nameof(controlToRender)} does not match the root control of this frame");
+      }
 
       _layoutCalculator.CalculateChildrenLayout(controlToRender);
       Renderer.Render(controlToRender);
@@ -86,8 +99,7 @@ namespace clui
     public void SetFocus<T>(T? control)
     where  T : ControlBase, ICanHaveFocus 
     {
-      if (_focusedControl != null)
-        _focusedControl.OnLostFocus();
+      _focusedControl?.OnLostFocus();
 
       Renderer.SetFocusedControl(control);
 
@@ -110,9 +122,11 @@ namespace clui
     
     public void Dispose()
     {
+      GC.SuppressFinalize (this);
       DisableBufferSizeChangeWatching();
       Renderer.Dispose();
       _alternateScreenBufferSection?.Dispose();
+
     }
   }
 }

@@ -52,7 +52,9 @@ namespace bonsai.Theme
       {
         var span = fileName.AsSpan();
         if (!_fileColorExtensionsAlternateLookUp.Value.TryGetValue(Path.GetExtension(span), out color))
+        {
           return FileColors.DefaultColor;
+        }
       }
 
       return color;
@@ -64,7 +66,9 @@ namespace bonsai.Theme
       {
         var span = fileName.AsSpan();
         if (!_fileIconExtensionsAlternateLookUp.Value.TryGetValue(Path.GetExtension(span), out icon))
+        {
           icon = FileIcons.DefaultIcon;
+        }
       }
 
       return icon ?? string.Empty;
@@ -73,7 +77,9 @@ namespace bonsai.Theme
     public Color? GetFolderColor(string folderName)
     {
       if (FolderColors.Named.TryGetValue(folderName, out Color? color))
+      {
         return color;
+      }
 
       return FolderColors.DefaultColor;
     }
@@ -81,7 +87,9 @@ namespace bonsai.Theme
     public string GetFolderIcon(string folderName)
     {
       if (!FolderIcons.Named.TryGetValue(folderName, out string? icon))
+      {
         icon = FolderIcons.DefaultIcon;
+      }
 
       return icon ?? string.Empty;
     }
@@ -92,7 +100,9 @@ namespace bonsai.Theme
       if (!File.Exists(themeFilePath))
       {
         if (!DoesResourceContainsTheme(theme))
+        {
           throw new FileNotFoundException($"Theme file '{themeFilePath}' does not exist.");
+        }
 
         themeFilePath = null;
       }
@@ -117,11 +127,15 @@ namespace bonsai.Theme
         var targetFilePath = path / themeName;
         
         if (File.Exists (targetFilePath) && !force)
+        {
           continue;
+        }
 
         using (Stream defaultThemeStream = GetThemeFromResources(themeName))
         using (FileStream fileStream = new(targetFilePath, FileMode.Create))
+        {
           defaultThemeStream.CopyTo(fileStream);
+        }
       }
 
       if (force)

@@ -6,7 +6,7 @@ csharp_style_prefer_primary_constructors = false:error
 csharp_indent_labels = no_change
 csharp_using_directive_placement = outside_namespace:error
 csharp_prefer_simple_using_statement = false:error
-csharp_prefer_braces = when_multiline:suggestion
+csharp_prefer_braces = true:suggestion
 csharp_style_namespace_declarations = block_scoped:silent
 csharp_style_prefer_method_group_conversion = true:silent
 csharp_style_prefer_top_level_statements = true:silent
@@ -24,7 +24,7 @@ csharp_style_prefer_null_check_over_type_check = true:suggestion
 csharp_prefer_simple_default_expression = true:suggestion
 csharp_style_prefer_local_over_anonymous_function = true:suggestion
 csharp_style_prefer_index_operator = true:suggestion
-csharp_style_prefer_range_operator = true:suggestion
+csharp_style_prefer_range_operator = false:suggestion
 csharp_prefer_static_local_function = true:suggestion
 csharp_prefer_static_anonymous_function = true:suggestion
 csharp_style_prefer_readonly_struct = true:suggestion
@@ -45,6 +45,9 @@ csharp_style_var_for_built_in_types = false:silent
 csharp_style_var_when_type_is_apparent = false:silent
 csharp_style_var_elsewhere = false:silent
 csharp_space_around_binary_operators = before_and_after
+
+# ReSharper properties
+resharper_braces_for_ifelse = not_required_for_both
 
 [*.{cs,vb}]
 #### Naming styles ####

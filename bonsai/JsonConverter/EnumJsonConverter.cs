@@ -19,7 +19,9 @@ namespace bonsai.JsonConverter
       string? stringValue = reader.GetString();
 
       if (Enum.TryParse(stringValue, false, out T value))
+      {
         return value;
+      }
 
       return _defaultValue;
     }

@@ -34,7 +34,9 @@ namespace bonsai.Utilities
     public void EnsureDirectoryExists()
     {
       if (!Directory.Exists(this))
+      {
         Directory.CreateDirectory(this);
+      }
     }
 
     public override string ToString()

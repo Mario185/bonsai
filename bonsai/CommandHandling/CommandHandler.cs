@@ -21,19 +21,26 @@ namespace bonsai.CommandHandling
         if (isDirectory)
         {
           if (Settings.Instance.DirectoryCommands.Count <= 0)
+          {
             return new DirectoryCommand(path, "Change location", true).GetExecutableAction();
+          }
+
           availableCommands = Settings.Instance.DirectoryCommands.Select(c => c.CloneForExecution(path)).Cast<Command>().ToList();
         }
         else
         {
           var extension = Path.GetExtension(path);
           availableCommands = Settings.Instance.FileCommands.Where(c => c.Extension == extension || c.Extension == "*").Select(f => f.CloneForExecution(path)).Cast<Command>().ToList();
-          if (!availableCommands.Any())
+          if (availableCommands.Count == 0)
+          {
             return new FileCommand(path, "Shell decides what to do", extension, true).GetExecutableAction();
+          }
         }
 
         if (availableCommands.Count == 1)
+        {
           return availableCommands[0].GetExecutableAction();
+        }
 
         return new CommandSelectionApp(availableCommands, path).Run();
       }

@@ -8,12 +8,12 @@ namespace bonsai.Logging
   public class Logger
   {
     private readonly Type _loggerType;
-    private static Lock s_lock = new Lock();
+    private static readonly Lock s_lock = new();
 
     private static DateTime s_currentLogFileDate = DateTime.MinValue;
     private static AbsolutePath? s_currentLogFilePath;
 
-    private static LogSeverity s_minimumSeverity = LogSeverity.Warning;
+    private const LogSeverity c_minimumSeverity = LogSeverity.Warning;
 
     public static Logger Create<TLoggerType>()
     {
@@ -28,7 +28,7 @@ namespace bonsai.Logging
         UpdateLogFileNameOnDemand();
         using (var stream = File.AppendText(s_currentLogFilePath!))
         {
-          stream.WriteLine(DateTime.Now.ToString("O") + " - " + severity + " - " + Thread.CurrentThread.ManagedThreadId + " - " + loggerType.FullName + " - " + message);
+          stream.WriteLine(DateTime.Now.ToString("O") + " - " + severity + " - " + Environment.CurrentManagedThreadId + " - " + loggerType.FullName + " - " + message);
         }
       }
     }
@@ -36,8 +36,10 @@ namespace bonsai.Logging
     private static void UpdateLogFileNameOnDemand()
     {
       if (s_currentLogFileDate == DateTime.Today && s_currentLogFilePath != null)
+      {
         return;
-      
+      }
+
       s_currentLogFileDate = DateTime.Today;
       s_currentLogFilePath = GetLogFileName();
     }
@@ -82,8 +84,10 @@ namespace bonsai.Logging
 
     private void LogMessage(string message, LogSeverity severity)
     {
-      if (severity >= s_minimumSeverity)
+      if (severity >= c_minimumSeverity)
+      {
         LogMessageToFile(_loggerType, message, severity);
+      }
     }
 
   }

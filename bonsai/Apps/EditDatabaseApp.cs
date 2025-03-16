@@ -16,22 +16,22 @@ namespace bonsai.Apps
   {
     private readonly NavigationEntryDescendingSortComparer _navigationEntryComparer = new();
     private readonly SearchFilterProvider<DatabaseEntry> _searchFilterProvider = new();
-    private ScrollableList<DatabaseEntry> _listControl = null!;
     private Border _border = null!;
+    private ScrollableList<DatabaseEntry> _listControl = null!;
     private TextBox _searchTextBox = null!;
 
     protected override IBonsaiContext Context => this;
 
     public bool IsFilteringActive => _searchFilterProvider.IsFilterActive;
 
-    protected override string? RunInternal()
+    protected override string? RunInternal ()
     {
-      using (var frame = new Frame())
+      using (Frame frame = new())
       {
-        CreateUi(frame);
+        CreateUi (frame);
 
-        _listControl.SetItemList(Database.Instance.Entries.Order(_navigationEntryComparer).ToList());
-        _listControl.SetFocusedIndex(0);
+        _listControl.SetItemList (Database.Instance.Entries.Order (_navigationEntryComparer).ToList());
+        _listControl.SetFocusedIndex (0);
 
         frame.RenderComplete();
 
@@ -42,36 +42,40 @@ namespace bonsai.Apps
         {
           ConsoleKeyInfo key = ConsoleHandler.Read();
 
-          if (_searchTextBox.HandleInput(key))
+          if (_searchTextBox.HandleInput (key))
+          {
             continue;
+          }
 
-          switch (Settings.Instance.GetInputActionType(key, KeyBindingContext.EditDatabaseApp))
+          switch (Settings.Instance.GetInputActionType (key, KeyBindingContext.EditDatabaseApp))
           {
             case ActionType.Exit:
               endLoop = true;
               continue;
 
             case ActionType.IncrementScore:
-              ChangeScore(1);
+              ChangeScore (1);
               break;
 
             case ActionType.DecrementScore:
-              ChangeScore(-1);
+              ChangeScore (-1);
               break;
 
             case ActionType.DeleteDatabaseEntry:
               if (_listControl.FocusedItem == null)
+              {
                 continue;
+              }
 
-              var index = _listControl.FocusedItemIndex;
-              _listControl.Items!.Remove(_listControl.FocusedItem);
-              Database.Instance.Entries.Remove(_listControl.FocusedItem);
-              _listControl.SetFocusedIndex(index);
+              int index = _listControl.FocusedItemIndex;
+              _listControl.Items!.Remove (_listControl.FocusedItem);
+              Database.Instance.Entries.Remove (_listControl.FocusedItem);
+              _listControl.SetFocusedIndex (index);
               UpdateBorder();
-              frame.RenderPartial(_border);
+              frame.RenderPartial (_border);
               break;
             case ActionType.SaveDatabaseChanges:
-              Database.Instance.CleanUpDatabase(true);
+              Database.Instance.CleanUpDatabase (true);
 
               endLoop = true;
               break;
@@ -107,136 +111,170 @@ namespace bonsai.Apps
       return null;
     }
 
-    private void UpdateBorder()
+    private void UpdateBorder ()
     {
       if (IsFilteringActive)
+      {
         _border.Text = $"❮ {_listControl.Items!.Count} / {Database.Instance.Entries.Count} ❯";
+      }
       else
+      {
         _border.Text = $"❮ {Database.Instance.Entries.Count} ❯";
+      }
 
-      _border.RootControl.AssociatedFrame.RenderPartial(_border);
+      _border.RootControl.AssociatedFrame.RenderPartial (_border);
     }
 
-    private void SearchTextBox_OnTextChanged(object sender, string text)
+    private void SearchTextBox_OnTextChanged (object sender, string text)
     {
-      (bool filterChanged, Func<DatabaseEntry, SearchMatch[]>? filter, bool _) = _searchFilterProvider.GetFilter(text, false);
+      (bool filterChanged, Func<DatabaseEntry, SearchMatch[]>? filter, bool _) = _searchFilterProvider.GetFilter (text, false);
 
       if (!filterChanged || filter == null)
+      {
         return;
+      }
 
       if (_searchFilterProvider.IsFilterActive)
       {
-        _listControl.SetItemList(
-            Database.Instance.Entries.Where(
+        _listControl.SetItemList (
+            Database.Instance.Entries.Where (
                 e =>
                 {
-                  var matches = filter(e);
-                  e.SetSearchMatches(matches);
+                  SearchMatch[] matches = filter (e);
+                  e.SetSearchMatches (matches);
                   return matches.Length > 0;
-                }).Order(_navigationEntryComparer).ToList());
+                }).Order (_navigationEntryComparer).ToList());
       }
       else
-        _listControl.SetItemList(Database.Instance.Entries.Order(_navigationEntryComparer).ToList());
-      _listControl.SetFocusedIndex(0);
+      {
+        _listControl.SetItemList (Database.Instance.Entries.Order (_navigationEntryComparer).ToList());
+      }
+
+      _listControl.SetFocusedIndex (0);
 
       UpdateBorder();
     }
 
-    private void ChangeScore(int value)
+    private void ChangeScore (int value)
     {
-      var focusedItem = _listControl.FocusedItem;
+      DatabaseEntry? focusedItem = _listControl.FocusedItem;
       if (focusedItem == null)
+      {
         return;
+      }
 
       focusedItem.Score += value;
       if (focusedItem.Score < 0)
+      {
         focusedItem.Score = 0;
+      }
 
       if (focusedItem.Score > Settings.Instance.MaxIndividualScore)
+      {
         focusedItem.Score = Settings.Instance.MaxIndividualScore;
+      }
 
-      var source = _listControl.Items as List<DatabaseEntry>;
-
-      if (source == null)
+      if (_listControl.Items is not List<DatabaseEntry> source)
+      {
         return;
+      }
 
-      source.Sort(_navigationEntryComparer);
-      _listControl.SetFocusedIndex(source.IndexOf(focusedItem));
+      source.Sort (_navigationEntryComparer);
+      _listControl.SetFocusedIndex (source.IndexOf (focusedItem));
     }
 
-    private void CreateUi(Frame frame)
+    private void CreateUi (Frame frame)
     {
-      var rootPanel = new Panel(1.AsFraction(), 1.AsFraction());
-      frame.AddControls(rootPanel);
+      Panel rootPanel = new(1.AsFraction(), 1.AsFraction());
+      frame.AddControls (rootPanel);
 
-      var titleLabel = new Label(1.AsFraction(), 1.AsFixed());
+      Label titleLabel = new(1.AsFraction(), 1.AsFixed());
 
-      _border = new Border(1.AsFraction(), 1.AsFraction());
-      _border.BorderColor = ThemeManger.Instance.BorderColor;
-      _border.TextPosition = BorderTextPosition.BottomLeft;
+      _border = new Border(1.AsFraction(), 1.AsFraction())
+      {
+        BorderColor = ThemeManger.Instance.BorderColor,
+        TextPosition = BorderTextPosition.BottomLeft
+      };
       titleLabel.Text = "Edit bonsai database";
 
-      Panel topPanel = new(1.AsFraction(), 1.AsFixed());
-      topPanel.BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor;
-      topPanel.TextColor = ThemeManger.Instance.TopBarTextColor;
-      topPanel.AddControls(titleLabel);
+      Panel topPanel = new(1.AsFraction(), 1.AsFixed())
+      {
+        BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor,
+        TextColor = ThemeManger.Instance.TopBarTextColor
+      };
+      topPanel.AddControls (titleLabel);
 
-      var increment = Settings.Instance.GetInstructionForAction(KeyBindingContext.EditDatabaseApp, ActionType.IncrementScore, "increment");
-      var decrement = Settings.Instance.GetInstructionForAction(KeyBindingContext.EditDatabaseApp, ActionType.DecrementScore, "decrement");
-      var delete = Settings.Instance.GetInstructionForAction(KeyBindingContext.EditDatabaseApp, ActionType.DeleteDatabaseEntry, "delete");
-      var save = Settings.Instance.GetInstructionForAction(KeyBindingContext.EditDatabaseApp, ActionType.SaveDatabaseChanges, "save and exit");
+      string increment = Settings.Instance.GetInstructionForAction (KeyBindingContext.EditDatabaseApp, ActionType.IncrementScore, "increment");
+      string decrement = Settings.Instance.GetInstructionForAction (KeyBindingContext.EditDatabaseApp, ActionType.DecrementScore, "decrement");
+      string delete = Settings.Instance.GetInstructionForAction (KeyBindingContext.EditDatabaseApp, ActionType.DeleteDatabaseEntry, "delete");
+      string save = Settings.Instance.GetInstructionForAction (KeyBindingContext.EditDatabaseApp, ActionType.SaveDatabaseChanges, "save and exit");
 
-      var instructionsLabel = new Label(1.AsFraction(), 1.AsFixed());
-      instructionsLabel.Text = $"{increment}   {decrement}   {delete}   {save}";
-      instructionsLabel.TextColor = Color.CadetBlue;
+      Label instructionsLabel = new(1.AsFraction(), 1.AsFixed())
+      {
+        Text = $"{increment}   {decrement}   {delete}   {save}",
+        TextColor = Color.CadetBlue
+      };
 
-      _listControl = new ScrollableList<DatabaseEntry>(ThemeManger.Instance.SelectionForegroundColor, ThemeManger.Instance.SelectionBackgroundColor, 1.AsFraction(), 1.AsFraction());
+      _listControl = new ScrollableList<DatabaseEntry> (
+          ThemeManger.Instance.SelectionForegroundColor,
+          ThemeManger.Instance.SelectionBackgroundColor,
+          1.AsFraction(),
+          1.AsFraction());
 
       rootPanel.BackgroundColor = ThemeManger.Instance.BackgroundColor;
 
-      Label title = new(1.AsFraction(), 1.AsFixed());
-      title.Text = "LAST USED         SCORE PATH";
-      title.TextColor = Color.DodgerBlue;
+      Label title = new(1.AsFraction(), 1.AsFixed())
+      {
+        Text = "LAST USED         SCORE PATH",
+        TextColor = Color.DodgerBlue
+      };
       //"yyyy-MM-dd HH:mm"
-      _border.AddControls(title, _listControl);
+      _border.AddControls (title, _listControl);
 
-      var searchPanel = new Panel(1.AsFraction(), 1.AsFixed());
-      searchPanel.Flow = ChildControlFlow.Horizontal;
-      Label searchLabel = new(9.AsFixed(), 1.AsFixed());
-      searchLabel.Text = "Search ❯";
-      searchLabel.TextColor = ThemeManger.Instance.SearchLabelTextColor;
-      searchLabel.BackgroundColor = ThemeManger.Instance.SearchLabelBackgroundColor;
+      Panel searchPanel = new(1.AsFraction(), 1.AsFixed())
+      {
+        Flow = ChildControlFlow.Horizontal
+      };
+      Label searchLabel = new(9.AsFixed(), 1.AsFixed())
+      {
+        Text = "Search ❯",
+        TextColor = ThemeManger.Instance.SearchLabelTextColor,
+        BackgroundColor = ThemeManger.Instance.SearchLabelBackgroundColor
+      };
 
-      _searchTextBox = new TextBox(1.AsFraction(), 1.AsFixed());
-      searchPanel.AddControls(searchLabel, _searchTextBox);
-      rootPanel.AddControls(topPanel, searchPanel, _border, instructionsLabel);
+      _searchTextBox = new TextBox (1.AsFraction(), 1.AsFixed());
+      searchPanel.AddControls (searchLabel, _searchTextBox);
+      rootPanel.AddControls (topPanel, searchPanel, _border, instructionsLabel);
 
       frame.EnableBufferSizeChangeWatching();
 
-      frame.SetFocus(_searchTextBox);
+      frame.SetFocus (_searchTextBox);
     }
-
-
   }
 
   internal class NavigationEntryDescendingSortComparer : IComparer<DatabaseEntry>
   {
-
-    public int Compare(DatabaseEntry? x, DatabaseEntry? y)
+    public int Compare (DatabaseEntry? x, DatabaseEntry? y)
     {
       if (x == null || y == null)
+      {
         return 0;
+      }
 
       if (x.Score == y.Score)
       {
         if (x.LastUsed == y.LastUsed)
-          return string.Compare(x.Path, y.Path, StringComparison.OrdinalIgnoreCase);
+        {
+          return string.Compare (x.Path, y.Path, StringComparison.OrdinalIgnoreCase);
+        }
 
         return x.LastUsed < y.LastUsed ? 1 : -1;
       }
 
       if (x.Score < y.Score)
+      {
         return 1;
+      }
 
       return -1;
     }

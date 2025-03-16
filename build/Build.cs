@@ -32,7 +32,9 @@ public class ExtendedGitHubActionsAttribute : GitHubActionsAttribute
   protected override IEnumerable<GitHubActionsDetailedTrigger> GetTriggers ()
   {
     if (OnReleasePublished)
+    {
       return base.GetTriggers().Append (new ReleaseGitHubActionsDetailedTrigger());
+    }
 
     return base.GetTriggers();
   }
@@ -65,7 +67,9 @@ partial class Build : NukeBuild
     public static int Main () => Execute<Build>(x => x.Compile);
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
-    readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+  [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Nuke")]
+  // ReSharper disable once UnusedMember.Local
+  readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
     private static readonly AbsolutePath s_releaseOutputRoot = (RootDirectory / "_release").CreateOrCleanDirectory();
 
@@ -76,7 +80,9 @@ partial class Build : NukeBuild
     [GeneratedRegex("^(release_)(?<version>[0-9]{1,}[.][0-9]{1,}[.][0-9]{1,})$")]
     private static partial Regex ReleaseVersionTagRegex();
 
-    Target Clean => _ => _
+  [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
+  // ReSharper disable once UnusedMember.Local
+  Target Clean => _ => _
         .Before(Restore)
         .Executes(() =>
         {
@@ -101,8 +107,7 @@ partial class Build : NukeBuild
 
 
   // ReSharper disable once UnusedMember.Local
-  [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Nuke Targets are only used implicit")]
- 
+
   Target Publish => d => d
       .DependsOn(Restore)
       .Executes(async () =>
@@ -115,10 +120,14 @@ partial class Build : NukeBuild
           var matches = result.Select(r => ReleaseVersionTagRegex().Match(r.Text)).Where(m => m.Success).ToArray();
 
           if (matches.Length == 0)
+          {
             throw new Exception("No release version tag found. Create a tag in this format \"release_1.2.3\"");
+          }
 
           if (matches.Length > 1)
+          {
             throw new Exception("Multiple release version tags found. Tags: " + string.Join(", ", matches.Select(m => m.Value.ToString())));
+          }
 
           versionNumber = matches[0].Groups["version"].Value;
         }

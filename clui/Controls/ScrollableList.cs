@@ -40,7 +40,10 @@ namespace clui.Controls
       ArgumentNullException.ThrowIfNull (listItems);
 
       if (listItems is INotifyCollectionChanged observableCollection)
+      {
         observableCollection.CollectionChanged += ListItemCollectionChanged;
+      }
+
       _listItems = listItems;
 
       FocusedItem = null;
@@ -51,13 +54,17 @@ namespace clui.Controls
     {
       // only when layout is calculated we want to handle the event
       if (CalculatedWidth == null || CalculatedHeight == null)
+      {
         return;
+      }
 
       switch (e.Action)
       {
         case NotifyCollectionChangedAction.Add:
           if (_listItems!.Count == 1)
+          {
             SetFocusedIndex (0);
+          }
           else if (e.NewStartingIndex < CurrentVisibleFromIndex + CalculatedHeight)
           {
             UpdateCurrentVisibleIndex();
@@ -70,12 +77,18 @@ namespace clui.Controls
           {
             int targetIndex = FocusedItemIndex - 1;
             if (targetIndex < 0)
+            {
               targetIndex = 0;
+            }
 
             if (targetIndex < _listItems!.Count)
+            {
               SetFocusedIndex (targetIndex);
+            }
             else
+            {
               ResetFocus();
+            }
           }
 
           break;
@@ -83,13 +96,16 @@ namespace clui.Controls
           break;
         case NotifyCollectionChangedAction.Move:
           if (e.OldItems != null && FocusedItem != null && e.OldItems.Contains (FocusedItem))
+          {
             SetFocusedItem (FocusedItem);
+          }
+
           break;
         case NotifyCollectionChangedAction.Reset:
           ResetFocus();
           break;
         default:
-          throw new ArgumentOutOfRangeException();
+          throw new ArgumentOutOfRangeException($"{e.Action} currently not supported.");
       }
     }
 
@@ -112,7 +128,10 @@ namespace clui.Controls
     internal override bool ShouldRenderControl ()
     {
       if (_listItems == null)
+      {
         return false;
+      }
+
       return base.ShouldRenderControl();
     }
 
@@ -131,7 +150,9 @@ namespace clui.Controls
           RenderListItem (item, textColor, backGroundColor, consoleWriter);
         }
         else
+        {
           consoleWriter.Text.EraseCharacter (CalculatedWidth!.Value);
+        }
 
         if (i < CalculatedHeight - 1)
         {
@@ -165,7 +186,9 @@ namespace clui.Controls
     public void TrySetCurrentVisibleFromIndex (int value)
     {
       if (_listItems == null || CalculatedWidth == null || CalculatedHeight == null)
+      {
         return;
+      }
 
       CurrentVisibleFromIndex = value;
     }
@@ -183,10 +206,14 @@ namespace clui.Controls
       if (wrapAround && _listItems != null)
       {
         if (index < 0)
+        {
           index = _listItems.Count - 1;
+        }
 
         if (index >= _listItems.Count)
+        {
           index = 0;
+        }
       }
 
       SetFocusedIndex (index);
@@ -204,7 +231,9 @@ namespace clui.Controls
 
       int index = _listItems!.IndexOf (item);
       if (index < 0)
+      {
         throw new ArgumentException ("The given item is not present in the list.");
+      }
 
       SetFocusedIndexInternal (index);
     }
@@ -212,11 +241,15 @@ namespace clui.Controls
     private void SetFocusedIndexInternal (int index)
     {
       if (_listItems == null)
+      {
         return;
+      }
 
       int clampedIndex = Math.Clamp (index, 0, Math.Max (0, _listItems.Count - 1));
       if (clampedIndex > _listItems.Count - 1)
+      {
         return;
+      }
 
       FocusedItemIndex = clampedIndex;
       FocusedItem = _listItems[clampedIndex];
@@ -228,21 +261,29 @@ namespace clui.Controls
     private void UpdateCurrentVisibleIndex ()
     {
       if (CalculatedWidth == null || CalculatedHeight == null)
+      {
         return;
+      }
 
       int currentTo = Math.Min (_listItems!.Count, CurrentVisibleFromIndex + CalculatedHeight!.Value);
       int newVisibleFrom = CurrentVisibleFromIndex;
 
       // move up
       if (FocusedItemIndex < CurrentVisibleFromIndex)
+      {
         newVisibleFrom = FocusedItemIndex;
+      }
 
       // move down
       if (FocusedItemIndex >= currentTo)
+      {
         newVisibleFrom = FocusedItemIndex - CalculatedHeight!.Value + 1;
+      }
 
       if (newVisibleFrom > _listItems.Count - CalculatedHeight)
+      {
         newVisibleFrom = _listItems.Count - CalculatedHeight!.Value;
+      }
 
       CurrentVisibleFromIndex = Math.Max (0, newVisibleFrom);
     }

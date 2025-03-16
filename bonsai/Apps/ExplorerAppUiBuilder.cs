@@ -57,29 +57,41 @@ namespace bonsai.Apps
       _rootPanel.AddControls(appPanel, settingsPanel); //, instructions);
     }
 
-    private Panel CreateInstructionsPanel()
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "CreateInstructionsPanel is for later use")]
+    // ReSharper disable once UnusedMember.Local
+    private static Panel CreateInstructionsPanel()
     {
-      var panel = new Panel(1.AsFraction(), 1.AsFixed());
-      panel.BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor;
-      panel.TextColor = ThemeManger.Instance.TopBarTextColor;
+      var panel = new Panel(1.AsFraction(), 1.AsFixed())
+      {
+        BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor,
+        TextColor = ThemeManger.Instance.TopBarTextColor,
 
-      panel.Flow = ChildControlFlow.Horizontal;
-      Label instructions = new(30.AsFixed(), 1.AsFixed());
-      instructions.Text = "Hier könnte ihre Anleitung stehen :D";
+        Flow = ChildControlFlow.Horizontal
+      };
+      Label instructions = new(30.AsFixed(), 1.AsFixed())
+      {
+        Text = "Hier könnte ihre Anleitung stehen :D"
+      };
 
 
-      Label shortCutLabel = new(2.AsFixed(), 1.AsFixed());
-      shortCutLabel.Text = "^I";
-      shortCutLabel.BackgroundColor = Color.FromArgb(63, 119, 185);
+      Label shortCutLabel = new(2.AsFixed(), 1.AsFixed())
+      {
+        Text = "^I",
+        BackgroundColor = Color.FromArgb(63, 119, 185)
+      };
 
-      Label includeSubDirectoriesInSearchLabel = new(25.AsFixed(), 1.AsFixed());
-      includeSubDirectoriesInSearchLabel.Text = " Include sub directories";
-      includeSubDirectoriesInSearchLabel.TextColor = Color.DarkGray;
+      Label includeSubDirectoriesInSearchLabel = new(25.AsFixed(), 1.AsFixed())
+      {
+        Text = " Include sub directories",
+        TextColor = Color.DarkGray
+      };
 
-      Label excludeSubDirectoriesInSearchLabel = new(25.AsFixed(), 1.AsFixed());
-      excludeSubDirectoriesInSearchLabel.Text = " Exclude sub directories";
-      excludeSubDirectoriesInSearchLabel.TextColor = Color.DarkGray;
-      excludeSubDirectoriesInSearchLabel.Visible = true;
+      Label excludeSubDirectoriesInSearchLabel = new(25.AsFixed(), 1.AsFixed())
+      {
+        Text = " Exclude sub directories",
+        TextColor = Color.DarkGray,
+        Visible = true
+      };
 
       panel.AddControls(instructions, shortCutLabel, includeSubDirectoriesInSearchLabel, excludeSubDirectoriesInSearchLabel);
       return panel;
@@ -87,12 +99,16 @@ namespace bonsai.Apps
 
     private Panel CreateTopPanel()
     {
-      Panel topPanel = new(1.AsFraction(), 1.AsFixed());
-      topPanel.Flow = ChildControlFlow.Horizontal;
-      CurrentDirectoryLabel = new Label(1.AsFraction(), 1.AsFixed());
-      CurrentDirectoryLabel.TruncateLeft = true;
-      CurrentDirectoryLabel.TextColor = ThemeManger.Instance.TopBarTextColor;
-      CurrentDirectoryLabel.BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor;
+      Panel topPanel = new(1.AsFraction(), 1.AsFixed())
+      {
+        Flow = ChildControlFlow.Horizontal
+      };
+      CurrentDirectoryLabel = new Label(1.AsFraction(), 1.AsFixed())
+      {
+        TruncateLeft = true,
+        TextColor = ThemeManger.Instance.TopBarTextColor,
+        BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor
+      };
 
       topPanel.AddControls(CurrentDirectoryLabel);
       return topPanel;
@@ -100,29 +116,37 @@ namespace bonsai.Apps
 
     private Panel CreateCenterPanel()
     {
-      Panel centerPanel = new(1.AsFraction(), 1.AsFraction());
-      centerPanel.Flow = ChildControlFlow.Horizontal;
+      Panel centerPanel = new(1.AsFraction(), 1.AsFraction())
+      {
+        Flow = ChildControlFlow.Horizontal
+      };
 
-      FileSystemListBorder = new Border(5.AsFraction(), 1.AsFraction());
-      FileSystemListBorder.TextPosition = BorderTextPosition.BottomLeft;
-      FileSystemListBorder.BorderColor = ThemeManger.Instance.BorderColor;
+      FileSystemListBorder = new Border(5.AsFraction(), 1.AsFraction())
+      {
+        TextPosition = BorderTextPosition.BottomLeft,
+        BorderColor = ThemeManger.Instance.BorderColor
+      };
 
       FileSystemList = new ScrollableList<FileSystemItem>(ThemeManger.Instance.SelectionForegroundColor, ThemeManger.Instance.SelectionBackgroundColor,
         1.AsFraction(), 1.AsFraction());
       FileSystemListBorder.AddControls(FileSystemList);
 
-      _detailsBorder = new Border(2.AsFraction(), 1.AsFraction());
-      _detailsBorder.BorderColor = ThemeManger.Instance.BorderColor;
-      _detailsBorder.Visible = false;
+      _detailsBorder = new Border(2.AsFraction(), 1.AsFraction())
+      {
+        BorderColor = ThemeManger.Instance.BorderColor,
+        Visible = false
+      };
 
       DetailsLabel = new MultiLIneLabel(1.AsFraction(), 1.AsFraction());
 
       GitPanel = new Panel(1.AsFraction(), 1.AsFraction());
       var seperator = new Border(1.AsFraction(), 1.AsFixed(), bottomFiller: null, bottomLeftCorner: null, bottomRightCorner: null, topLeftCorner: '─', topRightCorner: '─');
-      var multilineLabel2 = new MultiLIneLabel(1.AsFraction(), 1.AsFraction());
-      multilineLabel2.StickToBottom = true;
-      multilineLabel2.Lines =
-        [new FormattedLine("Hier noch GIT infos?"), new FormattedLine("ABC"), new FormattedLine("DEF"), new FormattedLine("GHI"), new FormattedLine("JKL"), new FormattedLine("MNO"), new FormattedLine("PQR")];
+      var multilineLabel2 = new MultiLIneLabel(1.AsFraction(), 1.AsFraction())
+      {
+        StickToBottom = true,
+        Lines =
+        [new FormattedLine("Hier noch GIT infos?"), new FormattedLine("ABC"), new FormattedLine("DEF"), new FormattedLine("GHI"), new FormattedLine("JKL"), new FormattedLine("MNO"), new FormattedLine("PQR")]
+      };
 
       GitPanel.AddControls(seperator, multilineLabel2);
       _detailsBorder.AddControls(DetailsLabel, GitPanel);
@@ -133,36 +157,48 @@ namespace bonsai.Apps
 
     private Panel CreateSearchPanel()
     {
-      Panel searchPanel = new(1.AsFraction(), 1.AsFixed());
-      searchPanel.Flow = ChildControlFlow.Horizontal;
+      Panel searchPanel = new(1.AsFraction(), 1.AsFixed())
+      {
+        Flow = ChildControlFlow.Horizontal
+      };
 
-      Label label = new(10.AsFixed(), 1.AsFixed());
-      label.Text = " Search ❯";
-      label.TextColor = ThemeManger.Instance.SearchLabelTextColor;
-      label.BackgroundColor = ThemeManger.Instance.SearchLabelBackgroundColor;
+      Label label = new(10.AsFixed(), 1.AsFixed())
+      {
+        Text = " Search ❯",
+        TextColor = ThemeManger.Instance.SearchLabelTextColor,
+        BackgroundColor = ThemeManger.Instance.SearchLabelBackgroundColor
+      };
 
       SearchTextBox = new TextBox(1.AsFraction(), 1.AsFixed());
 
       var text = Settings.Instance.GetInstructionForAction(KeyBindingContext.ExplorerApp, ActionType.ToggleRegexSearch, "regex");
-      _regexLabel = new(text.Length.AsFixed(), 1.AsFixed());
-      _regexLabel.TextColor = ThemeManger.Instance.OptionDisabledColor;
-      _regexLabel.Text = text;
+      _regexLabel = new(text.Length.AsFixed(), 1.AsFixed())
+      {
+        TextColor = ThemeManger.Instance.OptionDisabledColor,
+        Text = text
+      };
 
       searchPanel.AddControls(label, SearchTextBox, _regexLabel);
 
       return searchPanel;
     }
 
-    private Panel CreateSettingsPanel()
+    private static Panel CreateSettingsPanel()
     {
-      Panel settingsPanel = new(1.AsFraction(), 1.AsFraction());
-      settingsPanel.Visible = false;
+      Panel settingsPanel = new(1.AsFraction(), 1.AsFraction())
+      {
+        Visible = false
+      };
 
-      Border border = new(1.AsFraction(), 1.AsFraction());
-      border.BorderColor = ThemeManger.Instance.BorderColor;
-      border.Text = "bonsai settings";
-      Label label = new(1.AsFraction(), 1.AsFraction());
-      label.Text = "Settings YEAAA";
+      Border border = new(1.AsFraction(), 1.AsFraction())
+      {
+        BorderColor = ThemeManger.Instance.BorderColor,
+        Text = "bonsai settings"
+      };
+      Label label = new(1.AsFraction(), 1.AsFraction())
+      {
+        Text = "Settings YEAAA"
+      };
 
       border.AddControls(label);
       settingsPanel.AddControls(border);

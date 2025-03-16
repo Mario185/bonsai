@@ -90,9 +90,13 @@ try
   if (!string.IsNullOrWhiteSpace(result))
   {
     if (File.Exists (tempFilePath))
+    {
       File.WriteAllText (tempFilePath, result);
+    }
     else
+    {
       Console.WriteLine (result);
+    }
   }
 
   return 0;

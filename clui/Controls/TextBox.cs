@@ -29,7 +29,9 @@ namespace clui.Controls
         bool changed = _text != value;
         _text = value;
         if (changed)
+        {
           OnTextChanged?.Invoke (this, _text);
+        }
       }
     }
 
@@ -38,7 +40,9 @@ namespace clui.Controls
     public bool HandleInput (ConsoleKeyInfo key)
     {
       if (!HasFocus || !ShouldRenderControl())
+      {
         return false;
+      }
 
       bool keyHandled = false;
       if (key.Modifiers == ConsoleModifiers.None)
@@ -77,7 +81,10 @@ namespace clui.Controls
 
           case ConsoleKey.Delete:
             if (CursorPosition < Text.Length)
+            {
               Text = Text.Remove (CursorPosition, 1);
+            }
+
             keyHandled = true;
             break;
         }
@@ -91,7 +98,9 @@ namespace clui.Controls
       }
 
       if (!keyHandled)
+      {
         return false;
+      }
 
       CursorPosition = Math.Clamp (CursorPosition, 0, Text.Length);
 
@@ -117,7 +126,9 @@ namespace clui.Controls
       UpdateCurrentVisibleIndex();
 
       if (CalculatedWidth != null && CalculatedHeight != null)
+      {
         RootControl.AssociatedFrame.RenderPartial (this);
+      }
     }
 
     public override void OnLayoutCalculated ()
@@ -145,14 +156,20 @@ namespace clui.Controls
 
       // move left
       if (CursorPosition < _currentVisibleFromIndex)
+      {
         newVisibleFrom = CursorPosition;
+      }
 
       if (CursorPosition > _visibleTextLength && CursorPosition > currentTo)
+      {
         newVisibleFrom = CursorPosition - _visibleTextLength;
+      }
 
       // move right
       if (CursorPosition >= Text.Length)
+      {
         newVisibleFrom = Text.Length - _visibleTextLength;
+      }
 
       _currentVisibleFromIndex = Math.Max (0, newVisibleFrom);
     }

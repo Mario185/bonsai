@@ -2,42 +2,48 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Threading;
 
 namespace consoleTools.Windows
 {
-  internal sealed class WindowsConsoleHandler : IConsoleHandler
+  internal sealed partial class WindowsConsoleHandler : IConsoleHandler
   {
     private readonly Lock _bufferSizeRegistrationLock;
 
     private readonly List<BufferSizeChangeCallback> _bufferSizeChangeCallbacks = new();
 
-    private const int STD_INPUT_HANDLE = -10;
-    private const int STD_OUTPUT_HANDLE = -11;
-    private const int STD_ERROR_HANDLE = -12;
+    private const int c_stdInputHandle = -10;
+    private const int c_stdOutputHandle = -11;
+    // ReSharper disable once UnusedMember.Local
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
+    private const int c_stdErrorHandle = -12;
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
 
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    private static partial IntPtr GetStdHandle(int nStdHandle);
 
     [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern IntPtr GetStdHandle(int nStdHandle);
-
-    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "<Pending>")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "SYSLIB1054:Use 'LibraryImportAttribute' instead of 'DllImportAttribute' to generate P/Invoke marshalling code at compile time", Justification = "<Pending>")]
     private static extern bool ReadConsoleInput(IntPtr hConsoleInput, out InputRecord lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
 
-    [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
-    private static extern bool GetNumberOfConsoleInputEvents(IntPtr hConsoleInput, out uint lpcNumberOfEvents);
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool GetNumberOfConsoleInputEvents(IntPtr hConsoleInput, out uint lpcNumberOfEvents);
 
     private IntPtr _inputHandle;
     
 
     public void SetInputHandle(IntPtr? inputHandle)
     {
-      _inputHandle = inputHandle ?? GetStdHandle (STD_INPUT_HANDLE);
+      _inputHandle = inputHandle ?? GetStdHandle (c_stdInputHandle);
     }
 
     public void StartOperation (CancellationToken cancellationToken)
@@ -65,27 +71,33 @@ namespace consoleTools.Windows
       SetInputHandle (inputHandle);
     }
 
-    internal OutputModeType? GetOutputMode()
+    // ReSharper disable once UnusedMember.Global
+    internal static OutputModeType? GetOutputMode()
     {
-      IntPtr consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+      IntPtr consoleOutput = GetStdHandle(c_stdOutputHandle);
       if (!GetConsoleMode(consoleOutput, out uint uintOutputMode))
+      {
         return null;
+      }
 
       var outputMode = (OutputModeType)uintOutputMode;
       return outputMode;
     }
 
-    internal bool SetOutputMode(OutputModeType outputMode)
+    // ReSharper disable once UnusedMember.Global
+    internal static bool SetOutputMode(OutputModeType outputMode)
     {
-      IntPtr consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+      IntPtr consoleOutput = GetStdHandle(c_stdOutputHandle);
       return SetConsoleMode(consoleOutput, (uint)outputMode);
     }
 
     internal InputModeType? GetInputMode()
     {
-      IntPtr consoleInput = GetStdHandle(STD_INPUT_HANDLE);
+      IntPtr consoleInput = _inputHandle;
       if (!GetConsoleMode(consoleInput, out uint uintInputMode))
+      {
         return null;
+      }
 
       var inputMode = (InputModeType)uintInputMode;
       return inputMode;
@@ -93,7 +105,7 @@ namespace consoleTools.Windows
 
     internal bool SetInputMode(InputModeType inputMode)
     {
-      IntPtr consoleInput = GetStdHandle(STD_INPUT_HANDLE);
+      IntPtr consoleInput = _inputHandle;
       return SetConsoleMode(consoleInput, (uint)inputMode);
     }
 
@@ -102,7 +114,9 @@ namespace consoleTools.Windows
       while (!cancellationToken.IsCancellationRequested)
       {
         if (!GetNumberOfConsoleInputEvents(_inputHandle, out uint lpcNumberOfEvents) || lpcNumberOfEvents <= 0)
+        {
           continue;
+        }
 
         if (ReadConsoleInput (_inputHandle, out InputRecord buffer, 1, out uint read) && read > 0)
         {
@@ -123,7 +137,7 @@ namespace consoleTools.Windows
               HandleBufferSizeEvent (buffer.Event.WindowBufferSizeEvent, cancellationToken);
               break;
             default:
-              throw new ArgumentOutOfRangeException();
+              throw new ArgumentOutOfRangeException($"{eventType} currently not supported.");
           }
         }
       }
@@ -136,7 +150,9 @@ namespace consoleTools.Windows
         foreach(var callback in _bufferSizeChangeCallbacks)
         {
           if (cancellationToken.IsCancellationRequested)
+          {
             return;
+          }
 
           callback (eventWindowBufferSizeEvent.dwSize.X, eventWindowBufferSizeEvent.dwSize.Y);
         }
@@ -146,11 +162,15 @@ namespace consoleTools.Windows
     private void HandleKeyEvent(KeyEventRecord eventRecord, CancellationToken cancellationToken)
     {
       if (!eventRecord.bKeyDown || cancellationToken.IsCancellationRequested)
+      {
         return;
+      }
 
       ConsoleKey consoleKey = (ConsoleKey)(int)eventRecord.wVirtualKeyCode;
       if (!Enum.IsDefined (consoleKey))
+      {
         consoleKey = ConsoleKey.None;
+      }
 
       var ctrlKeyState = eventRecord.dwControlKeyState;
       var keyInfo = new ConsoleKeyInfo (

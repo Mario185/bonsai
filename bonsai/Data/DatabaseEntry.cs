@@ -28,7 +28,10 @@ namespace bonsai.Data
       set
       {
         if (_score != value)
+        {
           _printableText = null;
+        }
+
         _score = value;
       }
     }
@@ -47,13 +50,20 @@ namespace bonsai.Data
         for (int i = 0; i < totalLength; i++)
         {
           if (i >= indexOfSearchableText && IsIndexInMatch (i - indexOfSearchableText))
+          {
             writer.Style.ForegroundColor (Color.LightGreen).Underline();
+          }
           else
           {
             if (isFocusedItem)
+            {
               writer.Style.ForegroundColor (ThemeManger.Instance.SelectionForegroundColor);
+            }
             else
+            {
               writer.Style.ResetForegroundColor();
+            }
+
             writer.Style.ResetUnderscore();
           }
 
@@ -69,13 +79,17 @@ namespace bonsai.Data
     private bool IsIndexInMatch(int index)
     {
       if (_searchMatches == null || _searchMatches.Length == 0)
+      {
         return false;
+      }
 
       for (int i = 0; i < _searchMatches.Length; i++)
       {
         var match = _searchMatches[i];
         if (match.MatchStartAt <= index && index < match.MatchEndAt)
+        {
           return true;
+        }
       }
 
       return false;
@@ -83,9 +97,7 @@ namespace bonsai.Data
 
     private string GetPrintableText()
     {
-      if (_printableText == null)
-        _printableText = $"{LastUsed:yyyy-MM-dd HH:mm} {Score,6} {Path}";
-      return _printableText;
+      return _printableText ??= $"{LastUsed:yyyy-MM-dd HH:mm} {Score,6} {Path}";
     }
 
     [JsonIgnore]

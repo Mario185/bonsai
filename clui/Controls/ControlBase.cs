@@ -35,7 +35,9 @@ namespace clui.Controls
       get
       {
         if (Parent == null)
+        {
           return (RootControl)this;
+        }
 
         return Parent.RootControl;
       }
@@ -84,10 +86,14 @@ namespace clui.Controls
     internal virtual bool ShouldRenderControl ()
     {
       if (!Visible || CalculatedWidth == null || CalculatedHeight == null || CalculatedWidth <= 0 || CalculatedHeight <= 0)
+      {
         return false;
+      }
 
       if (Parent != null && !Parent.ShouldRenderControl())
+      {
         return false;
+      }
 
       return true;
     }
@@ -99,7 +105,10 @@ namespace clui.Controls
       foreach (ControlBase? control in controls)
       {
         if (control.Parent != null)
+        {
           throw new InvalidOperationException ("Controls already has parent and cannot be added to another hierarchy");
+        }
+
         control.Parent = this;
         _controls.Add (control);
       }

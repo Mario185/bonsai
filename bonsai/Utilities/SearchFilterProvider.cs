@@ -36,7 +36,9 @@ namespace bonsai.Utilities
       bool searchTermChanged = !string.Equals(trimmed, _currentSearchTerm, StringComparison.OrdinalIgnoreCase) || useRegex != _wasUsingRegex;
 
       if (!searchTermChanged)
+      {
         return (false, null, false);
+      }
 
       bool wasFilterActive = IsFilterActive;
       bool applyFilterToAlreadyFilteredList = wasFilterActive && trimmed.StartsWith(_currentSearchTerm, StringComparison.OrdinalIgnoreCase) && !useRegex;
@@ -44,7 +46,9 @@ namespace bonsai.Utilities
       _wasUsingRegex = useRegex;
 
       if (string.IsNullOrWhiteSpace(trimmed))
+      {
         return (wasFilterActive && searchTermChanged, null, false);
+      }
 
       Func<TItem?, SearchMatch[]> filter;
       if (useRegex)
@@ -56,12 +60,16 @@ namespace bonsai.Utilities
           filter = fileSystemItem =>
           {
             if (fileSystemItem == null)
+            {
               return [];
+            }
 
             var displayName = fileSystemItem.SearchableText;
             var match = regex.Match(displayName);
             if (!match.Success)
+            {
               return [];
+            }
 
             return [new SearchMatch(match.Index, match.Length)];
           };
@@ -77,7 +85,9 @@ namespace bonsai.Utilities
         filter = fileSystemItem =>
         {
           if (fileSystemItem == null)
+          {
             return [];
+          }
 
           var displayName = fileSystemItem.SearchableText;
           int lastIndex = 0;
@@ -88,7 +98,9 @@ namespace bonsai.Utilities
             var currentIndex = displayName.IndexOf(part, lastIndex, StringComparison.OrdinalIgnoreCase);
 
             if (currentIndex < lastIndex || currentIndex < 0)
+            {
               return [];
+            }
 
             matches[i] = new SearchMatch(currentIndex, part.Length);
             lastIndex = currentIndex + 1;
@@ -99,17 +111,6 @@ namespace bonsai.Utilities
       }
 
       return (true, filter, applyFilterToAlreadyFilteredList);
-    }
-
-
-    private IEnumerable<string> GetDistinctSearchTerms(string searchTerm)
-    {
-      var returnedItems = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-      foreach (var item in searchTerm.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-      {
-        if (returnedItems.Add(item))
-          yield return item;
-      }
     }
   }
 }

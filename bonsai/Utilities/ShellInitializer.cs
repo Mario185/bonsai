@@ -21,10 +21,14 @@ namespace bonsai.Utilities
     {
       AbsolutePath initScriptFilePath = GetInitScriptFilePath(scriptName);
       if (File.Exists(initScriptFilePath))
+      {
         return;
+      }
 
       using (StreamReader stream = new(typeof(Program).Assembly.GetManifestResourceStream("bonsai.Resources.initialization." + scriptName)!))
+      {
         File.WriteAllText(initScriptFilePath, stream.ReadToEnd());
+      }
     }
 
     private static AbsolutePath GetInitScriptFilePath(string scriptName)
@@ -36,17 +40,11 @@ namespace bonsai.Utilities
 
     private static string GetScriptName(string shellType)
     {
-      string? extension;
-      switch (shellType)
+      string extension = shellType switch
       {
-        case "powershell":
-          extension = "ps1";
-          break;
-
-        default:
-          throw new NotSupportedException($"Shell type: '{shellType}' is not supported.");
-      }
-
+        "powershell" => "ps1",
+        _ => throw new NotSupportedException($"Shell type: '{shellType}' is not supported."),
+      };
       return "init." + extension;
     }
   }

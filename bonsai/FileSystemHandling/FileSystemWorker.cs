@@ -60,8 +60,7 @@ namespace bonsai.FileSystemHandling
       CurrentDirectory = directory;
       IncludeSubDirectories = includeSubDirectories;
 
-      Thread thread = new(() => LoadDirectory(CurrentDirectory, includeSubDirectories ? _enumerationOptionsWithRecurse : _enumerationOptions,
-        _directoryLoadingCancellationTokenSource.Token, searchedItem));
+      Thread thread = new(() => LoadDirectory(CurrentDirectory, includeSubDirectories ? _enumerationOptionsWithRecurse : _enumerationOptions, searchedItem, _directoryLoadingCancellationTokenSource.Token));
 
       thread.Start();
     }
@@ -72,23 +71,27 @@ namespace bonsai.FileSystemHandling
       (bool filterChanged, Func<FileSystemItem?, SearchMatch[]>? searchFilter, bool canApplyFilterToFilteredList) = _searchFilterProvider.GetFilter(trimmed, useRegex);
 
       if (!filterChanged)
+      {
         return;
+      }
 
       _lastSearchTermChange = Stopwatch.GetTimestamp();
       _applyFilterCancellationTokenSource?.Cancel();
       _applyFilterCancellationTokenSource = new CancellationTokenSource();
       _waitForDeferredApplyFilter.Wait();
 
-      Thread thread = new(() => ApplyFilterDeferred(_applyFilterCancellationTokenSource.Token, searchFilter, canApplyFilterToFilteredList));
+      Thread thread = new(() => ApplyFilterDeferred(searchFilter, canApplyFilterToFilteredList, _applyFilterCancellationTokenSource.Token));
       thread.Start();
     }
 
-    private void ApplyFilterDeferred(CancellationToken token, Func<FileSystemItem?, SearchMatch[]>? newFilter, bool canApplyFilterToFilteredList)
+    private void ApplyFilterDeferred (Func<FileSystemItem?, SearchMatch[]>? newFilter, bool canApplyFilterToFilteredList, CancellationToken token)
     {
       while (Stopwatch.GetElapsedTime(_lastSearchTermChange).TotalMilliseconds < 200)
       {
         if (token.IsCancellationRequested)
+        {
           return;
+        }
       }
 
       try
@@ -96,7 +99,9 @@ namespace bonsai.FileSystemHandling
         _waitForDeferredApplyFilter.Reset();
 
         if (token.IsCancellationRequested)
+        {
           return;
+        }
 
         _searchFilter = newFilter;
 
@@ -112,7 +117,9 @@ namespace bonsai.FileSystemHandling
 
           List<FileSystemItem> listToFilter = _unfilteredList;
           if (canApplyFilterToFilteredList && _filteredList.Count > 0)
+          {
             listToFilter = _filteredList.ToList();
+          }
 
           _filteredList.Clear();
 
@@ -121,7 +128,9 @@ namespace bonsai.FileSystemHandling
           {
             FileSystemItem item = listToFilter[index];
             if (token.IsCancellationRequested)
+            {
               break;
+            }
 
             ApplyFilterToItemAndAddToList(item, _searchFilter, _filteredList);
             TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Updated, -1);
@@ -134,7 +143,9 @@ namespace bonsai.FileSystemHandling
           // directory loading is still in progress, so just notify the loading thread
           // that the filter has changed
           using (_filterChangeLock.EnterScope())
+          {
             _filterChanged = true;
+          }
         }
       }
       finally
@@ -151,7 +162,11 @@ namespace bonsai.FileSystemHandling
       _waitForDeferredApplyFilter.Wait();
     }
 
-    private void LoadDirectory(DirectoryInfo? directoryInfo, EnumerationOptions enumerationOptions, CancellationToken cancellationToken, string? searchedItem)
+    private void LoadDirectory (
+        DirectoryInfo? directoryInfo,
+        EnumerationOptions enumerationOptions,
+        string? searchedItem,
+        CancellationToken cancellationToken)
     {
       try
       {
@@ -164,7 +179,7 @@ namespace bonsai.FileSystemHandling
 
         if (directoryInfo == null)
         {
-          CreateAndAddFileSystemItems(DriveInfo.GetDrives(), cancellationToken, searchedItem, info => new DriveItem(info, currentDirectoryFullNameLength));
+          CreateAndAddFileSystemItems(DriveInfo.GetDrives(), searchedItem, info => new DriveItem(info, currentDirectoryFullNameLength), cancellationToken);
         }
 
         else
@@ -183,16 +198,23 @@ namespace bonsai.FileSystemHandling
             }
           }
 
-          var directorySource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new DirectoryItem(Path.Join(entry.Directory, entry.FileName), currentDirectoryFullNameLength), enumerationOptions);
-          directorySource.ShouldIncludePredicate = (ref FileSystemEntry entry) => entry.IsDirectory;
+          var directorySource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new DirectoryItem(Path.Join(entry.Directory, entry.FileName), currentDirectoryFullNameLength), enumerationOptions)
+          {
+            ShouldIncludePredicate = (ref FileSystemEntry entry) => entry.IsDirectory
+          };
           if (!cancellationToken.IsCancellationRequested)
-            CreateAndAddFileSystemItems(directorySource, cancellationToken, searchedItem, item => item);
+          {
+            CreateAndAddFileSystemItems(directorySource, searchedItem, item => item, cancellationToken);
+          }
 
-          var fileSource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new FileItem(entry.Directory, entry.FileName, currentDirectoryFullNameLength), enumerationOptions);
-          fileSource.ShouldIncludePredicate = (ref FileSystemEntry entry) => !entry.IsDirectory;
+          var fileSource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new FileItem(entry.Directory, entry.FileName, currentDirectoryFullNameLength), enumerationOptions)
+          {
+            ShouldIncludePredicate = (ref FileSystemEntry entry) => !entry.IsDirectory
+          };
           if (!cancellationToken.IsCancellationRequested)
-            CreateAndAddFileSystemItems(fileSource, cancellationToken, searchedItem, item => item);
-
+          {
+            CreateAndAddFileSystemItems(fileSource, searchedItem, item => item, cancellationToken);
+          }
         }
         TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Finished, -1);
       }
@@ -204,14 +226,20 @@ namespace bonsai.FileSystemHandling
 
     }
 
-    private void CreateAndAddFileSystemItems<T>(IEnumerable<T> source, CancellationToken cancellationToken, string? searchedItem, Func<T, FileSystemItem> itemFactory)
+    private void CreateAndAddFileSystemItems<T> (
+        IEnumerable<T> source,
+        string? searchedItem,
+        Func<T, FileSystemItem> itemFactory,
+        CancellationToken cancellationToken)
     {
       int searchedItemAtIndex = -1;
 
       foreach (T fileSystemInfo in source)
       {
         if (cancellationToken.IsCancellationRequested)
+        {
           break;
+        }
 
         var listItem = itemFactory (fileSystemInfo);
 
@@ -236,23 +264,29 @@ namespace bonsai.FileSystemHandling
         }
 
         if (searchedItem != null && listItem.FullName == searchedItem)
+        {
           searchedItemAtIndex = _unfilteredList.Count - 1;
+        }
 
         TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Updated, searchedItemAtIndex);
         searchedItemAtIndex = -1;
       }
     }
 
-    private void ApplyFilterToItemAndAddToList(FileSystemItem item, Func<FileSystemItem?, SearchMatch[]>? filter, List<FileSystemItem> targetList)
+    private static void ApplyFilterToItemAndAddToList(FileSystemItem item, Func<FileSystemItem?, SearchMatch[]>? filter, List<FileSystemItem> targetList)
     {
       item.ClearSearchMatches();
       if (filter == null)
+      {
         return;
+      }
 
       var matches = filter(item);
 
       if (matches.Length == 0)
+      {
         return;
+      }
 
       item.SetSearchMatches(matches);
 

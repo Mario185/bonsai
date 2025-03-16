@@ -17,7 +17,9 @@ namespace consoleTools.SubWriter
     public StyleWriter BackgroundColor(Color? color)
     {
       if (!color.HasValue)
+      {
         return this;
+      }
 
       StyleSequences.SetBackgroundColor(color.Value, _writeAction);
 //      Writer.Write(StyleSequences.SetBackgroundColor(color.Value));
@@ -36,7 +38,9 @@ namespace consoleTools.SubWriter
     public StyleWriter ForegroundColor(Color? color)
     {
       if (!color.HasValue)
+      {
         return this;
+      }
 
       StyleSequences.SetForegroundColor(color.Value, _writeAction);
       return this;

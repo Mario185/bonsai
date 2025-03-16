@@ -36,7 +36,7 @@ namespace bonsai.Data
       UpdateEntry(entry, autoSave);
     }
 
-    public int CalculateScore(int value, DateTime lastUsed, DateTime queryTime)
+    public static int CalculateScore(int value, DateTime lastUsed, DateTime queryTime)
     {
       // we cast TotalHours to int so we get hourly steps
       double recency = Math.Max(0, c_maxAge - (int)(queryTime - lastUsed).TotalHours);
@@ -83,7 +83,7 @@ namespace bonsai.Data
       }
     }
 
-    public void Save()
+    public static void Save()
     {
       JsonSerializerOptions options = GetJsonSerializerOptions();
       File.WriteAllText(GetDatabaseFilePath(), JsonSerializer.Serialize(Instance, options));
@@ -95,10 +95,14 @@ namespace bonsai.Data
       entry.Score++;
 
       if (entry.Score > TopScore)
+      {
         TopScore = entry.Score;
+      }
 
       if (autoSave)
+      {
         Save();
+      }
     }
 
     internal FileSystemItem[] Search(string args)
@@ -143,13 +147,20 @@ namespace bonsai.Data
         }
 
         if (!isMatch)
+        {
           continue;
+        }
 
         FileSystemItem fileSystemItem;
         if (entry.IsDirectory)
+        {
           fileSystemItem = new DirectoryItem(entry.Path, 0);
+        }
         else
+        {
           fileSystemItem = new FileItem(entry.Path, Path.GetFileName(entry.Path), 0);
+        }
+
         fileSystemItem.SetSearchMatches(matches);
         foundEntries.Add((fileSystemItem, entry));
       }
@@ -158,10 +169,12 @@ namespace bonsai.Data
       return foundEntries.OrderByDescending(i => CalculateScore(i.entry.Score, i.entry.LastUsed, queryTime)).ThenByDescending(i => i.entry.LastUsed).Select(i => i.fi).ToArray();
     }
 
-    private bool FileOrDirectoryExist(DatabaseEntry entry)
+    private static bool FileOrDirectoryExist(DatabaseEntry entry)
     {
       if (entry.IsDirectory)
+      {
         return Directory.Exists(entry.Path);
+      }
 
       return File.Exists(entry.Path);
     }
@@ -192,10 +205,14 @@ namespace bonsai.Data
 
       AbsolutePath databaseFilePath = GetDatabaseFilePath();
       if (!File.Exists(databaseFilePath))
+      {
         return new Database();
+      }
 
       using (FileStream stream = File.OpenRead(databaseFilePath))
+      {
         return JsonSerializer.Deserialize<Database>(stream, options)!;
+      }
     }
   }
 }

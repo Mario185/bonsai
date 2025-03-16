@@ -8,7 +8,9 @@ namespace consoleTools.VirtualTerminalSequences
     {
       writeTo(CommonSequences.ESC);
       if (addSquareBracket)
+      {
         writeTo("[");
+      }
     }
   }
 

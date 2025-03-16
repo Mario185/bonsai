@@ -24,9 +24,13 @@ namespace bonsai
         foreach (var context in Enum.GetValues<KeyBindingContext>())
         {
           if (KeyBindings.TryGetValue(context, out var bindings))
+          {
             result[context] = BuildKeyBindingDictionary(bindings);
+          }
           else
+          {
             result[context] = new Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)>();
+          }
         }
 
         return result;
@@ -59,7 +63,9 @@ namespace bonsai
       Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)> keyBindingsByContext = _keyBindings.Value[keyBindingContext];
       ActionType? result = GetInputActionInternal(keyInfo, keyBindingsByContext);
       if (result.HasValue)
+      {
         return result.Value;
+      }
 
       Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)>
         commonKeyBindings = _keyBindings.Value[KeyBindingContext.Common];
@@ -74,7 +80,9 @@ namespace bonsai
         var result = inner.Where(k => k.Action == action).OrderByDescending(k=>k.Key != null).FirstOrDefault();
 
         if (result == null)
+        {
           return $"[MISSING {keyBindingContext}.{action}]";
+        }
 
         var modifier = GetModifierText(result.Modifier);
         var key = (result.Key?.ToString() ?? result.KeyChar.ToString())?.ToLower();
@@ -102,13 +110,17 @@ namespace bonsai
 
       AbsolutePath settingsPath = GetSettingsFilePath();
       if (!File.Exists(settingsPath))
+      {
         WriteDefaultSettingsToFile();
+      }
 
       using (FileStream stream = File.OpenRead(settingsPath))
       {
         Instance = JsonSerializer.Deserialize<Settings>(stream, options)!;
         if (string.IsNullOrWhiteSpace(Instance.Theme))
+        {
           Instance.Theme = "default.json";
+        }
       }
     }
 
@@ -123,10 +135,12 @@ namespace bonsai
     {
       using (Stream defaultSettingsStream = GetDefaultSettings())
       using (FileStream fileStream = new(GetSettingsFilePath(), FileMode.Create))
+      {
         defaultSettingsStream.CopyTo(fileStream);
+      }
     }
 
-    private Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)> BuildKeyBindingDictionary(
+    private static Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)> BuildKeyBindingDictionary(
       IReadOnlyList<KeyBinding> rawBindings)
     {
       Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)> keyBindingDictionary = new();
@@ -134,18 +148,24 @@ namespace bonsai
 
       foreach (IGrouping<ConsoleModifiers, KeyBinding> group in groupedByModifier)
       {
-        (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey) value = new();
-        value.ByChar = new Dictionary<char, ActionType>();
-        value.ByKey = new Dictionary<ConsoleKey, ActionType>();
+        (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey) value = new()
+        {
+          ByChar = new Dictionary<char, ActionType>(),
+          ByKey = new Dictionary<ConsoleKey, ActionType>()
+        };
         keyBindingDictionary.Add(group.Key, value);
 
         foreach (KeyBinding entry in group)
         {
           if (entry.Key.HasValue)
+          {
             value.ByKey.Add(entry.Key.Value, entry.Action);
+          }
 
           if (entry.KeyChar.HasValue)
+          {
             value.ByChar.Add(entry.KeyChar.Value, entry.Action);
+          }
         }
       }
 
@@ -157,17 +177,23 @@ namespace bonsai
       return typeof(Settings).Assembly.GetManifestResourceStream("bonsai.Resources.default_settings.json")!;
     }
 
-    private ActionType? GetInputActionInternal(ConsoleKeyInfo keyInfo,
+    private static ActionType? GetInputActionInternal(ConsoleKeyInfo keyInfo,
       Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)> keyBindings)
     {
       if (!keyBindings.TryGetValue(keyInfo.Modifiers, out (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey) modifierByContext))
+      {
         return null;
+      }
 
       if (modifierByContext.ByChar.TryGetValue(keyInfo.KeyChar, out ActionType byChar))
+      {
         return byChar;
+      }
 
       if (modifierByContext.ByKey.TryGetValue(keyInfo.Key, out ActionType byKey))
+      {
         return byKey;
+      }
 
       return null;
     }

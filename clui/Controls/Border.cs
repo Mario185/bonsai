@@ -86,7 +86,9 @@ namespace clui.Controls
     internal override void Render (ConsoleWriter consoleWriter)
     {
       if (!ShouldRenderControl())
+      {
         return;
+      }
 
       consoleWriter.Cursor.MoveTo (Position.X, Position.Y);
 
@@ -95,13 +97,19 @@ namespace clui.Controls
           .BackgroundColor (GetEffectiveBackgroundColor());
 
       if (_topLeftCorner != null)
+      {
         consoleWriter.Write (_topLeftCorner.Value);
+      }
 
       if (_top.Length > 0)
+      {
         consoleWriter.Write (_top);
+      }
 
       if (_topRightCorner != null)
+      {
         consoleWriter.Write (_topRightCorner.Value);
+      }
 
       for (int i = Padding.Top; i < CalculatedHeight - Padding.Bottom; i++)
       {
@@ -122,11 +130,20 @@ namespace clui.Controls
           .Cursor.MoveTo (Position.X, Position.Y + CalculatedHeight!.Value - 1);
 
       if (_bottomLeftCorner != null)
+      {
         consoleWriter.Write (_bottomLeftCorner.Value);
+      }
+
       if (_bottom.Length > 0)
+      {
         consoleWriter.Write (_bottom);
+      }
+
       if (_bottomRightCorner != null)
+      {
         consoleWriter.Write (_bottomRightCorner.Value);
+      }
+
       consoleWriter.Style.ResetStyles();
 
       if (Text != string.Empty && _effectiveWidth > 0)
@@ -156,7 +173,7 @@ namespace clui.Controls
             consoleWriter.Cursor.MoveTo (Position.X + 1 + widthValue, Position.Y + CalculatedHeight!.Value - 1);
             break;
           default:
-            throw new ArgumentOutOfRangeException();
+            throw new ArgumentOutOfRangeException($"{TextPosition} currently not supported.");
         }
 
         consoleWriter.WriteTruncated (Text, 0, possibleUsedSpace);

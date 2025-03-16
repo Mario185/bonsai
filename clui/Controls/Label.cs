@@ -19,11 +19,15 @@ namespace clui.Controls
       set
       {
         if (_text == value)
+        {
           return;
+        }
 
         _text = value;
         if (CalculatedHeight != null && CalculatedWidth != null)
+        {
           RootControl.AssociatedFrame.RenderPartial (this);
+        }
       }
     }
 
@@ -32,7 +36,9 @@ namespace clui.Controls
     internal override void Render (ConsoleWriter consoleWriter)
     {
       if (!ShouldRenderControl())
+      {
         return;
+      }
 
       consoleWriter.Style.ForegroundColor (GetEffectiveTextColor())
           .BackgroundColor (GetEffectiveBackgroundColor())
@@ -56,7 +62,9 @@ namespace clui.Controls
           }
         }
         else
+        {
           consoleWriter.Write (Text);
+        }
       }
 
       consoleWriter.Style.ResetStyles();

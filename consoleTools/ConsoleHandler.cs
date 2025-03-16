@@ -10,7 +10,7 @@ namespace consoleTools
   public static class ConsoleHandler
   {
     private static readonly CancellationTokenSource s_cancellationTokenSource;
-    private static Lock s_bufferSizeCallbackLock = new();
+    private static readonly Lock s_bufferSizeCallbackLock = new();
 
     public static void RegisterBufferSizeChangeCallback(BufferSizeChangeCallback callbackAction)
     {
@@ -29,16 +29,26 @@ namespace consoleTools
       }
     }
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable CA1859 // Use concrete types when possible for improved performance
     private static readonly IConsoleHandler s_consoleHandlerImplementation;
+#pragma warning restore CA1859 // Use concrete types when possible for improved performance
+#pragma warning restore IDE0079 // Remove unnecessary suppression
+
     static ConsoleHandler()
+
     {
       if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
+      {
         s_consoleHandlerImplementation = new WindowsConsoleHandler(null, s_bufferSizeCallbackLock);
+      }
 
       s_cancellationTokenSource = new CancellationTokenSource();
 
       if (s_consoleHandlerImplementation == null)
+      {
         throw new NotSupportedException("OS " + RuntimeInformation.OSDescription + " is currently not supported.");
+      }
     }
 
     public static void StartOperation()

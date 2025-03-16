@@ -6,7 +6,7 @@ using consoleTools.SubWriter;
 
 namespace consoleTools
 {
-  public class ConsoleWriter : IDisposable
+  public sealed class ConsoleWriter : IDisposable
   {
     private static readonly Lock s_flushLock = new();
     private readonly StringBuilder _commandBuffer = new((Console.WindowHeight * Console.WindowWidth) * 4);
@@ -30,8 +30,10 @@ namespace consoleTools
       using(s_flushLock.EnterScope())
       {
         foreach (ReadOnlyMemory<char> chunk in _commandBuffer.GetChunks())
-          Console.Out.Write(chunk.Span);  
-      
+        {
+          Console.Out.Write(chunk.Span);
+        }
+
         Console.Out.Flush();
       }
 
@@ -55,10 +57,14 @@ namespace consoleTools
     public ConsoleWriter WriteTruncated(ReadOnlySpan<char> span, int from, int len)
     {
       if (span == string.Empty)
+      {
         return this;
+      }
 
       if (from >= span.Length || len <= 0)
+      {
         return this;
+      }
 
       int clampedLen = Math.Min(len, span.Length - from);
       

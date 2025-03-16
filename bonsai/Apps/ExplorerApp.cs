@@ -62,7 +62,9 @@ namespace bonsai.Apps
         }
 
         foreach (State s in statesToPush)
+        {
           _state.Push (s);
+        }
 
         _fileSystemWorker.ChangeDirectory (directoryInfo, false);
         try
@@ -74,7 +76,9 @@ namespace bonsai.Apps
             ConsoleKeyInfo key = ConsoleHandler.Read();
 
             if (_uiBuilder.SearchTextBox.HandleInput (key))
+            {
               continue;
+            }
 
             switch (Settings.Instance.GetInputActionType (key, KeyBindingContext.ExplorerApp))
             {
@@ -92,7 +96,9 @@ namespace bonsai.Apps
 
               case ActionType.ConfirmSelection:
                 if (_uiBuilder.FileSystemList.FocusedItem == null)
+                {
                   break;
+                }
 
                 FileSystemItem? focusedItem = _uiBuilder.FileSystemList.FocusedItem;
                 string? result = null;
@@ -106,14 +112,18 @@ namespace bonsai.Apps
                   case ParentDirectoryItem:
                     DirectoryInfo? parent = _fileSystemWorker.CurrentDirectory?.Parent ?? _fileSystemWorker.CurrentDirectory;
                     if (parent == null)
+                    {
                       break;
+                    }
 
                     result = CommandHandler.GetCommandAndShowSelectionUiOnDemand (parent.FullName);
                     break;
                 }
 
                 if (!string.IsNullOrWhiteSpace (result))
+                {
                   return result;
+                }
 
                 _uiBuilder.RenderComplete();
                 continue;
@@ -140,7 +150,10 @@ namespace bonsai.Apps
                 _uiBuilder.ToggleDetails();
 
                 if (_uiBuilder.FileSystemList.FocusedItem != null)
+                {
                   UpdateDetails (_uiBuilder.FileSystemList.FocusedItem);
+                }
+
                 continue;
               case ActionType.ToggleIncludeSubDirectories:
                 if (_fileSystemWorker.CurrentDirectory != null)
@@ -209,15 +222,23 @@ namespace bonsai.Apps
         _uiBuilder.SearchTextBox.SetText (state.SearchText ?? string.Empty);
         searchedItem = state.SelectedItem;
         if (state.ListCurrentVisibleFromIndex.HasValue)
+        {
           _uiBuilder.FileSystemList.TrySetCurrentVisibleFromIndex (state.ListCurrentVisibleFromIndex.Value);
+        }
       }
       else
+      {
         _uiBuilder.SearchTextBox.SetText (string.Empty);
+      }
 
       if (_fileSystemWorker.CurrentDirectory?.Parent != null)
+      {
         _fileSystemWorker.ChangeDirectory (_fileSystemWorker.CurrentDirectory.Parent, _includeSubDirectories, searchedItem);
+      }
       else if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows) && _fileSystemWorker.CurrentDirectory != null)
+      {
         _fileSystemWorker.ChangeDirectory (null, _includeSubDirectories, searchedItem);
+      }
     }
 
     private void OpenSelectedDirectory ()
@@ -250,7 +271,9 @@ namespace bonsai.Apps
             });
 
         foreach (DirectoryInfo dir in directoriesToPushIntoStack)
+        {
           _state.Push (new State { SelectedItem = dir.FullName });
+        }
 
         _uiBuilder.SearchTextBox.SetText (string.Empty);
         _fileSystemWorker.ChangeDirectory (newDirectory, _includeSubDirectories);
@@ -277,7 +300,9 @@ namespace bonsai.Apps
     private void UpdateDetails (FileSystemItem? selectedItem)
     {
       if (!_uiBuilder.AreDetailsVisible() || selectedItem == null)
+      {
         return;
+      }
 
       // we use fixed size array so the label will clear itself on rendering
       _uiBuilder.DetailsLabel.Lines = new FormattedLine[8];
@@ -302,7 +327,7 @@ namespace bonsai.Apps
           long used = driveItem.Info.TotalSize - driveItem.Info.AvailableFreeSpace;
 
           _uiBuilder.DetailsLabel.Lines[3] =
-              new FormattedLine ($"{FormatFileSize (used)} / {FormatFileSize (total)} ({(int)((double)used / total * 100)}%)") { Indent = 1 };
+              new FormattedLine ($"{FormatFileSize(used)} / {FormatFileSize(total)} ({(int)((double)used / total * 100)}%)") { Indent = 1 };
           _uiBuilder.DetailsLabel.Lines[4] = new FormattedLine ("Format:", Color.LightSlateGray);
           _uiBuilder.DetailsLabel.Lines[5] = new FormattedLine (driveItem.Info.DriveFormat) { Indent = 1 };
           _uiBuilder.DetailsLabel.Lines[6] = new FormattedLine ("Type:", Color.LightSlateGray);
@@ -324,22 +349,26 @@ namespace bonsai.Apps
       _uiBuilder.DetailsLabel.Lines[5] = new FormattedLine (fileSystemInfo.LastWriteTime.ToString ("O")) { Indent = 1 };
 
       if (fileSystemInfo is DirectoryInfo directoryInfo)
+      {
         _uiBuilder.DetailsLabel.Lines[1] = new FormattedLine (directoryInfo.Name, ThemeManger.Instance.FolderColors.DefaultColor) { Indent = 1 };
+      }
       else if (fileSystemInfo is FileInfo fileInfo)
       {
         _uiBuilder.DetailsLabel.Lines[1] = new FormattedLine (fileSystemInfo.Name, ThemeManger.Instance.FileColors.DefaultColor) { Indent = 1 };
         _uiBuilder.DetailsLabel.Lines[6] = new FormattedLine ("Size: ", Color.LightSlateGray);
-        _uiBuilder.DetailsLabel.Lines[7] = new FormattedLine (FormatFileSize (fileInfo.Length)) { Indent = 1 };
+        _uiBuilder.DetailsLabel.Lines[7] = new FormattedLine (FormatFileSize(fileInfo.Length)) { Indent = 1 };
       }
 
       _uiBuilder.RenderPartial (_uiBuilder.DetailsLabel);
     }
 
-    private string FormatFileSize (long bytes)
+    private static string FormatFileSize (long bytes)
     {
       int unit = 1024;
       if (bytes < unit)
+      {
         return $"{bytes} B ";
+      }
 
       int exp = (int)(Math.Log (bytes) / Math.Log (unit));
       return $"{bytes / Math.Pow (unit, exp):F1} {"KMGTPE"[exp - 1]}B";
@@ -363,9 +392,13 @@ namespace bonsai.Apps
           }
 
           if (sender.CurrentDirectory == null)
+          {
             _uiBuilder.CurrentDirectoryLabel.Text = "root";
+          }
           else
+          {
             _uiBuilder.CurrentDirectoryLabel.Text = " " + string.Join (" ❯ ", pathParts);
+          }
 
           //var wasVisible = _uiBuilder.GitPanel.Visible;
           //if (sender.CurrentDirectory != null)
@@ -398,10 +431,14 @@ namespace bonsai.Apps
           _loadingFinished = state == FileSystemLoadingState.Finished;
 
           if (searchedItemAtIndex > -1)
+          {
             _uiBuilder.FileSystemList.SetFocusedIndex (searchedItemAtIndex);
+          }
 
           if (_uiBuilder.FileSystemList.FocusedItemIndex < 0)
+          {
             _uiBuilder.FileSystemList.SetFocusedIndex (0);
+          }
 
           UpdateFileListBorderText();
 

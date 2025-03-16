@@ -28,16 +28,20 @@ namespace bonsai.Apps
     protected override string? RunInternal()
     {
       Directory.SetCurrentDirectory(_currentDirectory);
-      var isExistingPathResult = IsExistingPath(_currentDirectory, _originalArg);
-      if (isExistingPathResult.success)
-        return CommandHandler.GetCommandAndShowSelectionUiOnDemand(isExistingPathResult.result);
+      (bool success, string? result) = IsExistingPath(_currentDirectory, _originalArg);
+      if (success)
+      {
+        return CommandHandler.GetCommandAndShowSelectionUiOnDemand(result);
+      }
 
       Database.Instance.CleanUpDatabase();
 
       var foundEntries = Database.Instance.Search(_originalArg);
 
       if (foundEntries.Length == 0)
+      {
         return null;
+      }
 
       if (foundEntries.Length == 1)
       {
@@ -64,8 +68,9 @@ namespace bonsai.Apps
 
             case ActionType.ConfirmSelection:
               if (list.FocusedItem == null)
+              {
                 break;
-
+              }
 
               var focusedItem = list.FocusedItem;
               switch (focusedItem)
@@ -114,8 +119,10 @@ namespace bonsai.Apps
 
       var searchTermLabel = new Label(1.AsFraction(), 1.AsFixed());
 
-      var border = new Border(1.AsFraction(), 1.AsFraction());
-      border.BorderColor = ThemeManger.Instance.BorderColor;
+      var border = new Border(1.AsFraction(), 1.AsFraction())
+      {
+        BorderColor = ThemeManger.Instance.BorderColor
+      };
       searchTermLabel.Text = "Searched  ❯ " + originalArg;
 
       var list = new ScrollableList<FileSystemItem>(ThemeManger.Instance.SelectionForegroundColor, ThemeManger.Instance.SelectionBackgroundColor, 1.AsFraction(), 1.AsFraction());
@@ -135,13 +142,19 @@ namespace bonsai.Apps
     {
       var path = originalArg;
       if (!Path.IsPathFullyQualified(path))
+      {
         path = Path.GetFullPath(originalArg, currentDirectory);
+      }
 
       if (Directory.Exists(path))
+      {
         return (true, path);
+      }
 
       if (File.Exists(path))
+      {
         return (true, path);
+      }
 
       return (false, string.Empty);
     }
