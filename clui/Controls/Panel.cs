@@ -6,11 +6,11 @@ namespace clui.Controls
 {
   public class Panel : ControlBase
   {
-    public Panel(LayoutSize width, LayoutSize height)
-      : base(width, height)
+    public Panel (LayoutSize width, LayoutSize height)
+        : base (width, height)
     {
       Flow = ChildControlFlow.Vertical;
-      Padding = new Padding(0, 0, 0, 0);
+      Padding = new Padding (0, 0, 0, 0);
     }
 
     internal override void Render (ConsoleWriter consoleWriter)
@@ -20,11 +20,11 @@ namespace clui.Controls
         return;
       }
 
-      consoleWriter.Style.BackgroundColor(GetEffectiveBackgroundColor());
+      consoleWriter.Style.BackgroundColor (GetEffectiveBackgroundColor());
 
       for (int i = 0; i < CalculatedHeight!; i++)
       {
-        consoleWriter.Cursor.MoveTo(Position.X, Position.Y + i).Text.EraseCharacter(CalculatedWidth!.Value!);
+        consoleWriter.Cursor.MoveTo (Position.X, Position.Y + i).Text.EraseCharacter (CalculatedWidth!.Value!);
       }
 
       consoleWriter.Style.ResetStyles();

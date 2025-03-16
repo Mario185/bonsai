@@ -6,9 +6,9 @@ namespace consoleTools.Windows
   {
     internal Coordinate dwSize;
 
-    internal WindowBufferSizeRecord(short x, short y)
+    internal WindowBufferSizeRecord (short x, short y)
     {
-      dwSize = new Coordinate(x, y);
+      dwSize = new Coordinate (x, y);
     }
   }
 }

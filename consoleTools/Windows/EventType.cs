@@ -8,6 +8,6 @@ namespace consoleTools.Windows
     KEY_EVENT = 1,
     MENU_EVENT = 8,
     MOUSE_EVENT = 2,
-    WINDOW_BUFFER_SIZE_EVENT = 4,
+    WINDOW_BUFFER_SIZE_EVENT = 4
   }
 }

@@ -1,6 +1,5 @@
-﻿using System.IO;
-using System;
-using System.Diagnostics;
+﻿using System;
+using System.IO;
 using bonsai.CommandHandling;
 using bonsai.Data;
 using bonsai.FileSystemHandling;
@@ -17,7 +16,7 @@ namespace bonsai.Apps
     private readonly string _currentDirectory;
     private readonly string _originalArg;
 
-    public NavigationApp(string currentDirectory, string originalArg)
+    public NavigationApp (string currentDirectory, string originalArg)
     {
       _currentDirectory = currentDirectory;
       _originalArg = originalArg;
@@ -25,18 +24,20 @@ namespace bonsai.Apps
 
     protected override IBonsaiContext Context => this;
 
-    protected override string? RunInternal()
+    public bool IsFilteringActive => true;
+
+    protected override string? RunInternal ()
     {
-      Directory.SetCurrentDirectory(_currentDirectory);
-      (bool success, string? result) = IsExistingPath(_currentDirectory, _originalArg);
+      Directory.SetCurrentDirectory (_currentDirectory);
+      (bool success, string? result) = IsExistingPath (_currentDirectory, _originalArg);
       if (success)
       {
-        return CommandHandler.GetCommandAndShowSelectionUiOnDemand(result);
+        return CommandHandler.GetCommandAndShowSelectionUiOnDemand (result);
       }
 
       Database.Instance.CleanUpDatabase();
 
-      var foundEntries = Database.Instance.Search(_originalArg);
+      FileSystemItem[] foundEntries = Database.Instance.Search (_originalArg);
 
       if (foundEntries.Length == 0)
       {
@@ -45,13 +46,13 @@ namespace bonsai.Apps
 
       if (foundEntries.Length == 1)
       {
-        var firstEntry = foundEntries[0];
-        return CommandHandler.GetCommandAndShowSelectionUiOnDemand(firstEntry.FullName);
+        FileSystemItem firstEntry = foundEntries[0];
+        return CommandHandler.GetCommandAndShowSelectionUiOnDemand (firstEntry.FullName);
       }
 
-      using (var frame = new Frame())
+      using (Frame frame = new())
       {
-        var list = CreateUi(_originalArg, frame, foundEntries);
+        ScrollableList<FileSystemItem> list = CreateUi (_originalArg, frame, foundEntries);
 
         frame.RenderComplete();
         bool endLoop = false;
@@ -60,7 +61,7 @@ namespace bonsai.Apps
         {
           ConsoleKeyInfo key = ConsoleHandler.Read();
 
-          switch (Settings.Instance.GetInputActionType(key, KeyBindingContext.NavigationApp))
+          switch (Settings.Instance.GetInputActionType (key, KeyBindingContext.NavigationApp))
           {
             case ActionType.Exit:
               endLoop = true;
@@ -72,12 +73,12 @@ namespace bonsai.Apps
                 break;
               }
 
-              var focusedItem = list.FocusedItem;
+              FileSystemItem? focusedItem = list.FocusedItem;
               switch (focusedItem)
               {
                 case DirectoryItem:
                 case FileItem:
-                  return CommandHandler.GetCommandAndShowSelectionUiOnDemand(focusedItem.FullName);
+                  return CommandHandler.GetCommandAndShowSelectionUiOnDemand (focusedItem.FullName);
               }
 
               endLoop = true;
@@ -112,53 +113,55 @@ namespace bonsai.Apps
       return null;
     }
 
-    private static ScrollableList<FileSystemItem> CreateUi(string originalArg, Frame frame, FileSystemItem[] foundEntries)
+    private static ScrollableList<FileSystemItem> CreateUi (string originalArg, Frame frame, FileSystemItem[] foundEntries)
     {
-      var rootPanel = new Panel(1.AsFraction(), 1.AsFraction());
-      frame.AddControls(rootPanel);
+      Panel rootPanel = new(1.AsFraction(), 1.AsFraction());
+      frame.AddControls (rootPanel);
 
-      var searchTermLabel = new Label(1.AsFraction(), 1.AsFixed());
+      Label searchTermLabel = new(1.AsFraction(), 1.AsFixed());
 
-      var border = new Border(1.AsFraction(), 1.AsFraction())
-      {
-        BorderColor = ThemeManger.Instance.BorderColor
-      };
+      Border border = new(1.AsFraction(), 1.AsFraction())
+                      {
+                          BorderColor = ThemeManger.Instance.BorderColor
+                      };
       searchTermLabel.Text = "Searched  ❯ " + originalArg;
 
-      var list = new ScrollableList<FileSystemItem>(ThemeManger.Instance.SelectionForegroundColor, ThemeManger.Instance.SelectionBackgroundColor, 1.AsFraction(), 1.AsFraction());
+      ScrollableList<FileSystemItem> list = new(
+          ThemeManger.Instance.SelectionForegroundColor,
+          ThemeManger.Instance.SelectionBackgroundColor,
+          1.AsFraction(),
+          1.AsFraction());
       rootPanel.BackgroundColor = ThemeManger.Instance.BackgroundColor;
-      border.AddControls(list);
+      border.AddControls (list);
 
-      rootPanel.AddControls(searchTermLabel, border);
+      rootPanel.AddControls (searchTermLabel, border);
 
       frame.EnableBufferSizeChangeWatching();
 
-      list.SetItemList(foundEntries);
-      list.SetFocusedIndex(0);
+      list.SetItemList (foundEntries);
+      list.SetFocusedIndex (0);
       return list;
     }
 
-    private static (bool success, string result) IsExistingPath(string currentDirectory, string originalArg)
+    private static (bool success, string result) IsExistingPath (string currentDirectory, string originalArg)
     {
-      var path = originalArg;
-      if (!Path.IsPathFullyQualified(path))
+      string? path = originalArg;
+      if (!Path.IsPathFullyQualified (path))
       {
-        path = Path.GetFullPath(originalArg, currentDirectory);
+        path = Path.GetFullPath (originalArg, currentDirectory);
       }
 
-      if (Directory.Exists(path))
+      if (Directory.Exists (path))
       {
         return (true, path);
       }
 
-      if (File.Exists(path))
+      if (File.Exists (path))
       {
         return (true, path);
       }
 
       return (false, string.Empty);
     }
-
-    public bool IsFilteringActive => true;
   }
 }

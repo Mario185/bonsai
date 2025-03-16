@@ -4,10 +4,10 @@ namespace consoleTools.SubWriter
 {
   public class SubWriterBase
   {
-    protected SubWriterBase(ConsoleWriter consoleWriter)
+    protected SubWriterBase (ConsoleWriter consoleWriter)
     {
       Writer = consoleWriter;
-      ArgumentNullException.ThrowIfNull(consoleWriter);
+      ArgumentNullException.ThrowIfNull (consoleWriter);
     }
 
     /// <summary>
@@ -19,7 +19,7 @@ namespace consoleTools.SubWriter
     public StyleWriter Style => Writer.Style;
     public TextModificationWriter Text => Writer.Text;
 
-    public void Flush()
+    public void Flush ()
     {
       Writer.Flush();
     }

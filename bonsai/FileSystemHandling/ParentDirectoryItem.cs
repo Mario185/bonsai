@@ -6,20 +6,21 @@ namespace bonsai.FileSystemHandling
 {
   internal class ParentDirectoryItem : FileSystemItem
   {
-    public ParentDirectoryItem(int currentDirectoryFullNameLength)
-      : base(currentDirectoryFullNameLength, "..")
+    public ParentDirectoryItem (int currentDirectoryFullNameLength)
+        : base (currentDirectoryFullNameLength, "..")
     {
     }
 
     public override string FullName { get; } = "..";
-    protected override string GetIcon()
+
+    protected override string GetIcon ()
     {
-      return ThemeManger.Instance.GetFolderIcon("..");
+      return ThemeManger.Instance.GetFolderIcon ("..");
     }
 
-    protected override Color? GetTextColor()
+    protected override Color? GetTextColor ()
     {
-      return ThemeManger.Instance.GetFolderColor("..");
+      return ThemeManger.Instance.GetFolderColor ("..");
     }
   }
 }

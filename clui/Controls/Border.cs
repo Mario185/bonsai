@@ -173,7 +173,7 @@ namespace clui.Controls
             consoleWriter.Cursor.MoveTo (Position.X + 1 + widthValue, Position.Y + CalculatedHeight!.Value - 1);
             break;
           default:
-            throw new ArgumentOutOfRangeException($"{TextPosition} currently not supported.");
+            throw new ArgumentOutOfRangeException ($"{TextPosition} currently not supported.");
         }
 
         consoleWriter.WriteTruncated (Text, 0, possibleUsedSpace);

@@ -1,4 +1,6 @@
-﻿namespace consoleTools
+﻿using System;
+
+namespace consoleTools
 {
   public enum CursorShape
   {

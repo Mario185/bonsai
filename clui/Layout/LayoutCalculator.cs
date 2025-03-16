@@ -6,44 +6,42 @@ namespace clui.Layout
 {
   public class LayoutCalculator
   {
-    internal LayoutCalculator()
+    internal LayoutCalculator ()
     {
-      
     }
 
-    public void CalculateChildrenLayout(ControlBase control)
+    public void CalculateChildrenLayout (ControlBase control)
     {
       switch (control.Flow)
       {
         case ChildControlFlow.Vertical:
-          CalculateChildrenVerticalFlow(control);
+          CalculateChildrenVerticalFlow (control);
           break;
         case ChildControlFlow.Horizontal:
-          CalculateChildrenHorizontalFlow(control);
+          CalculateChildrenHorizontalFlow (control);
 
           break;
         default:
-          throw new ArgumentOutOfRangeException($"{control.Flow} currently not supported.");
+          throw new ArgumentOutOfRangeException ($"{control.Flow} currently not supported.");
       }
     }
 
-    public void CalculateRootControlLayout(ControlBase rootControl)
+    public void CalculateRootControlLayout (ControlBase rootControl)
     {
-      CalculateRootControlSize(rootControl);
+      CalculateRootControlSize (rootControl);
     }
 
-
-    private void CalculateChildrenHorizontalFlow(ControlBase container)
+    private void CalculateChildrenHorizontalFlow (ControlBase container)
     {
-      ControlBase[] fixedSizeControls = container.Controls.Where(c => c.Visible && c.Width is FixedSize).ToArray();
-      int sumFractions = container.Controls.Where(c => c.Visible && c.Width is FractionSize).Sum(c => c.Width.Value);
+      ControlBase[] fixedSizeControls = container.Controls.Where (c => c.Visible && c.Width is FixedSize).ToArray();
+      int sumFractions = container.Controls.Where (c => c.Visible && c.Width is FractionSize).Sum (c => c.Width.Value);
 
       int containerRemaining = container.CalculatedWidth!.Value - (container.Padding.Left + container.Padding.Right);
       int containerInnerHeight = container.CalculatedHeight!.Value - (container.Padding.Top + container.Padding.Bottom);
 
       foreach (ControlBase control in fixedSizeControls)
       {
-        control.CalculatedWidth = Math.Min(containerRemaining, control.Width.Value);
+        control.CalculatedWidth = Math.Min (containerRemaining, control.Width.Value);
         control.CalculatedHeight = control.Height is FractionSize ? containerInnerHeight : control.Height.Value;
         containerRemaining -= control.CalculatedWidth.Value;
       }
@@ -58,15 +56,15 @@ namespace clui.Layout
           continue;
         }
 
-        if (!fixedSizeControls.Contains(control))
+        if (!fixedSizeControls.Contains (control))
         {
           if (control.Width is FractionSize)
           {
-            control.CalculatedWidth = CalculateForFraction(control.Width.Value, containerRemainingForFraction, containerRemaining, sumFractions);
+            control.CalculatedWidth = CalculateForFraction (control.Width.Value, containerRemainingForFraction, containerRemaining, sumFractions);
           }
           else
           {
-            control.CalculatedWidth = Math.Min(containerRemaining, control.Width.Value);
+            control.CalculatedWidth = Math.Min (containerRemaining, control.Width.Value);
           }
 
           control.CalculatedHeight = control.Height is FractionSize ? containerInnerHeight : control.Height.Value;
@@ -74,19 +72,19 @@ namespace clui.Layout
           containerRemaining -= control.CalculatedWidth.Value;
         }
 
-        CalculatePositionFlowHorizontal(control, container, positionOffset);
+        CalculatePositionFlowHorizontal (control, container, positionOffset);
         positionOffset += control.CalculatedWidth!.Value;
 
         control.OnLayoutCalculated();
 
-        CalculateChildrenLayout(control);
+        CalculateChildrenLayout (control);
       }
     }
 
-    private void CalculateChildrenVerticalFlow(ControlBase container)
+    private void CalculateChildrenVerticalFlow (ControlBase container)
     {
-      ControlBase[] fixedSizeControls = container.Controls.Where(c => c.Visible && c.Height is FixedSize).ToArray();
-      int sumFractions = container.Controls.Where(c => c.Visible && c.Height is FractionSize).Sum(c => c.Height.Value);
+      ControlBase[] fixedSizeControls = container.Controls.Where (c => c.Visible && c.Height is FixedSize).ToArray();
+      int sumFractions = container.Controls.Where (c => c.Visible && c.Height is FractionSize).Sum (c => c.Height.Value);
 
       int containerRemaining = container.CalculatedHeight!.Value - (container.Padding.Top + container.Padding.Bottom);
       int containerInnerWidth = container.CalculatedWidth!.Value - (container.Padding.Left + container.Padding.Right);
@@ -94,7 +92,7 @@ namespace clui.Layout
       foreach (ControlBase control in fixedSizeControls)
       {
         control.CalculatedWidth = control.Width is FractionSize ? containerInnerWidth : control.Width.Value;
-        control.CalculatedHeight = Math.Min(containerRemaining, control.Height.Value);
+        control.CalculatedHeight = Math.Min (containerRemaining, control.Height.Value);
         containerRemaining -= control.CalculatedHeight.Value;
       }
 
@@ -108,15 +106,15 @@ namespace clui.Layout
           continue;
         }
 
-        if (!fixedSizeControls.Contains(control))
+        if (!fixedSizeControls.Contains (control))
         {
           if (control.Height is FractionSize)
           {
-            control.CalculatedHeight = CalculateForFraction(control.Height.Value, containerRemainingForFraction, containerRemaining, sumFractions);
+            control.CalculatedHeight = CalculateForFraction (control.Height.Value, containerRemainingForFraction, containerRemaining, sumFractions);
           }
           else
           {
-            control.CalculatedHeight = Math.Min(containerRemaining, control.Height.Value);
+            control.CalculatedHeight = Math.Min (containerRemaining, control.Height.Value);
           }
 
           control.CalculatedWidth = control.Width is FractionSize ? containerInnerWidth : control.Width.Value;
@@ -124,36 +122,37 @@ namespace clui.Layout
           containerRemaining -= control.CalculatedHeight.Value;
         }
 
-        CalculatePositionFlowVertical(control, container, positionOffset);
+        CalculatePositionFlowVertical (control, container, positionOffset);
         positionOffset += control.CalculatedHeight!.Value;
 
         control.OnLayoutCalculated();
 
-        CalculateChildrenLayout(control);
+        CalculateChildrenLayout (control);
       }
     }
-    
-    private static int CalculateForFraction(int desired,
-      int remainingForFraction,
-      int totalRemaining,
-      int sumFractions)
+
+    private static int CalculateForFraction (
+        int desired,
+        int remainingForFraction,
+        int totalRemaining,
+        int sumFractions)
     {
       double percentage = sumFractions < 0 ? 1.0 : desired / (double)sumFractions;
       int targetValue = (int)((remainingForFraction * percentage) + 0.5);
 
-      int value = Math.Min(totalRemaining, targetValue);
+      int value = Math.Min (totalRemaining, targetValue);
       return value;
     }
 
-    private static void CalculatePositionFlowHorizontal(ControlBase controlToPosition, ControlBase container, int positionOffset)
+    private static void CalculatePositionFlowHorizontal (ControlBase controlToPosition, ControlBase container, int positionOffset)
     {
       controlToPosition.Position.X = container.Position.X + container.Padding.Left + positionOffset;
       controlToPosition.Position.Y = container.Position.Y + container.Padding.Top;
-      
+
       //return new Position(container.Position.X + container.Padding.Left + positionOffset, container.Position.Y + container.Padding.Top);
     }
 
-    private static void CalculatePositionFlowVertical(ControlBase controlToPosition, ControlBase container, int positionOffset)
+    private static void CalculatePositionFlowVertical (ControlBase controlToPosition, ControlBase container, int positionOffset)
     {
       controlToPosition.Position.X = container.Position.X + container.Padding.Left;
       controlToPosition.Position.Y = container.Position.Y + container.Padding.Top + positionOffset;
@@ -161,34 +160,34 @@ namespace clui.Layout
       // return new Position(container.Position.X + container.Padding.Left, container.Position.Y + container.Padding.Top + positionOffset);
     }
 
-    private void CalculateRootControlSize(ControlBase rootControl)
+    private void CalculateRootControlSize (ControlBase rootControl)
     {
       if (!rootControl.Visible)
       {
         return;
       }
 
-      var maxWidth = Console.WindowWidth - (rootControl.Position.X - 1);
-      var maxHeight = Console.WindowHeight - (rootControl.Position.Y - 1);
+      int maxWidth = Console.WindowWidth - (rootControl.Position.X - 1);
+      int maxHeight = Console.WindowHeight - (rootControl.Position.Y - 1);
 
-      int width = rootControl.Width is FractionSize ? maxWidth : Math.Min(rootControl.Width.Value, maxWidth);
-      int height = rootControl.Height is FractionSize ? maxHeight : Math.Min(rootControl.Height.Value, maxHeight);
+      int width = rootControl.Width is FractionSize ? maxWidth : Math.Min (rootControl.Width.Value, maxWidth);
+      int height = rootControl.Height is FractionSize ? maxHeight : Math.Min (rootControl.Height.Value, maxHeight);
 
-      rootControl.CalculatedWidth = Math.Max(width, 0);
-      rootControl.CalculatedHeight = Math.Max(height, 0);
+      rootControl.CalculatedWidth = Math.Max (width, 0);
+      rootControl.CalculatedHeight = Math.Max (height, 0);
 
       rootControl.OnLayoutCalculated();
 
       switch (rootControl.Flow)
       {
         case ChildControlFlow.Vertical:
-          CalculateChildrenVerticalFlow(rootControl);
+          CalculateChildrenVerticalFlow (rootControl);
           break;
         case ChildControlFlow.Horizontal:
-          CalculateChildrenHorizontalFlow(rootControl);
+          CalculateChildrenHorizontalFlow (rootControl);
           break;
         default:
-          throw new ArgumentOutOfRangeException($"{rootControl.Flow} currently not supported.");
+          throw new ArgumentOutOfRangeException ($"{rootControl.Flow} currently not supported.");
       }
     }
   }

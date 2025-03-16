@@ -8,77 +8,77 @@ namespace consoleTools.SubWriter
   {
     private readonly Action<string> _writeAction;
 
-    internal StyleWriter(ConsoleWriter consoleWriter)
-      : base(consoleWriter)
+    internal StyleWriter (ConsoleWriter consoleWriter)
+        : base (consoleWriter)
     {
-      _writeAction = s => consoleWriter.Write(s);
+      _writeAction = s => consoleWriter.Write (s);
     }
 
-    public StyleWriter BackgroundColor(Color? color)
+    public StyleWriter BackgroundColor (Color? color)
     {
       if (!color.HasValue)
       {
         return this;
       }
 
-      StyleSequences.SetBackgroundColor(color.Value, _writeAction);
-//      Writer.Write(StyleSequences.SetBackgroundColor(color.Value));
+      StyleSequences.SetBackgroundColor (color.Value, _writeAction);
+      //      Writer.Write(StyleSequences.SetBackgroundColor(color.Value));
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="StyleSequences.Bold" />
     /// </summary>
-    public StyleWriter Bold()
+    public StyleWriter Bold ()
     {
-      Writer.Write(StyleSequences.Bold);
+      Writer.Write (StyleSequences.Bold);
       return this;
     }
 
-    public StyleWriter ForegroundColor(Color? color)
+    public StyleWriter ForegroundColor (Color? color)
     {
       if (!color.HasValue)
       {
         return this;
       }
 
-      StyleSequences.SetForegroundColor(color.Value, _writeAction);
+      StyleSequences.SetForegroundColor (color.Value, _writeAction);
       return this;
     }
 
-    public StyleWriter ResetBackgroundColor()
+    public StyleWriter ResetBackgroundColor ()
     {
-      Writer.Write(StyleSequences.ResetBackgroundColor);
+      Writer.Write (StyleSequences.ResetBackgroundColor);
       return this;
     }
 
-    public StyleWriter ResetBold()
+    public StyleWriter ResetBold ()
     {
-      Writer.Write(StyleSequences.ResetBold);
+      Writer.Write (StyleSequences.ResetBold);
       return this;
     }
 
-    public StyleWriter ResetForegroundColor()
+    public StyleWriter ResetForegroundColor ()
     {
-      Writer.Write(StyleSequences.ResetForegroundColor);
+      Writer.Write (StyleSequences.ResetForegroundColor);
       return this;
     }
 
-    public StyleWriter ResetStyles()
+    public StyleWriter ResetStyles ()
     {
-      Writer.Write(StyleSequences.Reset);
+      Writer.Write (StyleSequences.Reset);
       return this;
     }
 
-    public StyleWriter ResetUnderscore()
+    public StyleWriter ResetUnderscore ()
     {
-      Writer.Write(StyleSequences.ResetUnderline);
+      Writer.Write (StyleSequences.ResetUnderline);
       return this;
     }
 
-    public StyleWriter Underline()
+    public StyleWriter Underline ()
     {
-      Writer.Write(StyleSequences.Underline);
+      Writer.Write (StyleSequences.Underline);
       return this;
     }
   }

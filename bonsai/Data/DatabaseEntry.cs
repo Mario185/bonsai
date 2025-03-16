@@ -11,12 +11,12 @@ namespace bonsai.Data
 {
   internal class DatabaseEntry : IListItem, ISearchableItem
   {
-    private string? _printableText;
-
-    private SearchMatch[]? _searchMatches = [];
     private int _score;
 
-    public DatabaseEntry(string path, bool isDirectory)
+    private SearchMatch[]? _searchMatches = [];
+    private string? _printableText;
+
+    public DatabaseEntry (string path, bool isDirectory)
     {
       Path = path;
       IsDirectory = isDirectory;
@@ -44,9 +44,9 @@ namespace bonsai.Data
     {
       if (BonsaiContext.Current?.IsFilteringActive == true)
       {
-        var totalLength = GetPrintableText().Length;
-        var searchableTextLength = SearchableText.Length;
-        var indexOfSearchableText = totalLength - searchableTextLength;
+        int totalLength = GetPrintableText().Length;
+        int searchableTextLength = SearchableText.Length;
+        int indexOfSearchableText = totalLength - searchableTextLength;
         for (int i = 0; i < totalLength; i++)
         {
           if (i >= indexOfSearchableText && IsIndexInMatch (i - indexOfSearchableText))
@@ -76,7 +76,10 @@ namespace bonsai.Data
       }
     }
 
-    private bool IsIndexInMatch(int index)
+    [JsonIgnore]
+    public string SearchableText => Path;
+
+    private bool IsIndexInMatch (int index)
     {
       if (_searchMatches == null || _searchMatches.Length == 0)
       {
@@ -85,7 +88,7 @@ namespace bonsai.Data
 
       for (int i = 0; i < _searchMatches.Length; i++)
       {
-        var match = _searchMatches[i];
+        SearchMatch? match = _searchMatches[i];
         if (match.MatchStartAt <= index && index < match.MatchEndAt)
         {
           return true;
@@ -95,15 +98,12 @@ namespace bonsai.Data
       return false;
     }
 
-    private string GetPrintableText()
+    private string GetPrintableText ()
     {
       return _printableText ??= $"{LastUsed:yyyy-MM-dd HH:mm} {Score,6} {Path}";
     }
 
-    [JsonIgnore]
-    public string SearchableText => Path;
-
-    public void SetSearchMatches(SearchMatch[] matches)
+    public void SetSearchMatches (SearchMatch[] matches)
     {
       _searchMatches = matches;
     }

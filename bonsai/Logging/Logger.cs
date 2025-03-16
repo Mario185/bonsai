@@ -7,33 +7,39 @@ namespace bonsai.Logging
 {
   public class Logger
   {
-    private readonly Type _loggerType;
-    private static readonly Lock s_lock = new();
+    private const LogSeverity c_minimumSeverity = LogSeverity.Warning;
 
     private static DateTime s_currentLogFileDate = DateTime.MinValue;
     private static AbsolutePath? s_currentLogFilePath;
+    private static readonly Lock s_lock = new();
+    private readonly Type _loggerType;
 
-    private const LogSeverity c_minimumSeverity = LogSeverity.Warning;
-
-    public static Logger Create<TLoggerType>()
+    protected Logger (Type loggerType)
     {
-      UpdateLogFileNameOnDemand();
-      return new Logger(typeof(TLoggerType));
+      _loggerType = loggerType;
     }
 
-    private static void LogMessageToFile(Type loggerType, string message, LogSeverity severity)
+    public static Logger Create<TLoggerType> ()
+    {
+      UpdateLogFileNameOnDemand();
+      return new Logger (typeof(TLoggerType));
+    }
+
+    private static void LogMessageToFile (Type loggerType, string message, LogSeverity severity)
     {
       using (s_lock.EnterScope())
       {
         UpdateLogFileNameOnDemand();
-        using (var stream = File.AppendText(s_currentLogFilePath!))
+        using (StreamWriter? stream = File.AppendText (s_currentLogFilePath!))
         {
-          stream.WriteLine(DateTime.Now.ToString("O") + " - " + severity + " - " + Environment.CurrentManagedThreadId + " - " + loggerType.FullName + " - " + message);
+          stream.WriteLine (
+              DateTime.Now.ToString ("O") + " - " + severity + " - " + Environment.CurrentManagedThreadId + " - " + loggerType.FullName + " - "
+              + message);
         }
       }
     }
 
-    private static void UpdateLogFileNameOnDemand()
+    private static void UpdateLogFileNameOnDemand ()
     {
       if (s_currentLogFileDate == DateTime.Today && s_currentLogFilePath != null)
       {
@@ -44,60 +50,54 @@ namespace bonsai.Logging
       s_currentLogFilePath = GetLogFileName();
     }
 
-    private static AbsolutePath GetLogFileName()
+    private static AbsolutePath GetLogFileName ()
     {
-      var logFolder = KnownPaths.LogFolder;
+      AbsolutePath? logFolder = KnownPaths.LogFolder;
       logFolder.EnsureDirectoryExists();
 
-      return logFolder / s_currentLogFileDate.ToString("yyyyMMdd") + ".txt";
+      return (logFolder / s_currentLogFileDate.ToString ("yyyyMMdd")) + ".txt";
     }
 
-    protected Logger(Type loggerType)
+    public void Debug (string message)
     {
-      _loggerType = loggerType;
+      LogMessage (message, LogSeverity.Debug);
     }
 
-    public void Debug(string message)
+    public void Info (string message)
     {
-      LogMessage(message, LogSeverity.Debug);
+      LogMessage (message, LogSeverity.Information);
     }
 
-    public void Info(string message)
+    public void Warn (string message)
     {
-      LogMessage(message, LogSeverity.Information);
+      LogMessage (message, LogSeverity.Warning);
     }
 
-    public void Warn(string message)
+    public void Error (string message)
     {
-      LogMessage(message, LogSeverity.Warning);
+      LogMessage (message, LogSeverity.Error);
     }
 
-    public void Error(string message)
+    public void Fatal (string message)
     {
-      LogMessage(message, LogSeverity.Error);
+      LogMessage (message, LogSeverity.Fatal);
     }
 
-    public void Fatal(string message)
-    {
-      LogMessage(message, LogSeverity.Fatal);
-    }
-
-    private void LogMessage(string message, LogSeverity severity)
+    private void LogMessage (string message, LogSeverity severity)
     {
       if (severity >= c_minimumSeverity)
       {
-        LogMessageToFile(_loggerType, message, severity);
+        LogMessageToFile (_loggerType, message, severity);
       }
     }
-
   }
 
   public enum LogSeverity
   {
-    Debug=1,
-    Information=2,
-    Warning=3,
-    Error=4,
-    Fatal=5
+    Debug = 1,
+    Information = 2,
+    Warning = 3,
+    Error = 4,
+    Fatal = 5
   }
 }

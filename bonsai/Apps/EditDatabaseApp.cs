@@ -190,18 +190,18 @@ namespace bonsai.Apps
 
       Label titleLabel = new(1.AsFraction(), 1.AsFixed());
 
-      _border = new Border(1.AsFraction(), 1.AsFraction())
-      {
-        BorderColor = ThemeManger.Instance.BorderColor,
-        TextPosition = BorderTextPosition.BottomLeft
-      };
+      _border = new Border (1.AsFraction(), 1.AsFraction())
+                {
+                    BorderColor = ThemeManger.Instance.BorderColor,
+                    TextPosition = BorderTextPosition.BottomLeft
+                };
       titleLabel.Text = "Edit bonsai database";
 
       Panel topPanel = new(1.AsFraction(), 1.AsFixed())
-      {
-        BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor,
-        TextColor = ThemeManger.Instance.TopBarTextColor
-      };
+                       {
+                           BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor,
+                           TextColor = ThemeManger.Instance.TopBarTextColor
+                       };
       topPanel.AddControls (titleLabel);
 
       string increment = Settings.Instance.GetInstructionForAction (KeyBindingContext.EditDatabaseApp, ActionType.IncrementScore, "increment");
@@ -210,10 +210,10 @@ namespace bonsai.Apps
       string save = Settings.Instance.GetInstructionForAction (KeyBindingContext.EditDatabaseApp, ActionType.SaveDatabaseChanges, "save and exit");
 
       Label instructionsLabel = new(1.AsFraction(), 1.AsFixed())
-      {
-        Text = $"{increment}   {decrement}   {delete}   {save}",
-        TextColor = Color.CadetBlue
-      };
+                                {
+                                    Text = $"{increment}   {decrement}   {delete}   {save}",
+                                    TextColor = Color.CadetBlue
+                                };
 
       _listControl = new ScrollableList<DatabaseEntry> (
           ThemeManger.Instance.SelectionForegroundColor,
@@ -224,23 +224,23 @@ namespace bonsai.Apps
       rootPanel.BackgroundColor = ThemeManger.Instance.BackgroundColor;
 
       Label title = new(1.AsFraction(), 1.AsFixed())
-      {
-        Text = "LAST USED         SCORE PATH",
-        TextColor = Color.DodgerBlue
-      };
+                    {
+                        Text = "LAST USED         SCORE PATH",
+                        TextColor = Color.DodgerBlue
+                    };
       //"yyyy-MM-dd HH:mm"
       _border.AddControls (title, _listControl);
 
       Panel searchPanel = new(1.AsFraction(), 1.AsFixed())
-      {
-        Flow = ChildControlFlow.Horizontal
-      };
+                          {
+                              Flow = ChildControlFlow.Horizontal
+                          };
       Label searchLabel = new(9.AsFixed(), 1.AsFixed())
-      {
-        Text = "Search ❯",
-        TextColor = ThemeManger.Instance.SearchLabelTextColor,
-        BackgroundColor = ThemeManger.Instance.SearchLabelBackgroundColor
-      };
+                          {
+                              Text = "Search ❯",
+                              TextColor = ThemeManger.Instance.SearchLabelTextColor,
+                              BackgroundColor = ThemeManger.Instance.SearchLabelBackgroundColor
+                          };
 
       _searchTextBox = new TextBox (1.AsFraction(), 1.AsFixed());
       searchPanel.AddControls (searchLabel, _searchTextBox);

@@ -19,12 +19,18 @@ namespace bonsai.FileSystemHandling
 
   internal class FileSystemWorker
   {
-    public delegate void FileSystemLoadingStateChangedHandler(FileSystemWorker sender, FileSystemLoadingState state, int searchedItemAtIndex);
+    public delegate void FileSystemLoadingStateChangedHandler (FileSystemWorker sender, FileSystemLoadingState state, int searchedItemAtIndex);
 
     public event FileSystemLoadingStateChangedHandler? OnFileSystemInfoLoadingStateChanged;
 
-    private readonly EnumerationOptions _enumerationOptions = new() { IgnoreInaccessible = true, ReturnSpecialDirectories = false, AttributesToSkip = FileAttributes.None };
-    private readonly EnumerationOptions _enumerationOptionsWithRecurse = new() { IgnoreInaccessible = true, RecurseSubdirectories = true, ReturnSpecialDirectories = false, AttributesToSkip = FileAttributes.None };
+    private readonly EnumerationOptions _enumerationOptions =
+        new() { IgnoreInaccessible = true, ReturnSpecialDirectories = false, AttributesToSkip = FileAttributes.None };
+    private readonly EnumerationOptions _enumerationOptionsWithRecurse = new()
+                                                                         {
+                                                                             IgnoreInaccessible = true, RecurseSubdirectories = true,
+                                                                             ReturnSpecialDirectories = false,
+                                                                             AttributesToSkip = FileAttributes.None
+                                                                         };
     private readonly List<FileSystemItem> _filteredList = new();
     private readonly List<FileSystemItem> _unfilteredList = new();
     private readonly Lock _filterChangeLock = new();
@@ -49,7 +55,7 @@ namespace bonsai.FileSystemHandling
 
     public List<FileSystemItem> Data => _searchFilterProvider.IsFilterActive ? _filteredList : _unfilteredList;
 
-    public void ChangeDirectory(DirectoryInfo? directory, bool includeSubDirectories, string? searchedItem = null)
+    public void ChangeDirectory (DirectoryInfo? directory, bool includeSubDirectories, string? searchedItem = null)
     {
       _directoryLoadingCancellationTokenSource?.Cancel();
 
@@ -60,15 +66,21 @@ namespace bonsai.FileSystemHandling
       CurrentDirectory = directory;
       IncludeSubDirectories = includeSubDirectories;
 
-      Thread thread = new(() => LoadDirectory(CurrentDirectory, includeSubDirectories ? _enumerationOptionsWithRecurse : _enumerationOptions, searchedItem, _directoryLoadingCancellationTokenSource.Token));
+      Thread thread = new(
+          () => LoadDirectory (
+              CurrentDirectory,
+              includeSubDirectories ? _enumerationOptionsWithRecurse : _enumerationOptions,
+              searchedItem,
+              _directoryLoadingCancellationTokenSource.Token));
 
       thread.Start();
     }
 
-    public void ApplyFilter(string searchTerm, bool useRegex)
+    public void ApplyFilter (string searchTerm, bool useRegex)
     {
       string trimmed = searchTerm.Trim();
-      (bool filterChanged, Func<FileSystemItem?, SearchMatch[]>? searchFilter, bool canApplyFilterToFilteredList) = _searchFilterProvider.GetFilter(trimmed, useRegex);
+      (bool filterChanged, Func<FileSystemItem?, SearchMatch[]>? searchFilter, bool canApplyFilterToFilteredList) =
+          _searchFilterProvider.GetFilter (trimmed, useRegex);
 
       if (!filterChanged)
       {
@@ -80,13 +92,13 @@ namespace bonsai.FileSystemHandling
       _applyFilterCancellationTokenSource = new CancellationTokenSource();
       _waitForDeferredApplyFilter.Wait();
 
-      Thread thread = new(() => ApplyFilterDeferred(searchFilter, canApplyFilterToFilteredList, _applyFilterCancellationTokenSource.Token));
+      Thread thread = new(() => ApplyFilterDeferred (searchFilter, canApplyFilterToFilteredList, _applyFilterCancellationTokenSource.Token));
       thread.Start();
     }
 
     private void ApplyFilterDeferred (Func<FileSystemItem?, SearchMatch[]>? newFilter, bool canApplyFilterToFilteredList, CancellationToken token)
     {
-      while (Stopwatch.GetElapsedTime(_lastSearchTermChange).TotalMilliseconds < 200)
+      while (Stopwatch.GetElapsedTime (_lastSearchTermChange).TotalMilliseconds < 200)
       {
         if (token.IsCancellationRequested)
         {
@@ -110,8 +122,8 @@ namespace bonsai.FileSystemHandling
         {
           if (!_searchFilterProvider.IsFilterActive || _searchFilter == null)
           {
-            TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Started, -1);
-            TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Finished, -1);
+            TriggerOnFileSystemInfoLoadingStateChanged (FileSystemLoadingState.Started, -1);
+            TriggerOnFileSystemInfoLoadingStateChanged (FileSystemLoadingState.Finished, -1);
             return;
           }
 
@@ -123,7 +135,7 @@ namespace bonsai.FileSystemHandling
 
           _filteredList.Clear();
 
-          TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Started, -1);
+          TriggerOnFileSystemInfoLoadingStateChanged (FileSystemLoadingState.Started, -1);
           for (int index = 0; index < listToFilter.Count; index++)
           {
             FileSystemItem item = listToFilter[index];
@@ -132,11 +144,11 @@ namespace bonsai.FileSystemHandling
               break;
             }
 
-            ApplyFilterToItemAndAddToList(item, _searchFilter, _filteredList);
-            TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Updated, -1);
+            ApplyFilterToItemAndAddToList (item, _searchFilter, _filteredList);
+            TriggerOnFileSystemInfoLoadingStateChanged (FileSystemLoadingState.Updated, -1);
           }
 
-          TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Finished, -1);
+          TriggerOnFileSystemInfoLoadingStateChanged (FileSystemLoadingState.Finished, -1);
         }
         else
         {
@@ -154,7 +166,7 @@ namespace bonsai.FileSystemHandling
       }
     }
 
-    public void CancelOperations()
+    public void CancelOperations ()
     {
       _directoryLoadingCancellationTokenSource?.Cancel();
       _applyFilterCancellationTokenSource?.Cancel();
@@ -173,13 +185,17 @@ namespace bonsai.FileSystemHandling
         _unfilteredList.Clear();
         _filteredList.Clear();
 
-        TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Started, -1);
+        TriggerOnFileSystemInfoLoadingStateChanged (FileSystemLoadingState.Started, -1);
 
         int currentDirectoryFullNameLength = CurrentDirectory?.FullName.Length ?? 0;
 
         if (directoryInfo == null)
         {
-          CreateAndAddFileSystemItems(DriveInfo.GetDrives(), searchedItem, info => new DriveItem(info, currentDirectoryFullNameLength), cancellationToken);
+          CreateAndAddFileSystemItems (
+              DriveInfo.GetDrives(),
+              searchedItem,
+              info => new DriveItem (info, currentDirectoryFullNameLength),
+              cancellationToken);
         }
 
         else
@@ -188,42 +204,52 @@ namespace bonsai.FileSystemHandling
           {
             if (directoryInfo.Parent != null)
             {
-              var parent = new ParentDirectoryItem(currentDirectoryFullNameLength);
-              _unfilteredList.Add(parent);
+              ParentDirectoryItem parent = new(currentDirectoryFullNameLength);
+              _unfilteredList.Add (parent);
             }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            else if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
             {
-              var parent = new ParentDirectoryItem(currentDirectoryFullNameLength);
-              _unfilteredList.Add(parent);
+              ParentDirectoryItem parent = new(currentDirectoryFullNameLength);
+              _unfilteredList.Add (parent);
             }
           }
 
-          var directorySource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new DirectoryItem(Path.Join(entry.Directory, entry.FileName), currentDirectoryFullNameLength), enumerationOptions)
-          {
-            ShouldIncludePredicate = (ref FileSystemEntry entry) => entry.IsDirectory
-          };
+          FileSystemEnumerable<FileSystemItem> directorySource = new(
+                                                                     directoryInfo.FullName,
+                                                                     (ref FileSystemEntry entry) => new DirectoryItem (
+                                                                         Path.Join (entry.Directory, entry.FileName),
+                                                                         currentDirectoryFullNameLength),
+                                                                     enumerationOptions)
+                                                                 {
+                                                                     ShouldIncludePredicate = (ref FileSystemEntry entry) => entry.IsDirectory
+                                                                 };
           if (!cancellationToken.IsCancellationRequested)
           {
-            CreateAndAddFileSystemItems(directorySource, searchedItem, item => item, cancellationToken);
+            CreateAndAddFileSystemItems (directorySource, searchedItem, item => item, cancellationToken);
           }
 
-          var fileSource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new FileItem(entry.Directory, entry.FileName, currentDirectoryFullNameLength), enumerationOptions)
-          {
-            ShouldIncludePredicate = (ref FileSystemEntry entry) => !entry.IsDirectory
-          };
+          FileSystemEnumerable<FileSystemItem> fileSource = new(
+                                                                directoryInfo.FullName,
+                                                                (ref FileSystemEntry entry) => new FileItem (
+                                                                    entry.Directory,
+                                                                    entry.FileName,
+                                                                    currentDirectoryFullNameLength),
+                                                                enumerationOptions)
+                                                            {
+                                                                ShouldIncludePredicate = (ref FileSystemEntry entry) => !entry.IsDirectory
+                                                            };
           if (!cancellationToken.IsCancellationRequested)
           {
-            CreateAndAddFileSystemItems(fileSource, searchedItem, item => item, cancellationToken);
+            CreateAndAddFileSystemItems (fileSource, searchedItem, item => item, cancellationToken);
           }
         }
-        TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Finished, -1);
+
+        TriggerOnFileSystemInfoLoadingStateChanged (FileSystemLoadingState.Finished, -1);
       }
       finally
       {
         _waitForDirectoryLoadingThreadFinished.Set();
       }
-
-
     }
 
     private void CreateAndAddFileSystemItems<T> (
@@ -241,11 +267,11 @@ namespace bonsai.FileSystemHandling
           break;
         }
 
-        var listItem = itemFactory (fileSystemInfo);
+        FileSystemItem? listItem = itemFactory (fileSystemInfo);
 
-        _unfilteredList.Add(listItem);
+        _unfilteredList.Add (listItem);
 
-        ApplyFilterToItemAndAddToList(listItem, _searchFilter, _filteredList);
+        ApplyFilterToItemAndAddToList (listItem, _searchFilter, _filteredList);
 
         using (_filterChangeLock.EnterScope())
         {
@@ -253,10 +279,10 @@ namespace bonsai.FileSystemHandling
           {
             _filteredList.Clear();
 
-            foreach (var item in _unfilteredList)
+            foreach (FileSystemItem? item in _unfilteredList)
             {
-              ApplyFilterToItemAndAddToList(item, _searchFilter, _filteredList);
-              TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Started, -1);
+              ApplyFilterToItemAndAddToList (item, _searchFilter, _filteredList);
+              TriggerOnFileSystemInfoLoadingStateChanged (FileSystemLoadingState.Started, -1);
             }
 
             _filterChanged = false;
@@ -268,12 +294,15 @@ namespace bonsai.FileSystemHandling
           searchedItemAtIndex = _unfilteredList.Count - 1;
         }
 
-        TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Updated, searchedItemAtIndex);
+        TriggerOnFileSystemInfoLoadingStateChanged (FileSystemLoadingState.Updated, searchedItemAtIndex);
         searchedItemAtIndex = -1;
       }
     }
 
-    private static void ApplyFilterToItemAndAddToList(FileSystemItem item, Func<FileSystemItem?, SearchMatch[]>? filter, List<FileSystemItem> targetList)
+    private static void ApplyFilterToItemAndAddToList (
+        FileSystemItem item,
+        Func<FileSystemItem?, SearchMatch[]>? filter,
+        List<FileSystemItem> targetList)
     {
       item.ClearSearchMatches();
       if (filter == null)
@@ -281,24 +310,24 @@ namespace bonsai.FileSystemHandling
         return;
       }
 
-      var matches = filter(item);
+      SearchMatch[]? matches = filter (item);
 
       if (matches.Length == 0)
       {
         return;
       }
 
-      item.SetSearchMatches(matches);
+      item.SetSearchMatches (matches);
 
-      targetList.Add(item);
+      targetList.Add (item);
     }
 
-    private void TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState state, int searchedItemAtIndex)
+    private void TriggerOnFileSystemInfoLoadingStateChanged (FileSystemLoadingState state, int searchedItemAtIndex)
     {
       if (state != FileSystemLoadingState.Updated || !_lastFileSystemInfoLoadingStateChangedTriggered.HasValue ||
-          Stopwatch.GetElapsedTime(_lastFileSystemInfoLoadingStateChangedTriggered.Value).TotalMilliseconds > 100 || searchedItemAtIndex > -1)
+          Stopwatch.GetElapsedTime (_lastFileSystemInfoLoadingStateChangedTriggered.Value).TotalMilliseconds > 100 || searchedItemAtIndex > -1)
       {
-        OnFileSystemInfoLoadingStateChanged?.Invoke(this, state, searchedItemAtIndex);
+        OnFileSystemInfoLoadingStateChanged?.Invoke (this, state, searchedItemAtIndex);
         _lastFileSystemInfoLoadingStateChangedTriggered = Stopwatch.GetTimestamp();
       }
     }

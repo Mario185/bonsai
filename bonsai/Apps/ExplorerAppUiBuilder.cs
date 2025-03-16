@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using bonsai.FileSystemHandling;
 using bonsai.Theme;
@@ -11,13 +12,8 @@ namespace bonsai.Apps
   internal class ExplorerAppUiBuilder : Frame
   {
     private Border _detailsBorder = null!;
-    private Panel _rootPanel = null!;
     private Label _regexLabel = null!;
-
-    public ExplorerAppUiBuilder()
-    : base()
-    {
-    }
+    private Panel _rootPanel = null!;
 
     public TextBox SearchTextBox { get; private set; } = null!;
 
@@ -31,13 +27,10 @@ namespace bonsai.Apps
 
     public Panel GitPanel { get; private set; } = null!;
 
-
-
-    public void CreateUi()
+    public void CreateUi ()
     {
-
-      _rootPanel = new Panel(1.AsFraction(), 1.AsFraction());
-      AddControls(_rootPanel);
+      _rootPanel = new Panel (1.AsFraction(), 1.AsFraction());
+      AddControls (_rootPanel);
 
       _rootPanel.BackgroundColor = ThemeManger.Instance.BackgroundColor;
 
@@ -49,177 +42,189 @@ namespace bonsai.Apps
 
       Panel settingsPanel = CreateSettingsPanel();
 
-
-      appPanel.AddControls(topPanel, searchPanel, centerPanel);
+      appPanel.AddControls (topPanel, searchPanel, centerPanel);
 
       //var instructions = CreateInstructionsPanel();
 
-      _rootPanel.AddControls(appPanel, settingsPanel); //, instructions);
+      _rootPanel.AddControls (appPanel, settingsPanel); //, instructions);
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "CreateInstructionsPanel is for later use")]
+    [SuppressMessage ("CodeQuality", "IDE0051:Remove unused private members", Justification = "CreateInstructionsPanel is for later use")]
     // ReSharper disable once UnusedMember.Local
-    private static Panel CreateInstructionsPanel()
+    private static Panel CreateInstructionsPanel ()
     {
-      var panel = new Panel(1.AsFraction(), 1.AsFixed())
-      {
-        BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor,
-        TextColor = ThemeManger.Instance.TopBarTextColor,
+      Panel panel = new(1.AsFraction(), 1.AsFixed())
+                    {
+                        BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor,
+                        TextColor = ThemeManger.Instance.TopBarTextColor,
 
-        Flow = ChildControlFlow.Horizontal
-      };
+                        Flow = ChildControlFlow.Horizontal
+                    };
       Label instructions = new(30.AsFixed(), 1.AsFixed())
-      {
-        Text = "Hier könnte ihre Anleitung stehen :D"
-      };
-
+                           {
+                               Text = "Hier könnte ihre Anleitung stehen :D"
+                           };
 
       Label shortCutLabel = new(2.AsFixed(), 1.AsFixed())
-      {
-        Text = "^I",
-        BackgroundColor = Color.FromArgb(63, 119, 185)
-      };
+                            {
+                                Text = "^I",
+                                BackgroundColor = Color.FromArgb (63, 119, 185)
+                            };
 
       Label includeSubDirectoriesInSearchLabel = new(25.AsFixed(), 1.AsFixed())
-      {
-        Text = " Include sub directories",
-        TextColor = Color.DarkGray
-      };
+                                                 {
+                                                     Text = " Include sub directories",
+                                                     TextColor = Color.DarkGray
+                                                 };
 
       Label excludeSubDirectoriesInSearchLabel = new(25.AsFixed(), 1.AsFixed())
-      {
-        Text = " Exclude sub directories",
-        TextColor = Color.DarkGray,
-        Visible = true
-      };
+                                                 {
+                                                     Text = " Exclude sub directories",
+                                                     TextColor = Color.DarkGray,
+                                                     Visible = true
+                                                 };
 
-      panel.AddControls(instructions, shortCutLabel, includeSubDirectoriesInSearchLabel, excludeSubDirectoriesInSearchLabel);
+      panel.AddControls (instructions, shortCutLabel, includeSubDirectoriesInSearchLabel, excludeSubDirectoriesInSearchLabel);
       return panel;
     }
 
-    private Panel CreateTopPanel()
+    private Panel CreateTopPanel ()
     {
       Panel topPanel = new(1.AsFraction(), 1.AsFixed())
-      {
-        Flow = ChildControlFlow.Horizontal
-      };
-      CurrentDirectoryLabel = new Label(1.AsFraction(), 1.AsFixed())
-      {
-        TruncateLeft = true,
-        TextColor = ThemeManger.Instance.TopBarTextColor,
-        BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor
-      };
+                       {
+                           Flow = ChildControlFlow.Horizontal
+                       };
+      CurrentDirectoryLabel = new Label (1.AsFraction(), 1.AsFixed())
+                              {
+                                  TruncateLeft = true,
+                                  TextColor = ThemeManger.Instance.TopBarTextColor,
+                                  BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor
+                              };
 
-      topPanel.AddControls(CurrentDirectoryLabel);
+      topPanel.AddControls (CurrentDirectoryLabel);
       return topPanel;
     }
 
-    private Panel CreateCenterPanel()
+    private Panel CreateCenterPanel ()
     {
       Panel centerPanel = new(1.AsFraction(), 1.AsFraction())
-      {
-        Flow = ChildControlFlow.Horizontal
-      };
+                          {
+                              Flow = ChildControlFlow.Horizontal
+                          };
 
-      FileSystemListBorder = new Border(5.AsFraction(), 1.AsFraction())
-      {
-        TextPosition = BorderTextPosition.BottomLeft,
-        BorderColor = ThemeManger.Instance.BorderColor
-      };
+      FileSystemListBorder = new Border (5.AsFraction(), 1.AsFraction())
+                             {
+                                 TextPosition = BorderTextPosition.BottomLeft,
+                                 BorderColor = ThemeManger.Instance.BorderColor
+                             };
 
-      FileSystemList = new ScrollableList<FileSystemItem>(ThemeManger.Instance.SelectionForegroundColor, ThemeManger.Instance.SelectionBackgroundColor,
-        1.AsFraction(), 1.AsFraction());
-      FileSystemListBorder.AddControls(FileSystemList);
+      FileSystemList = new ScrollableList<FileSystemItem> (
+          ThemeManger.Instance.SelectionForegroundColor,
+          ThemeManger.Instance.SelectionBackgroundColor,
+          1.AsFraction(),
+          1.AsFraction());
+      FileSystemListBorder.AddControls (FileSystemList);
 
-      _detailsBorder = new Border(2.AsFraction(), 1.AsFraction())
-      {
-        BorderColor = ThemeManger.Instance.BorderColor,
-        Visible = false
-      };
+      _detailsBorder = new Border (2.AsFraction(), 1.AsFraction())
+                       {
+                           BorderColor = ThemeManger.Instance.BorderColor,
+                           Visible = false
+                       };
 
-      DetailsLabel = new MultiLIneLabel(1.AsFraction(), 1.AsFraction());
+      DetailsLabel = new MultiLIneLabel (1.AsFraction(), 1.AsFraction());
 
-      GitPanel = new Panel(1.AsFraction(), 1.AsFraction());
-      var seperator = new Border(1.AsFraction(), 1.AsFixed(), bottomFiller: null, bottomLeftCorner: null, bottomRightCorner: null, topLeftCorner: '─', topRightCorner: '─');
-      var multilineLabel2 = new MultiLIneLabel(1.AsFraction(), 1.AsFraction())
-      {
-        StickToBottom = true,
-        Lines =
-        [new FormattedLine("Hier noch GIT infos?"), new FormattedLine("ABC"), new FormattedLine("DEF"), new FormattedLine("GHI"), new FormattedLine("JKL"), new FormattedLine("MNO"), new FormattedLine("PQR")]
-      };
+      GitPanel = new Panel (1.AsFraction(), 1.AsFraction());
+      Border seperator = new(
+          1.AsFraction(),
+          1.AsFixed(),
+          bottomFiller: null,
+          bottomLeftCorner: null,
+          bottomRightCorner: null,
+          topLeftCorner: '─',
+          topRightCorner: '─');
+      MultiLIneLabel multilineLabel2 = new(1.AsFraction(), 1.AsFraction())
+                                       {
+                                           StickToBottom = true,
+                                           Lines =
+                                           [
+                                               new FormattedLine ("Hier noch GIT infos?"), new FormattedLine ("ABC"), new FormattedLine ("DEF"),
+                                               new FormattedLine ("GHI"), new FormattedLine ("JKL"), new FormattedLine ("MNO"),
+                                               new FormattedLine ("PQR")
+                                           ]
+                                       };
 
-      GitPanel.AddControls(seperator, multilineLabel2);
-      _detailsBorder.AddControls(DetailsLabel, GitPanel);
+      GitPanel.AddControls (seperator, multilineLabel2);
+      _detailsBorder.AddControls (DetailsLabel, GitPanel);
 
-      centerPanel.AddControls(FileSystemListBorder, _detailsBorder);
+      centerPanel.AddControls (FileSystemListBorder, _detailsBorder);
       return centerPanel;
     }
 
-    private Panel CreateSearchPanel()
+    private Panel CreateSearchPanel ()
     {
       Panel searchPanel = new(1.AsFraction(), 1.AsFixed())
-      {
-        Flow = ChildControlFlow.Horizontal
-      };
+                          {
+                              Flow = ChildControlFlow.Horizontal
+                          };
 
       Label label = new(10.AsFixed(), 1.AsFixed())
-      {
-        Text = " Search ❯",
-        TextColor = ThemeManger.Instance.SearchLabelTextColor,
-        BackgroundColor = ThemeManger.Instance.SearchLabelBackgroundColor
-      };
+                    {
+                        Text = " Search ❯",
+                        TextColor = ThemeManger.Instance.SearchLabelTextColor,
+                        BackgroundColor = ThemeManger.Instance.SearchLabelBackgroundColor
+                    };
 
-      SearchTextBox = new TextBox(1.AsFraction(), 1.AsFixed());
+      SearchTextBox = new TextBox (1.AsFraction(), 1.AsFixed());
 
-      var text = Settings.Instance.GetInstructionForAction(KeyBindingContext.ExplorerApp, ActionType.ToggleRegexSearch, "regex");
-      _regexLabel = new(text.Length.AsFixed(), 1.AsFixed())
-      {
-        TextColor = ThemeManger.Instance.OptionDisabledColor,
-        Text = text
-      };
+      string text = Settings.Instance.GetInstructionForAction (KeyBindingContext.ExplorerApp, ActionType.ToggleRegexSearch, "regex");
+      _regexLabel = new Label (text.Length.AsFixed(), 1.AsFixed())
+                    {
+                        TextColor = ThemeManger.Instance.OptionDisabledColor,
+                        Text = text
+                    };
 
-      searchPanel.AddControls(label, SearchTextBox, _regexLabel);
+      searchPanel.AddControls (label, SearchTextBox, _regexLabel);
 
       return searchPanel;
     }
 
-    private static Panel CreateSettingsPanel()
+    private static Panel CreateSettingsPanel ()
     {
       Panel settingsPanel = new(1.AsFraction(), 1.AsFraction())
-      {
-        Visible = false
-      };
+                            {
+                                Visible = false
+                            };
 
       Border border = new(1.AsFraction(), 1.AsFraction())
-      {
-        BorderColor = ThemeManger.Instance.BorderColor,
-        Text = "bonsai settings"
-      };
+                      {
+                          BorderColor = ThemeManger.Instance.BorderColor,
+                          Text = "bonsai settings"
+                      };
       Label label = new(1.AsFraction(), 1.AsFraction())
-      {
-        Text = "Settings YEAAA"
-      };
+                    {
+                        Text = "Settings YEAAA"
+                    };
 
-      border.AddControls(label);
-      settingsPanel.AddControls(border);
+      border.AddControls (label);
+      settingsPanel.AddControls (border);
       return settingsPanel;
     }
 
-    public void ToggleDetails()
+    public void ToggleDetails ()
     {
       _detailsBorder.Visible = !_detailsBorder.Visible;
-      RenderPartial(_detailsBorder.Parent!);
+      RenderPartial (_detailsBorder.Parent!);
     }
 
-    public bool AreDetailsVisible()
+    public bool AreDetailsVisible ()
     {
       return _detailsBorder.Visible;
     }
 
-    public void SetEnableRegExSearch(bool enabled)
+    public void SetEnableRegExSearch (bool enabled)
     {
       _regexLabel.TextColor = enabled ? ThemeManger.Instance.OptionEnabledColor : ThemeManger.Instance.OptionDisabledColor;
-      RenderPartial(_regexLabel);
+      RenderPartial (_regexLabel);
     }
   }
 }

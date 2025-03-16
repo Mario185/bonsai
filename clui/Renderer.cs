@@ -2,21 +2,26 @@
 using System.Threading;
 using clui.Controls;
 using clui.Controls.Interfaces;
+using clui.Layout;
 using consoleTools;
 
 namespace clui
 {
   public sealed class Renderer : IDisposable
   {
+    private static readonly Lock s_lock = new();
+
+    internal Renderer ()
+    {
+    }
+
     public ICanHaveFocus? FocusedControl { get; private set; }
 
     public ConsoleWriter ConsoleWriter { get; } = new();
 
-    private static readonly Lock s_lock = new();
-
-    internal Renderer()
+    public void Dispose ()
     {
-      
+      ConsoleWriter.Dispose();
     }
 
     public void Render (ControlBase control)
@@ -26,14 +31,14 @@ namespace clui
         // we need to flush the hide first otherwise flashing text occurs
         ConsoleWriter.Cursor.Hide().ResetPosition().Flush();
 
-        var controlHasVisibleCursor = FocusedControl as IHaveVisibleCursor;
+        IHaveVisibleCursor? controlHasVisibleCursor = FocusedControl as IHaveVisibleCursor;
 
-        RenderInternal(control);
+        RenderInternal (control);
 
         if (controlHasVisibleCursor != null)
         {
-          var cursorTarget = controlHasVisibleCursor.GetCursorPosition();
-          ConsoleWriter.Cursor.MoveTo(cursorTarget.X, cursorTarget.Y);
+          Position? cursorTarget = controlHasVisibleCursor.GetCursorPosition();
+          ConsoleWriter.Cursor.MoveTo (cursorTarget.X, cursorTarget.Y);
         }
         else
         {
@@ -60,18 +65,13 @@ namespace clui
 
       foreach (ControlBase child in control.Controls)
       {
-        RenderInternal(child);
+        RenderInternal (child);
       }
     }
 
     public void SetFocusedControl (ICanHaveFocus? control)
     {
       FocusedControl = control;
-    }
-
-    public void Dispose()
-    {
-      ConsoleWriter.Dispose();
     }
   }
 }

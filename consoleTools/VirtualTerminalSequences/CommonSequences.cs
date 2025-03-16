@@ -9,27 +9,27 @@ namespace consoleTools.VirtualTerminalSequences
     /// </summary>
     public const string ESC = "\x1b";
 
-    public static void ScrollDown(int n, Action<string> writeTo)
+    public static void ScrollDown (int n, Action<string> writeTo)
     {
-      WriteEsc(writeTo);
-      writeTo(n.ToString());
-      writeTo("T");
+      WriteEsc (writeTo);
+      writeTo (n.ToString());
+      writeTo ("T");
     }
 
-    public static void ScrollUp(int n, Action<string> writeTo)
+    public static void ScrollUp (int n, Action<string> writeTo)
     {
-      WriteEsc(writeTo);
-      writeTo(n.ToString());
-      writeTo("S");
+      WriteEsc (writeTo);
+      writeTo (n.ToString());
+      writeTo ("S");
     }
 
-    public static void SetScrollingRegion(int top, int bottom, Action<string> writeTo)
+    public static void SetScrollingRegion (int top, int bottom, Action<string> writeTo)
     {
-      WriteEsc(writeTo);
-      writeTo(top.ToString());
-      writeTo(";");
-      writeTo(bottom.ToString());
-      writeTo("r");
+      WriteEsc (writeTo);
+      writeTo (top.ToString());
+      writeTo (";");
+      writeTo (bottom.ToString());
+      writeTo ("r");
     }
   }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Xml;
 
 namespace consoleTools.VirtualTerminalSequences
 {
@@ -20,7 +18,7 @@ namespace consoleTools.VirtualTerminalSequences
     ///   Switches to a new alternate screen buffer.
     ///   And returns an instance of <see cref="AlternateScreenBufferSection" />.
     /// </summary>
-    public static AlternateScreenBufferSection ActivateAlternateScreenBuffer()
+    public static AlternateScreenBufferSection ActivateAlternateScreenBuffer ()
     {
       return new AlternateScreenBufferSection();
     }

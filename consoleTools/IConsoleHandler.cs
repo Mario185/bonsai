@@ -6,13 +6,12 @@ namespace consoleTools
 {
   internal interface IConsoleHandler
   {
+    BlockingCollection<ConsoleKeyInfo> KeyQueue { get; }
     void SetInputHandle (IntPtr? inputHandle);
 
     void StartOperation (CancellationToken cancellationToken);
 
-    BlockingCollection<ConsoleKeyInfo> KeyQueue { get; }
-
     void RegisterBufferSizeChange (BufferSizeChangeCallback callback);
-    void UnregisterBufferSizeChange(BufferSizeChangeCallback callbackAction);
+    void UnregisterBufferSizeChange (BufferSizeChangeCallback callbackAction);
   }
 }

@@ -25,23 +25,23 @@ namespace clui.Controls
         return;
       }
 
-      var filledLines = Lines.Where(l => l != null && !string.IsNullOrWhiteSpace(l.Value)).ToArray();
+      FormattedLine?[] filledLines = Lines.Where (l => l != null && !string.IsNullOrWhiteSpace (l.Value)).ToArray();
 
       int lineToStart = 0;
       if (StickToBottom)
       {
-        lineToStart = (CalculatedHeight!.Value) - filledLines.Length;
+        lineToStart = CalculatedHeight!.Value - filledLines.Length;
       }
 
-      consoleWriter.Cursor.MoveTo(Position.X, lineToStart);
+      consoleWriter.Cursor.MoveTo (Position.X, lineToStart);
 
       for (int i = 0; i < CalculatedHeight!.Value; i++)
       {
-        consoleWriter.Style.ResetStyles().Cursor.MoveTo(Position.X, Position.Y + i);
+        consoleWriter.Style.ResetStyles().Cursor.MoveTo (Position.X, Position.Y + i);
 
         consoleWriter.Style.ForegroundColor (GetEffectiveTextColor())
             .BackgroundColor (GetEffectiveBackgroundColor())
-            .Text.EraseCharacter (CalculatedWidth!.Value!);
+            .Text.EraseCharacter (CalculatedWidth!.Value);
 
         if (i >= lineToStart && i - lineToStart < filledLines.Length)
         {
@@ -50,7 +50,7 @@ namespace clui.Controls
           {
             string lineText = formattedLine.Value;
 
-            consoleWriter.Style.ForegroundColor(formattedLine.TextColor).BackgroundColor(formattedLine.BackgroundColor);
+            consoleWriter.Style.ForegroundColor (formattedLine.TextColor).BackgroundColor (formattedLine.BackgroundColor);
 
             if (formattedLine.Bold)
             {
@@ -62,30 +62,28 @@ namespace clui.Controls
               consoleWriter.Style.Underline();
             }
 
-            consoleWriter.Cursor.MoveAbsoluteHorizontally(Position.X + formattedLine.Indent);
+            consoleWriter.Cursor.MoveAbsoluteHorizontally (Position.X + formattedLine.Indent);
 
             if (lineText.Length + formattedLine.Indent > CalculatedWidth!)
             {
               if (TruncateLeft)
               {
-                consoleWriter.Write('…').WriteTruncated(
+                consoleWriter.Write ('…').WriteTruncated (
                     lineText,
-                    (lineText.Length + formattedLine.Indent) - CalculatedWidth!.Value + 1,
+                    lineText.Length + formattedLine.Indent - CalculatedWidth!.Value + 1,
                     CalculatedWidth!.Value - 1);
               }
               else
               {
-                consoleWriter.WriteTruncated(lineText, 0, CalculatedWidth!.Value - 1 - formattedLine.Indent).Write('…');
+                consoleWriter.WriteTruncated (lineText, 0, CalculatedWidth!.Value - 1 - formattedLine.Indent).Write ('…');
               }
             }
             else
             {
-              consoleWriter.Write(lineText);
+              consoleWriter.Write (lineText);
             }
           }
         }
-
-        
       }
 
       consoleWriter.Style.ResetStyles();

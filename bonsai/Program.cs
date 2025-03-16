@@ -1,18 +1,14 @@
 ﻿using System;
 using System.IO;
-using System.IO.Enumeration;
-using System.Linq;
 using System.Text;
 using bonsai;
 using bonsai.Apps;
-using bonsai.CommandHandling;
 using bonsai.Theme;
 using bonsai.Utilities;
 using consoleTools;
 
-var originalInputEncoding = Console.InputEncoding;
-var originalOutputEncoding = Console.OutputEncoding;
-
+Encoding originalInputEncoding = Console.InputEncoding;
+Encoding originalOutputEncoding = Console.OutputEncoding;
 
 try
 {
@@ -25,16 +21,16 @@ try
 
   if (args.Length == 0)
   {
-    Console.WriteLine(new ExplorerApp(Directory.GetCurrentDirectory()).Run());
+    Console.WriteLine (new ExplorerApp (Directory.GetCurrentDirectory()).Run());
     return 0;
   }
 
-  var command = args[0];
+  string command = args[0];
 
   string tempFilePath = string.Empty;
   string currentDirectory;
   AppBase? appToStart = null;
-  switch(command)
+  switch (command)
   {
     case "init":
       if (args.Length != 2)
@@ -46,7 +42,7 @@ try
       ShellInitializer.WriteInitializationScriptToConsole (args[1]);
       ThemeManger.WriteResourceThemesToConfigFolder (false);
       return 0;
-    
+
     case "editdb":
       appToStart = new EditDatabaseApp();
       break;
@@ -61,10 +57,11 @@ try
         Console.WriteLine ($"Command '{command}' requires three arguments. 1. Temporary file path, 2. Current location, 3. Search argument");
         return 1;
       }
+
       tempFilePath = args[1];
       currentDirectory = args[2];
-      var searchArgs = args[3];
-      appToStart = new NavigationApp(currentDirectory, searchArgs);
+      string searchArgs = args[3];
+      appToStart = new NavigationApp (currentDirectory, searchArgs);
       break;
 
     case "main":
@@ -76,7 +73,7 @@ try
 
       tempFilePath = args[1];
       currentDirectory = args[2];
-      appToStart = new ExplorerApp(currentDirectory);
+      appToStart = new ExplorerApp (currentDirectory);
 
       break;
 
@@ -85,9 +82,9 @@ try
       return 1;
   }
 
-  var result = appToStart.Run();
+  string? result = appToStart.Run();
 
-  if (!string.IsNullOrWhiteSpace(result))
+  if (!string.IsNullOrWhiteSpace (result))
   {
     if (File.Exists (tempFilePath))
     {

@@ -7,31 +7,29 @@ namespace bonsai.FileSystemHandling
 {
   internal class DriveItem : FileSystemItem
   {
-    private readonly DriveInfo _driveInfo;
-
-    public DriveItem(DriveInfo driveInfo, int currentDirectoryFullNameLength)
-      : base(currentDirectoryFullNameLength)
+    public DriveItem (DriveInfo driveInfo, int currentDirectoryFullNameLength)
+        : base (currentDirectoryFullNameLength)
     {
-      _driveInfo = driveInfo;
+      Info = driveInfo;
     }
 
-    public override string FullName => _driveInfo.RootDirectory.FullName;
+    public override string FullName => Info.RootDirectory.FullName;
 
-    protected override string GetIcon()
+    public DriveInfo Info { get; }
+
+    protected override string GetIcon ()
     {
       return ""; //ThemeManger.Instance.GetFolderIcon(_driveInfo.Name);
     }
 
-    protected override Color? GetTextColor()
+    protected override Color? GetTextColor ()
     {
       return ThemeManger.Instance.FolderColors.DefaultColor;
     }
 
-    public override string GetDisplayName()
+    public override string GetDisplayName ()
     {
-      return $"{_driveInfo.Name} ({_driveInfo.VolumeLabel})";
+      return $"{Info.Name} ({Info.VolumeLabel})";
     }
-
-    public DriveInfo Info => _driveInfo;
   }
 }

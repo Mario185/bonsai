@@ -16,7 +16,6 @@ namespace clui.Controls
 
     private readonly Color? _backgroundColorFocused;
     private readonly Color? _foregroundColorFocused;
-    private IList<T>? _listItems;
 
     public ScrollableList (Color? foregroundColorFocused, Color? backgroundColorFocused, LayoutSize width, LayoutSize height)
         : base (width, height)
@@ -33,7 +32,7 @@ namespace clui.Controls
 
     public int CurrentVisibleFromIndex { get; private set; }
 
-    public IList<T>? Items => _listItems;
+    public IList<T>? Items { get; private set; }
 
     public void SetItemList (IList<T> listItems)
     {
@@ -44,7 +43,7 @@ namespace clui.Controls
         observableCollection.CollectionChanged += ListItemCollectionChanged;
       }
 
-      _listItems = listItems;
+      Items = listItems;
 
       FocusedItem = null;
       FocusedItemIndex = -1;
@@ -61,14 +60,14 @@ namespace clui.Controls
       switch (e.Action)
       {
         case NotifyCollectionChangedAction.Add:
-          if (_listItems!.Count == 1)
+          if (Items!.Count == 1)
           {
             SetFocusedIndex (0);
           }
           else if (e.NewStartingIndex < CurrentVisibleFromIndex + CalculatedHeight)
           {
             UpdateCurrentVisibleIndex();
-            RootControl.AssociatedFrame.RenderPartial(this);
+            RootControl.AssociatedFrame.RenderPartial (this);
           }
 
           break;
@@ -81,7 +80,7 @@ namespace clui.Controls
               targetIndex = 0;
             }
 
-            if (targetIndex < _listItems!.Count)
+            if (targetIndex < Items!.Count)
             {
               SetFocusedIndex (targetIndex);
             }
@@ -105,7 +104,7 @@ namespace clui.Controls
           ResetFocus();
           break;
         default:
-          throw new ArgumentOutOfRangeException($"{e.Action} currently not supported.");
+          throw new ArgumentOutOfRangeException ($"{e.Action} currently not supported.");
       }
     }
 
@@ -127,7 +126,7 @@ namespace clui.Controls
 
     internal override bool ShouldRenderControl ()
     {
-      if (_listItems == null)
+      if (Items == null)
       {
         return false;
       }
@@ -144,9 +143,9 @@ namespace clui.Controls
       {
         int effectiveIndex = i + CurrentVisibleFromIndex;
         consoleWriter.Style.BackgroundColor (backGroundColor);
-        if (effectiveIndex < _listItems!.Count)
+        if (effectiveIndex < Items!.Count)
         {
-          T item = _listItems[effectiveIndex];
+          T item = Items[effectiveIndex];
           RenderListItem (item, textColor, backGroundColor, consoleWriter);
         }
         else
@@ -185,7 +184,7 @@ namespace clui.Controls
 
     public void TrySetCurrentVisibleFromIndex (int value)
     {
-      if (_listItems == null || CalculatedWidth == null || CalculatedHeight == null)
+      if (Items == null || CalculatedWidth == null || CalculatedHeight == null)
       {
         return;
       }
@@ -203,14 +202,14 @@ namespace clui.Controls
     {
       int index = FocusedItemIndex + step;
 
-      if (wrapAround && _listItems != null)
+      if (wrapAround && Items != null)
       {
         if (index < 0)
         {
-          index = _listItems.Count - 1;
+          index = Items.Count - 1;
         }
 
-        if (index >= _listItems.Count)
+        if (index >= Items.Count)
         {
           index = 0;
         }
@@ -229,7 +228,7 @@ namespace clui.Controls
     {
       ArgumentNullException.ThrowIfNull (item);
 
-      int index = _listItems!.IndexOf (item);
+      int index = Items!.IndexOf (item);
       if (index < 0)
       {
         throw new ArgumentException ("The given item is not present in the list.");
@@ -240,19 +239,19 @@ namespace clui.Controls
 
     private void SetFocusedIndexInternal (int index)
     {
-      if (_listItems == null)
+      if (Items == null)
       {
         return;
       }
 
-      int clampedIndex = Math.Clamp (index, 0, Math.Max (0, _listItems.Count - 1));
-      if (clampedIndex > _listItems.Count - 1)
+      int clampedIndex = Math.Clamp (index, 0, Math.Max (0, Items.Count - 1));
+      if (clampedIndex > Items.Count - 1)
       {
         return;
       }
 
       FocusedItemIndex = clampedIndex;
-      FocusedItem = _listItems[clampedIndex];
+      FocusedItem = Items[clampedIndex];
 
       OnSelectionChanged?.Invoke (this, FocusedItem);
       UpdateCurrentVisibleIndex();
@@ -265,7 +264,7 @@ namespace clui.Controls
         return;
       }
 
-      int currentTo = Math.Min (_listItems!.Count, CurrentVisibleFromIndex + CalculatedHeight!.Value);
+      int currentTo = Math.Min (Items!.Count, CurrentVisibleFromIndex + CalculatedHeight!.Value);
       int newVisibleFrom = CurrentVisibleFromIndex;
 
       // move up
@@ -280,9 +279,9 @@ namespace clui.Controls
         newVisibleFrom = FocusedItemIndex - CalculatedHeight!.Value + 1;
       }
 
-      if (newVisibleFrom > _listItems.Count - CalculatedHeight)
+      if (newVisibleFrom > Items.Count - CalculatedHeight)
       {
-        newVisibleFrom = _listItems.Count - CalculatedHeight!.Value;
+        newVisibleFrom = Items.Count - CalculatedHeight!.Value;
       }
 
       CurrentVisibleFromIndex = Math.Max (0, newVisibleFrom);
@@ -315,7 +314,7 @@ namespace clui.Controls
 
     public void SelectLastItem ()
     {
-      MoveFocusedIndex (_listItems!.Count - FocusedItemIndex, false);
+      MoveFocusedIndex (Items!.Count - FocusedItemIndex, false);
     }
   }
 

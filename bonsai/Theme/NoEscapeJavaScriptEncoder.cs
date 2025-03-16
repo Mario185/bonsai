@@ -9,39 +9,49 @@ namespace bonsai.Theme
   {
     public override int MaxOutputCharactersPerInputCharacter => 1;
 
-    public override unsafe bool TryEncodeUnicodeScalar(int unicodeScalar, char* buffer, int bufferLength, out int numberOfCharactersWritten)
+    public override unsafe bool TryEncodeUnicodeScalar (int unicodeScalar, char* buffer, int bufferLength, out int numberOfCharactersWritten)
     {
       numberOfCharactersWritten = 0;
       return false;
     }
 
-    public override bool WillEncode(int unicodeScalar)
+    public override bool WillEncode (int unicodeScalar)
     {
       return false;
     }
 
-    public override OperationStatus EncodeUtf8(ReadOnlySpan<byte> utf8Source, Span<byte> utf8Destination, out int bytesConsumed, out int bytesWritten, bool isFinalBlock = true)
+    public override OperationStatus EncodeUtf8 (
+        ReadOnlySpan<byte> utf8Source,
+        Span<byte> utf8Destination,
+        out int bytesConsumed,
+        out int bytesWritten,
+        bool isFinalBlock = true)
     {
-      utf8Source.CopyTo(utf8Destination);
+      utf8Source.CopyTo (utf8Destination);
       bytesConsumed = utf8Source.Length;
       bytesWritten = utf8Source.Length;
       return OperationStatus.Done;
     }
 
-    public override unsafe int FindFirstCharacterToEncode(char* text, int textLength)
+    public override unsafe int FindFirstCharacterToEncode (char* text, int textLength)
     {
       return -1;
     }
 
-    public override OperationStatus Encode(ReadOnlySpan<char> source, Span<char> destination, out int charsConsumed, out int charsWritten, bool isFinalBlock)
+    public override OperationStatus Encode (
+        ReadOnlySpan<char> source,
+        Span<char> destination,
+        out int charsConsumed,
+        out int charsWritten,
+        bool isFinalBlock)
     {
-      source.CopyTo(destination);
+      source.CopyTo (destination);
       charsConsumed = source.Length;
       charsWritten = source.Length;
       return 0;
     }
 
-    public override string Encode(string value)
+    public override string Encode (string value)
     {
       return value;
     }

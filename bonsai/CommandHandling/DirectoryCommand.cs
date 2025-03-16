@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace bonsai.CommandHandling
 {
@@ -6,24 +7,23 @@ namespace bonsai.CommandHandling
   {
     private readonly bool _isDefault;
 
-    public DirectoryCommand CloneForExecution(string path)
-    {
-      return new DirectoryCommand(Action.Replace("[path]", path), DisplayName);
-    }
-
     [JsonConstructor]
-    public DirectoryCommand()
+    public DirectoryCommand ()
     {
-
     }
 
-    public DirectoryCommand(string action, string displayName, bool isDefault = false)
-      : base(action, displayName)
+    public DirectoryCommand (string action, string displayName, bool isDefault = false)
+        : base (action, displayName)
     {
       _isDefault = isDefault;
     }
 
-    public override string GetExecutableAction()
+    public DirectoryCommand CloneForExecution (string path)
+    {
+      return new DirectoryCommand (Action.Replace ("[path]", path), DisplayName);
+    }
+
+    public override string GetExecutableAction ()
     {
       return $"d{(_isDefault ? "y" : "n")}" + Action;
     }

@@ -327,7 +327,7 @@ namespace bonsai.Apps
           long used = driveItem.Info.TotalSize - driveItem.Info.AvailableFreeSpace;
 
           _uiBuilder.DetailsLabel.Lines[3] =
-              new FormattedLine ($"{FormatFileSize(used)} / {FormatFileSize(total)} ({(int)((double)used / total * 100)}%)") { Indent = 1 };
+              new FormattedLine ($"{FormatFileSize (used)} / {FormatFileSize (total)} ({(int)((double)used / total * 100)}%)") { Indent = 1 };
           _uiBuilder.DetailsLabel.Lines[4] = new FormattedLine ("Format:", Color.LightSlateGray);
           _uiBuilder.DetailsLabel.Lines[5] = new FormattedLine (driveItem.Info.DriveFormat) { Indent = 1 };
           _uiBuilder.DetailsLabel.Lines[6] = new FormattedLine ("Type:", Color.LightSlateGray);
@@ -356,7 +356,7 @@ namespace bonsai.Apps
       {
         _uiBuilder.DetailsLabel.Lines[1] = new FormattedLine (fileSystemInfo.Name, ThemeManger.Instance.FileColors.DefaultColor) { Indent = 1 };
         _uiBuilder.DetailsLabel.Lines[6] = new FormattedLine ("Size: ", Color.LightSlateGray);
-        _uiBuilder.DetailsLabel.Lines[7] = new FormattedLine (FormatFileSize(fileInfo.Length)) { Indent = 1 };
+        _uiBuilder.DetailsLabel.Lines[7] = new FormattedLine (FormatFileSize (fileInfo.Length)) { Indent = 1 };
       }
 
       _uiBuilder.RenderPartial (_uiBuilder.DetailsLabel);

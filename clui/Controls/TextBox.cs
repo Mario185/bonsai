@@ -11,16 +11,17 @@ namespace clui.Controls
 
     public delegate void TextChangedHandler (object sender, string text);
 
+    private readonly Position _cursorPosition = new(0, 0);
+
     private int _currentVisibleFromIndex;
     private int _visibleTextLength;
     private string _text = string.Empty;
 
-    public TextBox(LayoutSize width, LayoutSize height)
-    : base(width, height)
+    public TextBox (LayoutSize width, LayoutSize height)
+        : base (width, height)
     {
-      
     }
- 
+
     public string Text
     {
       get => _text;
@@ -110,7 +111,18 @@ namespace clui.Controls
       return true;
     }
 
-    private readonly Position _cursorPosition = new(0, 0);
+    public void OnGotFocus ()
+    {
+      HasFocus = true;
+    }
+
+    public void OnLostFocus ()
+    {
+      HasFocus = false;
+    }
+
+    public bool HasFocus { get; private set; }
+
     public Position GetCursorPosition ()
     {
       _cursorPosition.X = Position.X + CursorPosition - _currentVisibleFromIndex;
@@ -173,17 +185,5 @@ namespace clui.Controls
 
       _currentVisibleFromIndex = Math.Max (0, newVisibleFrom);
     }
-
-    public void OnGotFocus()
-    {
-      HasFocus = true;
-    }
-
-    public void OnLostFocus()
-    {
-      HasFocus = false;
-    }
-
-    public bool HasFocus { get; private set; }
   }
 }

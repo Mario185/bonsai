@@ -1,39 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace bonsai.Utilities
 {
   internal record SearchMatch
   {
-    public int MatchStartAt { get; }
-    public int MatchLength { get; }
-    public int MatchEndAt { get; }
-
-    public SearchMatch(int matchStartAt, int matchLength)
+    public SearchMatch (int matchStartAt, int matchLength)
     {
       MatchStartAt = matchStartAt;
       MatchLength = matchLength;
       MatchEndAt = matchStartAt + matchLength;
     }
+
+    public int MatchStartAt { get; }
+    public int MatchLength { get; }
+    public int MatchEndAt { get; }
   }
 
   public interface ISearchableItem
   {
     string SearchableText { get; }
   }
+
   internal class SearchFilterProvider<TItem>
-  where  TItem : ISearchableItem
+      where TItem : ISearchableItem
   {
-    private string _currentSearchTerm = string.Empty;
     private bool _wasUsingRegex;
+    private string _currentSearchTerm = string.Empty;
 
-    public bool IsFilterActive => !string.IsNullOrWhiteSpace(_currentSearchTerm);
+    public bool IsFilterActive => !string.IsNullOrWhiteSpace (_currentSearchTerm);
 
-    public (bool filterChanged, Func<TItem?, SearchMatch[]>? filter, bool canApplyFilterToFilteredList) GetFilter(string searchTerm, bool useRegex)
+    public (bool filterChanged, Func<TItem?, SearchMatch[]>? filter, bool canApplyFilterToFilteredList) GetFilter (string searchTerm, bool useRegex)
     {
       string trimmed = searchTerm.Trim();
-      bool searchTermChanged = !string.Equals(trimmed, _currentSearchTerm, StringComparison.OrdinalIgnoreCase) || useRegex != _wasUsingRegex;
+      bool searchTermChanged = !string.Equals (trimmed, _currentSearchTerm, StringComparison.OrdinalIgnoreCase) || useRegex != _wasUsingRegex;
 
       if (!searchTermChanged)
       {
@@ -41,11 +41,12 @@ namespace bonsai.Utilities
       }
 
       bool wasFilterActive = IsFilterActive;
-      bool applyFilterToAlreadyFilteredList = wasFilterActive && trimmed.StartsWith(_currentSearchTerm, StringComparison.OrdinalIgnoreCase) && !useRegex;
+      bool applyFilterToAlreadyFilteredList =
+          wasFilterActive && trimmed.StartsWith (_currentSearchTerm, StringComparison.OrdinalIgnoreCase) && !useRegex;
       _currentSearchTerm = trimmed;
       _wasUsingRegex = useRegex;
 
-      if (string.IsNullOrWhiteSpace(trimmed))
+      if (string.IsNullOrWhiteSpace (trimmed))
       {
         return (wasFilterActive && searchTermChanged, null, false);
       }
@@ -55,7 +56,7 @@ namespace bonsai.Utilities
       {
         try
         {
-          var regex = new Regex(_currentSearchTerm, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+          Regex regex = new(_currentSearchTerm, RegexOptions.Compiled | RegexOptions.IgnoreCase);
           // ReSharper disable once ConvertToLocalFunction
           filter = fileSystemItem =>
           {
@@ -64,14 +65,14 @@ namespace bonsai.Utilities
               return [];
             }
 
-            var displayName = fileSystemItem.SearchableText;
-            var match = regex.Match(displayName);
+            string displayName = fileSystemItem.SearchableText;
+            Match match = regex.Match (displayName);
             if (!match.Success)
             {
               return [];
             }
 
-            return [new SearchMatch(match.Index, match.Length)];
+            return [new SearchMatch (match.Index, match.Length)];
           };
         }
         catch (RegexParseException)
@@ -81,7 +82,9 @@ namespace bonsai.Utilities
       }
       else
       {
-        string[] parts = _currentSearchTerm.Split(' ', StringSplitOptions.RemoveEmptyEntries);// GetDistinctSearchTerms(_currentSearchTerm).ToArray();
+        string[] parts = _currentSearchTerm.Split (
+            ' ',
+            StringSplitOptions.RemoveEmptyEntries); // GetDistinctSearchTerms(_currentSearchTerm).ToArray();
         filter = fileSystemItem =>
         {
           if (fileSystemItem == null)
@@ -89,20 +92,20 @@ namespace bonsai.Utilities
             return [];
           }
 
-          var displayName = fileSystemItem.SearchableText;
+          string displayName = fileSystemItem.SearchableText;
           int lastIndex = 0;
-          var matches = new SearchMatch[parts.Length];
+          SearchMatch[] matches = new SearchMatch[parts.Length];
           for (int i = 0; i < parts.Length; i++)
           {
-            var part = parts[i];
-            var currentIndex = displayName.IndexOf(part, lastIndex, StringComparison.OrdinalIgnoreCase);
+            string part = parts[i];
+            int currentIndex = displayName.IndexOf (part, lastIndex, StringComparison.OrdinalIgnoreCase);
 
             if (currentIndex < lastIndex || currentIndex < 0)
             {
               return [];
             }
 
-            matches[i] = new SearchMatch(currentIndex, part.Length);
+            matches[i] = new SearchMatch (currentIndex, part.Length);
             lastIndex = currentIndex + 1;
           }
 

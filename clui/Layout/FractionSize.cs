@@ -1,8 +1,11 @@
-﻿namespace clui.Layout
+﻿using System;
+
+namespace clui.Layout
 {
   public record FractionSize : LayoutSize
   {
-    public FractionSize(int value) : base (value) 
+    public FractionSize (int value)
+        : base (value)
     {
     }
   }

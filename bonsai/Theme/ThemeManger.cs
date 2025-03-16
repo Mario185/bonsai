@@ -17,8 +17,13 @@ namespace bonsai.Theme
   {
     private const string c_manifestResourceNamePrefix = "bonsai.Resources.themes.";
 
+    private readonly Lazy<Dictionary<string, Color?>.AlternateLookup<ReadOnlySpan<char>>> _fileColorExtensionsAlternateLookUp =
+        new(() => Instance.FileColors.Extensions.GetAlternateLookup<ReadOnlySpan<char>>());
+    private readonly Lazy<Dictionary<string, string?>.AlternateLookup<ReadOnlySpan<char>>> _fileIconExtensionsAlternateLookUp =
+        new(() => Instance.FileIcons.Extensions.GetAlternateLookup<ReadOnlySpan<char>>());
+
     [JsonConstructor]
-    private ThemeManger()
+    private ThemeManger ()
     {
     }
 
@@ -42,16 +47,12 @@ namespace bonsai.Theme
 
     public string? LoadingSpinnerChars { get; set; }
 
-
-    private readonly Lazy<Dictionary<string, Color?>.AlternateLookup<ReadOnlySpan<char>>> _fileColorExtensionsAlternateLookUp = new (() => Instance.FileColors.Extensions.GetAlternateLookup<ReadOnlySpan<char>>());
-    private readonly Lazy<Dictionary<string, string?>.AlternateLookup<ReadOnlySpan<char>>> _fileIconExtensionsAlternateLookUp = new (() => Instance.FileIcons.Extensions.GetAlternateLookup<ReadOnlySpan<char>>());
-
-    public Color? GetFileColor(string fileName)
+    public Color? GetFileColor (string fileName)
     {
-      if (!FileColors.Named.TryGetValue(fileName, out Color? color))
+      if (!FileColors.Named.TryGetValue (fileName, out Color? color))
       {
-        var span = fileName.AsSpan();
-        if (!_fileColorExtensionsAlternateLookUp.Value.TryGetValue(Path.GetExtension(span), out color))
+        ReadOnlySpan<char> span = fileName.AsSpan();
+        if (!_fileColorExtensionsAlternateLookUp.Value.TryGetValue (Path.GetExtension (span), out color))
         {
           return FileColors.DefaultColor;
         }
@@ -60,12 +61,12 @@ namespace bonsai.Theme
       return color;
     }
 
-    public string GetFileIcon(string fileName)
+    public string GetFileIcon (string fileName)
     {
-      if (!FileIcons.Named.TryGetValue(fileName, out string? icon))
+      if (!FileIcons.Named.TryGetValue (fileName, out string? icon))
       {
-        var span = fileName.AsSpan();
-        if (!_fileIconExtensionsAlternateLookUp.Value.TryGetValue(Path.GetExtension(span), out icon))
+        ReadOnlySpan<char> span = fileName.AsSpan();
+        if (!_fileIconExtensionsAlternateLookUp.Value.TryGetValue (Path.GetExtension (span), out icon))
         {
           icon = FileIcons.DefaultIcon;
         }
@@ -74,9 +75,9 @@ namespace bonsai.Theme
       return icon ?? string.Empty;
     }
 
-    public Color? GetFolderColor(string folderName)
+    public Color? GetFolderColor (string folderName)
     {
-      if (FolderColors.Named.TryGetValue(folderName, out Color? color))
+      if (FolderColors.Named.TryGetValue (folderName, out Color? color))
       {
         return color;
       }
@@ -84,9 +85,9 @@ namespace bonsai.Theme
       return FolderColors.DefaultColor;
     }
 
-    public string GetFolderIcon(string folderName)
+    public string GetFolderIcon (string folderName)
     {
-      if (!FolderIcons.Named.TryGetValue(folderName, out string? icon))
+      if (!FolderIcons.Named.TryGetValue (folderName, out string? icon))
       {
         icon = FolderIcons.DefaultIcon;
       }
@@ -94,81 +95,83 @@ namespace bonsai.Theme
       return icon ?? string.Empty;
     }
 
-    public static void LoadTheme(string theme)
+    public static void LoadTheme (string theme)
     {
       AbsolutePath? themeFilePath = KnownPaths.ThemesFolder / theme;
-      if (!File.Exists(themeFilePath))
+      if (!File.Exists (themeFilePath))
       {
-        if (!DoesResourceContainsTheme(theme))
+        if (!DoesResourceContainsTheme (theme))
         {
-          throw new FileNotFoundException($"Theme file '{themeFilePath}' does not exist.");
+          throw new FileNotFoundException ($"Theme file '{themeFilePath}' does not exist.");
         }
 
         themeFilePath = null;
       }
 
       JsonSerializerOptions options = GetJsonSerializerOptions();
-      using (Stream stream = themeFilePath == null ? GetThemeFromResources(theme) : File.OpenRead(themeFilePath))
+      using (Stream stream = themeFilePath == null ? GetThemeFromResources (theme) : File.OpenRead (themeFilePath))
       {
-        Instance = JsonSerializer.Deserialize<ThemeManger>(stream, options)!;
+        Instance = JsonSerializer.Deserialize<ThemeManger> (stream, options)!;
       }
     }
 
-    public static void WriteResourceThemesToConfigFolder(bool force)
+    public static void WriteResourceThemesToConfigFolder (bool force)
     {
       AbsolutePath path = KnownPaths.ThemesFolder;
       path.EnsureDirectoryExists();
 
-      IEnumerable<string> resourceThemeNames = typeof(ThemeManger).Assembly.GetManifestResourceNames().Where(n => n.StartsWith(c_manifestResourceNamePrefix))
-        .Select(n => n.Substring(c_manifestResourceNamePrefix.Length));
+      IEnumerable<string> resourceThemeNames = typeof(ThemeManger).Assembly.GetManifestResourceNames()
+          .Where (n => n.StartsWith (c_manifestResourceNamePrefix))
+          .Select (n => n.Substring (c_manifestResourceNamePrefix.Length));
 
       foreach (string themeName in resourceThemeNames)
       {
-        var targetFilePath = path / themeName;
-        
+        AbsolutePath targetFilePath = path / themeName;
+
         if (File.Exists (targetFilePath) && !force)
         {
           continue;
         }
 
-        using (Stream defaultThemeStream = GetThemeFromResources(themeName))
+        using (Stream defaultThemeStream = GetThemeFromResources (themeName))
         using (FileStream fileStream = new(targetFilePath, FileMode.Create))
         {
-          defaultThemeStream.CopyTo(fileStream);
+          defaultThemeStream.CopyTo (fileStream);
         }
       }
 
       if (force)
       {
-        using (var writer = new ConsoleWriter())
+        using (ConsoleWriter writer = new())
         {
-          writer.Style.ForegroundColor(Color.ForestGreen)
-            .Writer.Write($"Themes saved to '{path}'\n")
-            .Style.ResetStyles();
+          writer.Style.ForegroundColor (Color.ForestGreen)
+              .Writer.Write ($"Themes saved to '{path}'\n")
+              .Style.ResetStyles();
         }
       }
     }
 
-    private static bool DoesResourceContainsTheme(string theme)
+    private static bool DoesResourceContainsTheme (string theme)
     {
-      return typeof(ThemeManger).Assembly.GetManifestResourceInfo(c_manifestResourceNamePrefix + theme.ToLower(CultureInfo.InvariantCulture)) != null;
+      return typeof(ThemeManger).Assembly.GetManifestResourceInfo (c_manifestResourceNamePrefix + theme.ToLower (CultureInfo.InvariantCulture))
+             != null;
     }
 
-    private static JsonSerializerOptions GetJsonSerializerOptions()
+    private static JsonSerializerOptions GetJsonSerializerOptions ()
     {
       JsonSerializerOptions options = new()
-      {
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true,
-        Converters = { new ColorJsonConverter() }
-      };
+                                      {
+                                          PropertyNameCaseInsensitive = true,
+                                          PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                                          WriteIndented = true,
+                                          Converters = { new ColorJsonConverter() }
+                                      };
       return options;
     }
 
-    private static Stream GetThemeFromResources(string theme)
+    private static Stream GetThemeFromResources (string theme)
     {
-      return typeof(ThemeManger).Assembly.GetManifestResourceStream(c_manifestResourceNamePrefix + theme.ToLower(CultureInfo.InvariantCulture))!;
+      return typeof(ThemeManger).Assembly.GetManifestResourceStream (c_manifestResourceNamePrefix + theme.ToLower (CultureInfo.InvariantCulture))!;
     }
   }
 }

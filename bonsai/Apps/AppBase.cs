@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using clui;
 
 namespace bonsai.Apps
 {
@@ -10,13 +9,13 @@ namespace bonsai.Apps
 
     public static IBonsaiContext? Current { get; private set; }
 
-    public static void Push(IBonsaiContext app)
+    public static void Push (IBonsaiContext app)
     {
-      s_appStack.Push(app);
+      s_appStack.Push (app);
       Current = s_appStack.Peek();
     }
 
-    public static void Pop()
+    public static void Pop ()
     {
       s_appStack.Pop();
       Current = s_appStack.Count > 0 ? s_appStack.Peek() : null;
@@ -25,15 +24,13 @@ namespace bonsai.Apps
 
   internal abstract class AppBase
   {
-    protected AppBase()
-    {
-    }
+    protected abstract IBonsaiContext Context { get; }
 
-    public string? Run()
+    public string? Run ()
     {
       try
       {
-        BonsaiContext.Push(Context);
+        BonsaiContext.Push (Context);
         return RunInternal();
       }
       finally
@@ -42,9 +39,7 @@ namespace bonsai.Apps
       }
     }
 
-    protected abstract IBonsaiContext Context { get; }
-
-    protected abstract string? RunInternal();
+    protected abstract string? RunInternal ();
   }
 
   internal interface IBonsaiContext

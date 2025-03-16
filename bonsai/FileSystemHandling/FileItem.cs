@@ -10,23 +10,23 @@ namespace bonsai.FileSystemHandling
     private readonly string _fileName;
     private readonly string _fullName;
 
-    public FileItem(ReadOnlySpan<char> directory, ReadOnlySpan<char> fileName , int currentDirectoryFullNameLength, string? displayOverride = null)
-      : base(currentDirectoryFullNameLength, displayOverride)
+    public FileItem (ReadOnlySpan<char> directory, ReadOnlySpan<char> fileName, int currentDirectoryFullNameLength, string? displayOverride = null)
+        : base (currentDirectoryFullNameLength, displayOverride)
     {
-      _fullName = Path.Join(directory, fileName);
+      _fullName = Path.Join (directory, fileName);
       _fileName = fileName.ToString();
     }
 
     public override string FullName => _fullName;
 
-    protected override string GetIcon()
+    protected override string GetIcon ()
     {
-      return ThemeManger.Instance.GetFileIcon(_fileName);
+      return ThemeManger.Instance.GetFileIcon (_fileName);
     }
 
-    protected override Color? GetTextColor()
+    protected override Color? GetTextColor ()
     {
-      return ThemeManger.Instance.GetFileColor(_fileName);
+      return ThemeManger.Instance.GetFileColor (_fileName);
     }
   }
 }

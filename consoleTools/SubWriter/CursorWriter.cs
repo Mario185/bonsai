@@ -1,5 +1,5 @@
-﻿using consoleTools.VirtualTerminalSequences;
-using System;
+﻿using System;
+using consoleTools.VirtualTerminalSequences;
 
 namespace consoleTools.SubWriter
 {
@@ -7,153 +7,153 @@ namespace consoleTools.SubWriter
   {
     private readonly Action<string> _writeAction;
 
-    internal CursorWriter(ConsoleWriter consoleWriter)
-      : base(consoleWriter)
+    internal CursorWriter (ConsoleWriter consoleWriter)
+        : base (consoleWriter)
     {
-      _writeAction = s => consoleWriter.Write(s);
+      _writeAction = s => consoleWriter.Write (s);
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.DisableBlinking" />
     /// </summary>
-    public CursorWriter DisableBlinking()
+    public CursorWriter DisableBlinking ()
     {
-      Writer.Write(CursorSequences.DisableBlinking);
+      Writer.Write (CursorSequences.DisableBlinking);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.EnableBlinking" />
     /// </summary>
-    public CursorWriter EnableBlinking()
+    public CursorWriter EnableBlinking ()
     {
-      Writer.Write(CursorSequences.EnableBlinking);
+      Writer.Write (CursorSequences.EnableBlinking);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.Hide" />
     /// </summary>
-    public CursorWriter Hide()
+    public CursorWriter Hide ()
     {
-      Writer.Write(CursorSequences.Hide);
+      Writer.Write (CursorSequences.Hide);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.MoveAbsoluteHorizontally(int)" />
     /// </summary>
-    public CursorWriter MoveAbsoluteHorizontally(int n)
+    public CursorWriter MoveAbsoluteHorizontally (int n)
     {
-      CursorSequences.MoveAbsoluteHorizontally(n, _writeAction);
+      CursorSequences.MoveAbsoluteHorizontally (n, _writeAction);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.MoveAbsoluteVertically(int)" />
     /// </summary>
-    public CursorWriter MoveAbsoluteVertically(int n)
+    public CursorWriter MoveAbsoluteVertically (int n)
     {
-      CursorSequences.MoveAbsoluteVertically(n, _writeAction);
+      CursorSequences.MoveAbsoluteVertically (n, _writeAction);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.MoveDown(int)" />
     /// </summary>
-    public CursorWriter MoveDown(int rows = 1)
+    public CursorWriter MoveDown (int rows = 1)
     {
-      CursorSequences.MoveDown(rows, _writeAction);
+      CursorSequences.MoveDown (rows, _writeAction);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.MoveLeft(int)" />
     /// </summary>
-    public CursorWriter MoveLeft(int columns = 1)
+    public CursorWriter MoveLeft (int columns = 1)
     {
-      CursorSequences.MoveLeft(columns, _writeAction);
+      CursorSequences.MoveLeft (columns, _writeAction);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.MoveRight(int)" />
     /// </summary>
-    public CursorWriter MoveRight(int columns = 1)
+    public CursorWriter MoveRight (int columns = 1)
     {
-      CursorSequences.MoveRight(columns, _writeAction);
+      CursorSequences.MoveRight (columns, _writeAction);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.MoveTo(int, int)" />
     /// </summary>
-    public CursorWriter MoveTo(int x, int y)
+    public CursorWriter MoveTo (int x, int y)
     {
-      CursorSequences.MoveTo(x, y, _writeAction);
+      CursorSequences.MoveTo (x, y, _writeAction);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.MoveUp(int)" />
     /// </summary>
-    public CursorWriter MoveUp(int rows = 1)
+    public CursorWriter MoveUp (int rows = 1)
     {
-      CursorSequences.MoveUp(rows, _writeAction);
+      CursorSequences.MoveUp (rows, _writeAction);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.ResetPosition" />
     /// </summary>
-    public CursorWriter ResetPosition()
+    public CursorWriter ResetPosition ()
     {
-      Writer.Write(CursorSequences.ResetPosition);
+      Writer.Write (CursorSequences.ResetPosition);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.RestorePosition" />
     /// </summary>
-    public CursorWriter RestorePosition()
+    public CursorWriter RestorePosition ()
     {
-      Writer.Write(CursorSequences.RestorePosition);
+      Writer.Write (CursorSequences.RestorePosition);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.ReverseIndex" />
     /// </summary>
-    public CursorWriter ReverseIndex()
+    public CursorWriter ReverseIndex ()
     {
-      Writer.Write(CursorSequences.ReverseIndex);
+      Writer.Write (CursorSequences.ReverseIndex);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.SavePosition" />
     /// </summary>
-    public CursorWriter SavePosition()
+    public CursorWriter SavePosition ()
     {
-      Writer.Write(CursorSequences.SavePosition);
+      Writer.Write (CursorSequences.SavePosition);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.SetShape(CursorShape)" />
     /// </summary>
-    public CursorWriter SetShape(CursorShape shape)
+    public CursorWriter SetShape (CursorShape shape)
     {
-      CursorSequences.SetShape(shape, _writeAction);
+      CursorSequences.SetShape (shape, _writeAction);
       return this;
     }
 
     /// <summary>
     ///   <inheritdoc cref="CursorSequences.Show" />
     /// </summary>
-    public CursorWriter Show()
+    public CursorWriter Show ()
     {
-      Writer.Write(CursorSequences.Show);
+      Writer.Write (CursorSequences.Show);
       return this;
     }
   }

@@ -15,7 +15,7 @@ namespace bonsai.Apps
     private readonly IReadOnlyList<Command> _commands;
     private readonly string _path;
 
-    public CommandSelectionApp(IReadOnlyList<Command> commands, string path)
+    public CommandSelectionApp (IReadOnlyList<Command> commands, string path)
     {
       _commands = commands;
       _path = path;
@@ -23,27 +23,33 @@ namespace bonsai.Apps
 
     protected override IBonsaiContext Context => this;
 
-    protected override string? RunInternal()
-    {
-      using (var frame = new Frame())
-      {
-        var rootPanel = new Panel(1.AsFraction(), 1.AsFraction());
-        var border = new Border(1.AsFraction(), 1.AsFraction());
-        var list = new ScrollableList<Command>(ThemeManger.Instance.SelectionForegroundColor, ThemeManger.Instance.SelectionBackgroundColor, 1.AsFraction(), 1.AsFraction());
-        var hintLabel = new Label(1.AsFraction(), 1.AsFixed());
+    public bool IsFilteringActive => false;
 
-        frame.AddControls(rootPanel);
+    protected override string? RunInternal ()
+    {
+      using (Frame frame = new())
+      {
+        Panel rootPanel = new(1.AsFraction(), 1.AsFraction());
+        Border border = new(1.AsFraction(), 1.AsFraction());
+        ScrollableList<Command> list = new(
+            ThemeManger.Instance.SelectionForegroundColor,
+            ThemeManger.Instance.SelectionBackgroundColor,
+            1.AsFraction(),
+            1.AsFraction());
+        Label hintLabel = new(1.AsFraction(), 1.AsFixed());
+
+        frame.AddControls (rootPanel);
 
         rootPanel.BackgroundColor = ThemeManger.Instance.BackgroundColor;
         hintLabel.Text = $"Multiple commands available for {_path}";
         border.BorderColor = ThemeManger.Instance.BorderColor;
 
-        rootPanel.AddControls(hintLabel);
-        border.AddControls(list);
-        rootPanel.AddControls(border);
+        rootPanel.AddControls (hintLabel);
+        border.AddControls (list);
+        rootPanel.AddControls (border);
 
-        list.SetItemList(_commands.ToList());
-        list.SetFocusedIndex(0);
+        list.SetItemList (_commands.ToList());
+        list.SetFocusedIndex (0);
 
         frame.RenderComplete();
         frame.EnableBufferSizeChangeWatching();
@@ -54,7 +60,7 @@ namespace bonsai.Apps
         {
           ConsoleKeyInfo key = ConsoleHandler.Read();
 
-          switch (Settings.Instance.GetInputActionType(key, KeyBindingContext.NavigationApp))
+          switch (Settings.Instance.GetInputActionType (key, KeyBindingContext.NavigationApp))
           {
             case ActionType.Exit:
               endLoop = true;
@@ -91,7 +97,5 @@ namespace bonsai.Apps
 
       return null;
     }
-
-    public bool IsFilteringActive => false;
   }
 }

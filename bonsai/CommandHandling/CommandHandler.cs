@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using bonsai.Apps;
@@ -8,32 +9,33 @@ namespace bonsai.CommandHandling
 {
   public class CommandHandler
   {
-    public static string? GetCommandAndShowSelectionUiOnDemand(string path)
+    public static string? GetCommandAndShowSelectionUiOnDemand (string path)
     {
       try
       {
-        var attributes = File.GetAttributes(path);
-        var isDirectory = (attributes & FileAttributes.Directory) != 0;
+        FileAttributes attributes = File.GetAttributes (path);
+        bool isDirectory = (attributes & FileAttributes.Directory) != 0;
 
-        Database.Instance.AddOrUpdate(path, isDirectory);
+        Database.Instance.AddOrUpdate (path, isDirectory);
 
         List<Command> availableCommands;
         if (isDirectory)
         {
           if (Settings.Instance.DirectoryCommands.Count <= 0)
           {
-            return new DirectoryCommand(path, "Change location", true).GetExecutableAction();
+            return new DirectoryCommand (path, "Change location", true).GetExecutableAction();
           }
 
-          availableCommands = Settings.Instance.DirectoryCommands.Select(c => c.CloneForExecution(path)).Cast<Command>().ToList();
+          availableCommands = Settings.Instance.DirectoryCommands.Select (c => c.CloneForExecution (path)).Cast<Command>().ToList();
         }
         else
         {
-          var extension = Path.GetExtension(path);
-          availableCommands = Settings.Instance.FileCommands.Where(c => c.Extension == extension || c.Extension == "*").Select(f => f.CloneForExecution(path)).Cast<Command>().ToList();
+          string extension = Path.GetExtension (path);
+          availableCommands = Settings.Instance.FileCommands.Where (c => c.Extension == extension || c.Extension == "*")
+              .Select (f => f.CloneForExecution (path)).Cast<Command>().ToList();
           if (availableCommands.Count == 0)
           {
-            return new FileCommand(path, "Shell decides what to do", extension, true).GetExecutableAction();
+            return new FileCommand (path, "Shell decides what to do", extension, true).GetExecutableAction();
           }
         }
 
@@ -42,7 +44,7 @@ namespace bonsai.CommandHandling
           return availableCommands[0].GetExecutableAction();
         }
 
-        return new CommandSelectionApp(availableCommands, path).Run();
+        return new CommandSelectionApp (availableCommands, path).Run();
       }
       catch
       {
