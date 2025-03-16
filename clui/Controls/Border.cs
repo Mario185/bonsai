@@ -31,17 +31,19 @@ namespace clui.Controls
     private char[] _top;
     private int _effectiveWidth;
 
-    public Border(LayoutSize width, LayoutSize height,
-      char? topLeftCorner = '┌',
-      char? topFiller = '─',
-      char? topRightCorner = '┐',
-      char? leftFiller = '│',
-      char? rightFiller = '│',
-      char? bottomLeftCorner = '└',
-      char? bottomFiller = '─',
-      char? bottomRightCorner = '┘'
+    public Border (
+        LayoutSize width,
+        LayoutSize height,
+        char? topLeftCorner = '┌',
+        char? topFiller = '─',
+        char? topRightCorner = '┐',
+        char? leftFiller = '│',
+        char? rightFiller = '│',
+        char? bottomLeftCorner = '└',
+        char? bottomFiller = '─',
+        char? bottomRightCorner = '┘'
     )
-    : base(width, height)
+        : base (width, height)
     {
       _topLeftCorner = topLeftCorner;
       _topFiller = topFiller;
@@ -52,14 +54,15 @@ namespace clui.Controls
       _bottomFiller = bottomFiller;
       _bottomRightCorner = bottomRightCorner;
 
-      Padding = new Padding(topFiller == null && topRightCorner == null && topLeftCorner == null ? 0 : 1,
-        topLeftCorner == null && leftFiller == null && bottomLeftCorner == null ? 0 : 1,
-        bottomFiller == null && bottomRightCorner == null && bottomLeftCorner == null ? 0 : 1,
-        topRightCorner == null && rightFiller == null && bottomRightCorner == null ? 0 : 1);
+      Padding = new Padding (
+          topFiller == null && topRightCorner == null && topLeftCorner == null ? 0 : 1,
+          topLeftCorner == null && leftFiller == null && bottomLeftCorner == null ? 0 : 1,
+          bottomFiller == null && bottomRightCorner == null && bottomLeftCorner == null ? 0 : 1,
+          topRightCorner == null && rightFiller == null && bottomRightCorner == null ? 0 : 1);
 
       _top = _bottom = [];
     }
-   
+
     public Color? BorderColor { get; set; }
     public Color? TextBackgroundColor { get; set; }
 
@@ -91,35 +94,39 @@ namespace clui.Controls
           .ForegroundColor (BorderColor)
           .BackgroundColor (GetEffectiveBackgroundColor());
 
-        if (_topLeftCorner != null)
-          consoleWriter.Write (_topLeftCorner.Value);
-        
-        if (_top.Length > 0)
-          consoleWriter.Write (_top);
+      if (_topLeftCorner != null)
+        consoleWriter.Write (_topLeftCorner.Value);
 
-        if (_topRightCorner != null)
-          consoleWriter.Write(_topRightCorner.Value);
+      if (_top.Length > 0)
+        consoleWriter.Write (_top);
+
+      if (_topRightCorner != null)
+        consoleWriter.Write (_topRightCorner.Value);
 
       for (int i = Padding.Top; i < CalculatedHeight - Padding.Bottom; i++)
       {
         if (_leftFiller != null)
-          consoleWriter.Cursor.MoveTo(Position.X, Position.Y + i).Writer
-            .Write(_leftFiller.Value);
+        {
+          consoleWriter.Cursor.MoveTo (Position.X, Position.Y + i).Writer
+              .Write (_leftFiller.Value);
+        }
 
         if (_rightFiller != null)
-          consoleWriter.Cursor.MoveTo(Position.X + CalculatedWidth!.Value - 1, Position.Y + i)
-            .Writer.Write(_rightFiller.Value);
+        {
+          consoleWriter.Cursor.MoveTo (Position.X + CalculatedWidth!.Value - 1, Position.Y + i)
+              .Writer.Write (_rightFiller.Value);
+        }
       }
 
       consoleWriter
           .Cursor.MoveTo (Position.X, Position.Y + CalculatedHeight!.Value - 1);
 
       if (_bottomLeftCorner != null)
-        consoleWriter.Write(_bottomLeftCorner.Value);
+        consoleWriter.Write (_bottomLeftCorner.Value);
       if (_bottom.Length > 0)
-        consoleWriter.Write(_bottom);
+        consoleWriter.Write (_bottom);
       if (_bottomRightCorner != null)
-        consoleWriter.Write(_bottomRightCorner.Value);
+        consoleWriter.Write (_bottomRightCorner.Value);
       consoleWriter.Style.ResetStyles();
 
       if (Text != string.Empty && _effectiveWidth > 0)

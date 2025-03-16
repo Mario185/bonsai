@@ -13,8 +13,6 @@ namespace bonsai.Apps
 {
   internal class ExplorerApp : AppBase, IBonsaiContext
   {
-    private readonly string _initialDirectory;
-
     private class State
     {
       public string? SelectedItem { get; set; }
@@ -23,24 +21,25 @@ namespace bonsai.Apps
     }
 
     private readonly FileSystemWorker _fileSystemWorker = new();
-    private ExplorerAppUiBuilder? _uiBuilder;
     private readonly Stack<State> _state = new();
+    private readonly string _initialDirectory;
 
     private bool _includeSubDirectories;
     private bool _loadingFinished;
-    private int _currentSpinnerPosition;
     private bool _regexSearchEnabled;
+    private ExplorerAppUiBuilder _uiBuilder = null!;
+    private int _currentSpinnerPosition;
 
-    public ExplorerApp(string initialDirectory)
+    public ExplorerApp (string initialDirectory)
     {
       _initialDirectory = initialDirectory;
     }
 
-    public bool IsFilteringActive => _fileSystemWorker.IsFilterActive;
-
     protected override IBonsaiContext Context => this;
 
-    protected override string? RunInternal()
+    public bool IsFilteringActive => _fileSystemWorker.IsFilterActive;
+
+    protected override string? RunInternal ()
     {
       using (_uiBuilder = new ExplorerAppUiBuilder())
       {
@@ -52,20 +51,20 @@ namespace bonsai.Apps
         _uiBuilder.FileSystemList.OnSelectionChanged += FileSystemList_OnSelectionChanged;
         _uiBuilder.SearchTextBox.OnTextChanged += SearchTextBox_OnTextChanged;
 
-        _uiBuilder.SetFocus(_uiBuilder.SearchTextBox);
+        _uiBuilder.SetFocus (_uiBuilder.SearchTextBox);
 
-        var currentStateDirectory = directoryInfo;
-        List<State> statesToPush = new List<State>();
+        DirectoryInfo? currentStateDirectory = directoryInfo;
+        List<State> statesToPush = new();
         while (currentStateDirectory != null)
         {
-          statesToPush.Insert(0, new State { SelectedItem = currentStateDirectory.FullName });
+          statesToPush.Insert (0, new State { SelectedItem = currentStateDirectory.FullName });
           currentStateDirectory = currentStateDirectory.Parent;
         }
 
-        foreach (var s in statesToPush)
-          _state.Push(s);
+        foreach (State s in statesToPush)
+          _state.Push (s);
 
-        _fileSystemWorker.ChangeDirectory(directoryInfo, false);
+        _fileSystemWorker.ChangeDirectory (directoryInfo, false);
         try
         {
           _uiBuilder.RenderComplete();
@@ -74,10 +73,10 @@ namespace bonsai.Apps
           {
             ConsoleKeyInfo key = ConsoleHandler.Read();
 
-            if (_uiBuilder.SearchTextBox.HandleInput(key))
+            if (_uiBuilder.SearchTextBox.HandleInput (key))
               continue;
 
-            switch (Settings.Instance.GetInputActionType(key, KeyBindingContext.ExplorerApp))
+            switch (Settings.Instance.GetInputActionType (key, KeyBindingContext.ExplorerApp))
             {
               case ActionType.Exit:
                 endLoop = true;
@@ -95,25 +94,25 @@ namespace bonsai.Apps
                 if (_uiBuilder.FileSystemList.FocusedItem == null)
                   break;
 
-                var focusedItem = _uiBuilder.FileSystemList.FocusedItem;
+                FileSystemItem? focusedItem = _uiBuilder.FileSystemList.FocusedItem;
                 string? result = null;
                 switch (focusedItem)
                 {
                   case DirectoryItem:
                   case DriveItem:
                   case FileItem:
-                    result = CommandHandler.GetCommandAndShowSelectionUiOnDemand(focusedItem.FullName);
+                    result = CommandHandler.GetCommandAndShowSelectionUiOnDemand (focusedItem.FullName);
                     break;
                   case ParentDirectoryItem:
-                    var parent = _fileSystemWorker.CurrentDirectory?.Parent ?? _fileSystemWorker.CurrentDirectory;
+                    DirectoryInfo? parent = _fileSystemWorker.CurrentDirectory?.Parent ?? _fileSystemWorker.CurrentDirectory;
                     if (parent == null)
                       break;
 
-                    result = CommandHandler.GetCommandAndShowSelectionUiOnDemand(parent.FullName);
+                    result = CommandHandler.GetCommandAndShowSelectionUiOnDemand (parent.FullName);
                     break;
                 }
 
-                if (!string.IsNullOrWhiteSpace(result))
+                if (!string.IsNullOrWhiteSpace (result))
                   return result;
 
                 _uiBuilder.RenderComplete();
@@ -141,20 +140,20 @@ namespace bonsai.Apps
                 _uiBuilder.ToggleDetails();
 
                 if (_uiBuilder.FileSystemList.FocusedItem != null)
-                  UpdateDetails(_uiBuilder.FileSystemList.FocusedItem);
+                  UpdateDetails (_uiBuilder.FileSystemList.FocusedItem);
                 continue;
               case ActionType.ToggleIncludeSubDirectories:
                 if (_fileSystemWorker.CurrentDirectory != null)
                 {
                   _includeSubDirectories = !_includeSubDirectories;
-                  _fileSystemWorker.ChangeDirectory(_fileSystemWorker.CurrentDirectory, _includeSubDirectories);
+                  _fileSystemWorker.ChangeDirectory (_fileSystemWorker.CurrentDirectory, _includeSubDirectories);
                 }
 
                 continue;
               case ActionType.ToggleRegexSearch:
                 _regexSearchEnabled = !_regexSearchEnabled;
-                _uiBuilder.SetEnableRegExSearch(_regexSearchEnabled);
-                _fileSystemWorker.ApplyFilter(_uiBuilder.SearchTextBox.Text, _regexSearchEnabled);
+                _uiBuilder.SetEnableRegExSearch (_regexSearchEnabled);
+                _fileSystemWorker.ApplyFilter (_uiBuilder.SearchTextBox.Text, _regexSearchEnabled);
                 continue;
 
               case ActionType.None:
@@ -173,12 +172,12 @@ namespace bonsai.Apps
       }
     }
 
-    private void SearchTextBox_OnTextChanged(object sender, string text)
+    private void SearchTextBox_OnTextChanged (object sender, string text)
     {
-      _fileSystemWorker.ApplyFilter(text, _regexSearchEnabled);
+      _fileSystemWorker.ApplyFilter (text, _regexSearchEnabled);
     }
 
-    private void UpdateFileListBorderText()
+    private void UpdateFileListBorderText ()
     {
       string spinner = string.Empty;
       if (!_loadingFinished && ThemeManger.Instance.LoadingSpinnerChars != null)
@@ -188,7 +187,7 @@ namespace bonsai.Apps
         spinner = currentSpinnerChar + " ";
       }
 
-      if (string.IsNullOrWhiteSpace(_uiBuilder.SearchTextBox.Text))
+      if (string.IsNullOrWhiteSpace (_uiBuilder.SearchTextBox.Text))
       {
         _uiBuilder.FileSystemListBorder.TextColor = _loadingFinished ? Color.Green : Color.Orange;
         _uiBuilder.FileSystemListBorder.Text = spinner + $"❮ {_fileSystemWorker.Data.Count} ❯";
@@ -199,31 +198,29 @@ namespace bonsai.Apps
         _uiBuilder.FileSystemListBorder.Text = spinner + $"❮ {_fileSystemWorker.CountFiltered} / {_fileSystemWorker.CountUnfiltered} ❯";
       }
 
-      _uiBuilder.RenderPartial(_uiBuilder.FileSystemListBorder);
+      _uiBuilder.RenderPartial (_uiBuilder.FileSystemListBorder);
     }
 
-    private void OpenParentDirectory()
+    private void OpenParentDirectory ()
     {
       string? searchedItem = null;
-      if (_state.TryPop(out State? state))
+      if (_state.TryPop (out State? state))
       {
-        _uiBuilder.SearchTextBox.SetText(state.SearchText ?? string.Empty);
+        _uiBuilder.SearchTextBox.SetText (state.SearchText ?? string.Empty);
         searchedItem = state.SelectedItem;
         if (state.ListCurrentVisibleFromIndex.HasValue)
-          _uiBuilder.FileSystemList.TrySetCurrentVisibleFromIndex(state.ListCurrentVisibleFromIndex.Value);
+          _uiBuilder.FileSystemList.TrySetCurrentVisibleFromIndex (state.ListCurrentVisibleFromIndex.Value);
       }
       else
-        _uiBuilder.SearchTextBox.SetText(string.Empty);
+        _uiBuilder.SearchTextBox.SetText (string.Empty);
 
       if (_fileSystemWorker.CurrentDirectory?.Parent != null)
-        _fileSystemWorker.ChangeDirectory(_fileSystemWorker.CurrentDirectory.Parent, _includeSubDirectories, searchedItem);
-      else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && _fileSystemWorker.CurrentDirectory != null)
-        _fileSystemWorker.ChangeDirectory(null, _includeSubDirectories, searchedItem);
-
-
+        _fileSystemWorker.ChangeDirectory (_fileSystemWorker.CurrentDirectory.Parent, _includeSubDirectories, searchedItem);
+      else if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows) && _fileSystemWorker.CurrentDirectory != null)
+        _fileSystemWorker.ChangeDirectory (null, _includeSubDirectories, searchedItem);
     }
 
-    private void OpenSelectedDirectory()
+    private void OpenSelectedDirectory ()
     {
       FileSystemItem? focusedItem = _uiBuilder.FileSystemList.FocusedItem;
 
@@ -240,43 +237,44 @@ namespace bonsai.Apps
         List<DirectoryInfo> directoriesToPushIntoStack = new();
         while (currentStackDirectory.Parent!.FullName != _fileSystemWorker.CurrentDirectory.FullName)
         {
-          directoriesToPushIntoStack.Insert(0, currentStackDirectory);
+          directoriesToPushIntoStack.Insert (0, currentStackDirectory);
           currentStackDirectory = currentStackDirectory.Parent;
         }
 
-        _state.Push(new State
-        {
-          SearchText = _uiBuilder.SearchTextBox.Text,
-          SelectedItem = directoryItem.FullName,
-          ListCurrentVisibleFromIndex = _uiBuilder.FileSystemList.CurrentVisibleFromIndex
-        });
+        _state.Push (
+            new State
+            {
+                SearchText = _uiBuilder.SearchTextBox.Text,
+                SelectedItem = directoryItem.FullName,
+                ListCurrentVisibleFromIndex = _uiBuilder.FileSystemList.CurrentVisibleFromIndex
+            });
 
         foreach (DirectoryInfo dir in directoriesToPushIntoStack)
-          _state.Push(new State { SelectedItem = dir.FullName });
+          _state.Push (new State { SelectedItem = dir.FullName });
 
-        _uiBuilder.SearchTextBox.SetText(string.Empty);
-        _fileSystemWorker.ChangeDirectory(newDirectory, _includeSubDirectories);
+        _uiBuilder.SearchTextBox.SetText (string.Empty);
+        _fileSystemWorker.ChangeDirectory (newDirectory, _includeSubDirectories);
       }
 
       if (focusedItem is DriveItem driveItem)
       {
-        _state.Push(new State
-        {
-          SearchText = _uiBuilder.SearchTextBox.Text,
-          SelectedItem = driveItem.FullName,
-          ListCurrentVisibleFromIndex = _uiBuilder.FileSystemList.CurrentVisibleFromIndex
-        });
-        _fileSystemWorker.ChangeDirectory(new DirectoryInfo(driveItem.FullName), _includeSubDirectories);
-
+        _state.Push (
+            new State
+            {
+                SearchText = _uiBuilder.SearchTextBox.Text,
+                SelectedItem = driveItem.FullName,
+                ListCurrentVisibleFromIndex = _uiBuilder.FileSystemList.CurrentVisibleFromIndex
+            });
+        _fileSystemWorker.ChangeDirectory (new DirectoryInfo (driveItem.FullName), _includeSubDirectories);
       }
     }
 
-    private void FileSystemList_OnSelectionChanged(object sender, FileSystemItem selectedItem)
+    private void FileSystemList_OnSelectionChanged (object sender, FileSystemItem selectedItem)
     {
-      UpdateDetails(selectedItem);
+      UpdateDetails (selectedItem);
     }
 
-    private void UpdateDetails(FileSystemItem? selectedItem)
+    private void UpdateDetails (FileSystemItem? selectedItem)
     {
       if (!_uiBuilder.AreDetailsVisible() || selectedItem == null)
         return;
@@ -289,89 +287,87 @@ namespace bonsai.Apps
       switch (selectedItem)
       {
         case DirectoryItem directoryItem:
-          fileSystemInfo = new DirectoryInfo(directoryItem.FullName);
+          fileSystemInfo = new DirectoryInfo (directoryItem.FullName);
           break;
         case FileItem fileItem:
-          fileSystemInfo = new FileInfo(fileItem.FullName);
+          fileSystemInfo = new FileInfo (fileItem.FullName);
           break;
         case DriveItem driveItem:
-          _uiBuilder.DetailsLabel.Lines[0] = new FormattedLine("Name:", Color.LightSlateGray);
-          _uiBuilder.DetailsLabel.Lines[1] = new FormattedLine(driveItem.Info.Name, ThemeManger.Instance.FolderColors.DefaultColor) { Indent = 1 };
+          _uiBuilder.DetailsLabel.Lines[0] = new FormattedLine ("Name:", Color.LightSlateGray);
+          _uiBuilder.DetailsLabel.Lines[1] = new FormattedLine (driveItem.Info.Name, ThemeManger.Instance.FolderColors.DefaultColor) { Indent = 1 };
 
-          _uiBuilder.DetailsLabel.Lines[2] = new FormattedLine("Space:", Color.LightSlateGray);
+          _uiBuilder.DetailsLabel.Lines[2] = new FormattedLine ("Space:", Color.LightSlateGray);
 
-          var total = driveItem.Info.TotalSize;
-          var used = driveItem.Info.TotalSize - driveItem.Info.AvailableFreeSpace;
+          long total = driveItem.Info.TotalSize;
+          long used = driveItem.Info.TotalSize - driveItem.Info.AvailableFreeSpace;
 
-          _uiBuilder.DetailsLabel.Lines[3] = new FormattedLine($"{FormatFileSize(used)} / {FormatFileSize(total)} ({(int)((double)used / total * 100)}%)") { Indent = 1 };
-          _uiBuilder.DetailsLabel.Lines[4] = new FormattedLine("Format:", Color.LightSlateGray);
-          _uiBuilder.DetailsLabel.Lines[5] = new FormattedLine(driveItem.Info.DriveFormat) { Indent = 1 };
-          _uiBuilder.DetailsLabel.Lines[6] = new FormattedLine("Type:", Color.LightSlateGray);
-          _uiBuilder.DetailsLabel.Lines[7] = new FormattedLine(driveItem.Info.DriveType.ToString()) { Indent = 1 };
+          _uiBuilder.DetailsLabel.Lines[3] =
+              new FormattedLine ($"{FormatFileSize (used)} / {FormatFileSize (total)} ({(int)((double)used / total * 100)}%)") { Indent = 1 };
+          _uiBuilder.DetailsLabel.Lines[4] = new FormattedLine ("Format:", Color.LightSlateGray);
+          _uiBuilder.DetailsLabel.Lines[5] = new FormattedLine (driveItem.Info.DriveFormat) { Indent = 1 };
+          _uiBuilder.DetailsLabel.Lines[6] = new FormattedLine ("Type:", Color.LightSlateGray);
+          _uiBuilder.DetailsLabel.Lines[7] = new FormattedLine (driveItem.Info.DriveType.ToString()) { Indent = 1 };
 
-          _uiBuilder.RenderPartial(_uiBuilder.DetailsLabel);
+          _uiBuilder.RenderPartial (_uiBuilder.DetailsLabel);
           return;
-          break;
         case ParentDirectoryItem:
-          _uiBuilder.RenderPartial(_uiBuilder.DetailsLabel);
+          _uiBuilder.RenderPartial (_uiBuilder.DetailsLabel);
           return;
         default:
-          throw new ArgumentOutOfRangeException(nameof(selectedItem));
+          throw new ArgumentOutOfRangeException (nameof(selectedItem));
       }
 
-      _uiBuilder.DetailsLabel.Lines[0] = new FormattedLine("Name:", Color.LightSlateGray);
-      _uiBuilder.DetailsLabel.Lines[2] = new FormattedLine("Created at:", Color.LightSlateGray);
-      _uiBuilder.DetailsLabel.Lines[3] = new FormattedLine(fileSystemInfo.CreationTime.ToString("O")) { Indent = 1 };
-      _uiBuilder.DetailsLabel.Lines[4] = new FormattedLine("Last write at:", Color.LightSlateGray);
-      _uiBuilder.DetailsLabel.Lines[5] = new FormattedLine(fileSystemInfo.LastWriteTime.ToString("O")) { Indent = 1 };
+      _uiBuilder.DetailsLabel.Lines[0] = new FormattedLine ("Name:", Color.LightSlateGray);
+      _uiBuilder.DetailsLabel.Lines[2] = new FormattedLine ("Created at:", Color.LightSlateGray);
+      _uiBuilder.DetailsLabel.Lines[3] = new FormattedLine (fileSystemInfo.CreationTime.ToString ("O")) { Indent = 1 };
+      _uiBuilder.DetailsLabel.Lines[4] = new FormattedLine ("Last write at:", Color.LightSlateGray);
+      _uiBuilder.DetailsLabel.Lines[5] = new FormattedLine (fileSystemInfo.LastWriteTime.ToString ("O")) { Indent = 1 };
 
       if (fileSystemInfo is DirectoryInfo directoryInfo)
-        _uiBuilder.DetailsLabel.Lines[1] = new FormattedLine(directoryInfo.Name, ThemeManger.Instance.FolderColors.DefaultColor) { Indent = 1 };
+        _uiBuilder.DetailsLabel.Lines[1] = new FormattedLine (directoryInfo.Name, ThemeManger.Instance.FolderColors.DefaultColor) { Indent = 1 };
       else if (fileSystemInfo is FileInfo fileInfo)
       {
-        _uiBuilder.DetailsLabel.Lines[1] = new FormattedLine(fileSystemInfo.Name, ThemeManger.Instance.FileColors.DefaultColor) { Indent = 1 };
-        _uiBuilder.DetailsLabel.Lines[6] = new FormattedLine("Size: ", Color.LightSlateGray);
-        _uiBuilder.DetailsLabel.Lines[7] = new FormattedLine(FormatFileSize(fileInfo.Length)) { Indent = 1 };
+        _uiBuilder.DetailsLabel.Lines[1] = new FormattedLine (fileSystemInfo.Name, ThemeManger.Instance.FileColors.DefaultColor) { Indent = 1 };
+        _uiBuilder.DetailsLabel.Lines[6] = new FormattedLine ("Size: ", Color.LightSlateGray);
+        _uiBuilder.DetailsLabel.Lines[7] = new FormattedLine (FormatFileSize (fileInfo.Length)) { Indent = 1 };
       }
 
-      _uiBuilder.RenderPartial(_uiBuilder.DetailsLabel);
+      _uiBuilder.RenderPartial (_uiBuilder.DetailsLabel);
     }
 
-    private string FormatFileSize(long bytes)
+    private string FormatFileSize (long bytes)
     {
       int unit = 1024;
       if (bytes < unit)
         return $"{bytes} B ";
 
-      int exp = (int)(Math.Log(bytes) / Math.Log(unit));
-      return $"{bytes / Math.Pow(unit, exp):F1} {"KMGTPE"[exp - 1]}B";
+      int exp = (int)(Math.Log (bytes) / Math.Log (unit));
+      return $"{bytes / Math.Pow (unit, exp):F1} {"KMGTPE"[exp - 1]}B";
     }
 
-    private void FileSystemWorker_OnFileSystemInfoLoadingStateChanged(FileSystemWorker sender, FileSystemLoadingState state, int searchedItemAtIndex)
+    private void FileSystemWorker_OnFileSystemInfoLoadingStateChanged (FileSystemWorker sender, FileSystemLoadingState state, int searchedItemAtIndex)
     {
       switch (state)
       {
         case FileSystemLoadingState.Started:
           _loadingFinished = false;
-          _uiBuilder.FileSystemList.SetItemList(sender.Data);
+          _uiBuilder.FileSystemList.SetItemList (sender.Data);
 
-          List<string> pathParts = new List<string>();
+          List<string> pathParts = new();
           DirectoryInfo? currentDirectory = sender.CurrentDirectory;
 
           while (currentDirectory != null)
           {
-            pathParts.Insert(0, currentDirectory.Name);
+            pathParts.Insert (0, currentDirectory.Name);
             currentDirectory = currentDirectory.Parent;
           }
 
           if (sender.CurrentDirectory == null)
             _uiBuilder.CurrentDirectoryLabel.Text = "root";
           else
-          {
-            _uiBuilder.CurrentDirectoryLabel.Text = " " + string.Join(" ❯ ", pathParts);
-          }
+            _uiBuilder.CurrentDirectoryLabel.Text = " " + string.Join (" ❯ ", pathParts);
 
-          var wasVisible = _uiBuilder.GitPanel.Visible;
+          //var wasVisible = _uiBuilder.GitPanel.Visible;
           //if (sender.CurrentDirectory != null)
           //{
           //  var processInfo = new ProcessStartInfo("git", "rev-parse --is-inside-work-tree");
@@ -402,19 +398,17 @@ namespace bonsai.Apps
           _loadingFinished = state == FileSystemLoadingState.Finished;
 
           if (searchedItemAtIndex > -1)
-            _uiBuilder.FileSystemList.SetFocusedIndex(searchedItemAtIndex);
+            _uiBuilder.FileSystemList.SetFocusedIndex (searchedItemAtIndex);
 
           if (_uiBuilder.FileSystemList.FocusedItemIndex < 0)
-            _uiBuilder.FileSystemList.SetFocusedIndex(0);
+            _uiBuilder.FileSystemList.SetFocusedIndex (0);
 
           UpdateFileListBorderText();
 
           break;
         default:
-          throw new ArgumentOutOfRangeException(nameof(state), state, null);
+          throw new ArgumentOutOfRangeException (nameof(state), state, null);
       }
     }
-
-
   }
 }

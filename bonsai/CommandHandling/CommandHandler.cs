@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using bonsai.Apps;
-using bonsai.Navigation;
+using bonsai.Data;
 
 namespace bonsai.CommandHandling
 {
@@ -17,7 +17,7 @@ namespace bonsai.CommandHandling
 
         Database.Instance.AddOrUpdate(path, isDirectory);
 
-        IReadOnlyList<Command> availableCommands;
+        List<Command> availableCommands;
         if (isDirectory)
         {
           if (Settings.Instance.DirectoryCommands.Count <= 0)

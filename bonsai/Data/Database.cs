@@ -7,7 +7,7 @@ using System.Text.Json.Serialization;
 using bonsai.FileSystemHandling;
 using bonsai.Utilities;
 
-namespace bonsai.Navigation
+namespace bonsai.Data
 {
   internal class Database
   {

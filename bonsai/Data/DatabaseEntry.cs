@@ -7,7 +7,7 @@ using bonsai.Utilities;
 using clui.Controls;
 using consoleTools;
 
-namespace bonsai.Navigation
+namespace bonsai.Data
 {
   internal class DatabaseEntry : IListItem, ISearchableItem
   {

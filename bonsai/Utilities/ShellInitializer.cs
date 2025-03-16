@@ -36,7 +36,7 @@ namespace bonsai.Utilities
 
     private static string GetScriptName(string shellType)
     {
-      string extension = null;
+      string? extension;
       switch (shellType)
       {
         case "powershell":

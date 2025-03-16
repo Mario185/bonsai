@@ -8,10 +8,9 @@ namespace clui.Controls
   {
     private string? _text;
 
-    public Label(LayoutSize width, LayoutSize height)
-    : base(width,height)
+    public Label (LayoutSize width, LayoutSize height)
+        : base (width, height)
     {
-      
     }
 
     public string? Text
@@ -24,12 +23,11 @@ namespace clui.Controls
 
         _text = value;
         if (CalculatedHeight != null && CalculatedWidth != null)
-          RootControl.AssociatedFrame.RenderPartial(this);
+          RootControl.AssociatedFrame.RenderPartial (this);
       }
     }
 
     public bool TruncateLeft { get; set; }
-
 
     internal override void Render (ConsoleWriter consoleWriter)
     {
@@ -53,7 +51,9 @@ namespace clui.Controls
                 CalculatedWidth!.Value - 1);
           }
           else
+          {
             consoleWriter.WriteTruncated (Text, 0, CalculatedWidth!.Value - 1).Write ('…');
+          }
         }
         else
           consoleWriter.Write (Text);

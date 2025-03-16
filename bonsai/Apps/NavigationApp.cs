@@ -2,13 +2,13 @@
 using System;
 using System.Diagnostics;
 using bonsai.CommandHandling;
+using bonsai.Data;
 using bonsai.FileSystemHandling;
 using bonsai.Theme;
 using clui;
 using clui.Controls;
 using clui.Extensions;
 using consoleTools;
-using bonsai.Navigation;
 
 namespace bonsai.Apps
 {

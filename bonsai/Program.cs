@@ -6,7 +6,6 @@ using System.Text;
 using bonsai;
 using bonsai.Apps;
 using bonsai.CommandHandling;
-using bonsai.Navigation;
 using bonsai.Theme;
 using bonsai.Utilities;
 using consoleTools;

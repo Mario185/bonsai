@@ -101,7 +101,7 @@ namespace clui.Controls
       return true;
     }
 
-    private readonly Position _cursorPosition = new Position(0, 0);
+    private readonly Position _cursorPosition = new(0, 0);
     public Position GetCursorPosition ()
     {
       _cursorPosition.X = Position.X + CursorPosition - _currentVisibleFromIndex;

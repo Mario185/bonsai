@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using bonsai.Navigation;
+using bonsai.Data;
 using bonsai.Theme;
 using bonsai.Utilities;
 using clui;
@@ -119,9 +119,9 @@ namespace bonsai.Apps
 
     private void SearchTextBox_OnTextChanged(object sender, string text)
     {
-      (bool filterChanged, Func<DatabaseEntry, SearchMatch[]>? filter, bool canApplyFilterToFilteredList) = _searchFilterProvider.GetFilter(text, false);
+      (bool filterChanged, Func<DatabaseEntry, SearchMatch[]>? filter, bool _) = _searchFilterProvider.GetFilter(text, false);
 
-      if (!filterChanged)
+      if (!filterChanged || filter == null)
         return;
 
       if (_searchFilterProvider.IsFilterActive)
@@ -194,7 +194,7 @@ namespace bonsai.Apps
 
       rootPanel.BackgroundColor = ThemeManger.Instance.BackgroundColor;
 
-      Label title = new Label(1.AsFraction(), 1.AsFixed());
+      Label title = new(1.AsFraction(), 1.AsFixed());
       title.Text = "LAST USED         SCORE PATH";
       title.TextColor = Color.DodgerBlue;
       //"yyyy-MM-dd HH:mm"

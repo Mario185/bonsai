@@ -57,9 +57,9 @@ public class ReleaseGitHubActionsDetailedTrigger : GitHubActionsDetailedTrigger
     GitHubActionsImage.WindowsLatest,
     //On = [ GitHubActionsTrigger.WorkflowDispatch ],
     OnReleasePublished = true,
-    WritePermissions = new [] { GitHubActionsPermissions.Contents},
+    WritePermissions = [GitHubActionsPermissions.Contents],
     EnableGitHubToken = true,
-    InvokedTargets = new[] { nameof(Publish) })]
+    InvokedTargets = [nameof(Publish)])]
 partial class Build : NukeBuild
 {
     public static int Main () => Execute<Build>(x => x.Compile);
@@ -67,7 +67,7 @@ partial class Build : NukeBuild
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
 
-    static readonly AbsolutePath ReleaseOutputRoot = (RootDirectory / "_release").CreateOrCleanDirectory();
+    private static readonly AbsolutePath s_releaseOutputRoot = (RootDirectory / "_release").CreateOrCleanDirectory();
 
     [Required]
     [Solution(GenerateProjects = true)]
@@ -128,7 +128,7 @@ partial class Build : NukeBuild
           .SetConfiguration(Configuration.Release)
           .SetPublishSingleFile(true)
           .SetSelfContained(false)
-          .SetOutput(ReleaseOutputRoot)
+          .SetOutput(s_releaseOutputRoot)
           .SetProperty("FileVersion", versionNumber)
           .SetProperty("AssemblyVersion", versionNumber)
           .SetProperty("InformationalVersion", versionNumber)
@@ -143,7 +143,7 @@ partial class Build : NukeBuild
           client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue ("Bearer", GitHubActions.Instance.Token);
           client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github+json"));
           client.DefaultRequestHeaders.Add("User-Agent", "bonsai");
-          using (var zipStream = new FileStream (ReleaseOutputRoot / "bonsai.exe", FileMode.Open))
+          using (var zipStream = new FileStream (s_releaseOutputRoot / "bonsai.exe", FileMode.Open))
           {
             var content = new StreamContent (zipStream);
             content.Headers.ContentType = MediaTypeHeaderValue.Parse ("application/zip");

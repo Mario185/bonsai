@@ -186,12 +186,12 @@ namespace bonsai.FileSystemHandling
           var directorySource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new DirectoryItem(Path.Join(entry.Directory, entry.FileName), currentDirectoryFullNameLength), enumerationOptions);
           directorySource.ShouldIncludePredicate = (ref FileSystemEntry entry) => entry.IsDirectory;
           if (!cancellationToken.IsCancellationRequested)
-            CreateAndAddFileSystemItems(directorySource, cancellationToken, searchedItem, null/*info => new DirectoryItem(info, currentDirectoryFullNameLength, isFilterActiveFunc)*/);
+            CreateAndAddFileSystemItems(directorySource, cancellationToken, searchedItem, item => item);
 
           var fileSource = new FileSystemEnumerable<FileSystemItem>(directoryInfo.FullName, (ref FileSystemEntry entry) => new FileItem(entry.Directory, entry.FileName, currentDirectoryFullNameLength), enumerationOptions);
           fileSource.ShouldIncludePredicate = (ref FileSystemEntry entry) => !entry.IsDirectory;
           if (!cancellationToken.IsCancellationRequested)
-            CreateAndAddFileSystemItems(fileSource, cancellationToken, searchedItem, null /*info => new FileItem(info, currentDirectoryFullNameLength, isFilterActiveFunc)*/);
+            CreateAndAddFileSystemItems(fileSource, cancellationToken, searchedItem, item => item);
 
         }
         TriggerOnFileSystemInfoLoadingStateChanged(FileSystemLoadingState.Finished, -1);
@@ -212,9 +212,8 @@ namespace bonsai.FileSystemHandling
       {
         if (cancellationToken.IsCancellationRequested)
           break;
-        
-        if (!(fileSystemInfo is FileSystemItem listItem))
-          listItem = itemFactory(fileSystemInfo);
+
+        var listItem = itemFactory (fileSystemInfo);
 
         _unfilteredList.Add(listItem);
 
