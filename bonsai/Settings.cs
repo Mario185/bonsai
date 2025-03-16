@@ -7,24 +7,27 @@ using System.Text.Json.Serialization;
 using bonsai.CommandHandling;
 using bonsai.JsonConverter;
 using bonsai.Utilities;
+using ConsoleModiferDictionary =
+    System.Collections.Generic.Dictionary<System.ConsoleModifiers, (System.Collections.Generic.Dictionary<char, bonsai.ActionType> ByChar,
+        System.Collections.Generic.Dictionary<System.ConsoleKey, bonsai.ActionType> ByKey)>;
+using KeyBindingContextDictionary =
+    System.Collections.Generic.Dictionary<bonsai.KeyBindingContext, System.Collections.Generic.Dictionary<System.ConsoleModifiers, (
+        System.Collections.Generic.Dictionary<char, bonsai.ActionType> ByChar,
+        System.Collections.Generic.Dictionary<System.ConsoleKey, bonsai.ActionType> ByKey)>>;
 
 namespace bonsai
 {
   internal sealed class Settings
   {
-    private readonly Lazy<Dictionary<KeyBindingContext,
-            Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)>>>
-        _keyBindings;
+    private readonly Lazy<KeyBindingContextDictionary> _keyBindings;
 
     public Settings ()
     {
       _keyBindings =
-          new Lazy<Dictionary<KeyBindingContext,
-              Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)>>> (
+          new Lazy<KeyBindingContextDictionary> (
               () =>
               {
-                Dictionary<KeyBindingContext,
-                    Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)>> result = new();
+                KeyBindingContextDictionary result = new();
 
                 foreach (KeyBindingContext context in Enum.GetValues<KeyBindingContext>())
                 {
@@ -34,8 +37,7 @@ namespace bonsai
                   }
                   else
                   {
-                    result[context] =
-                        new Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)>();
+                    result[context] = new ConsoleModiferDictionary();
                   }
                 }
 
@@ -67,16 +69,14 @@ namespace bonsai
 
     public ActionType GetInputActionType (ConsoleKeyInfo keyInfo, KeyBindingContext keyBindingContext)
     {
-      Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)> keyBindingsByContext =
-          _keyBindings.Value[keyBindingContext];
+      ConsoleModiferDictionary keyBindingsByContext = _keyBindings.Value[keyBindingContext];
       ActionType? result = GetInputActionInternal (keyInfo, keyBindingsByContext);
       if (result.HasValue)
       {
         return result.Value;
       }
 
-      Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)>
-          commonKeyBindings = _keyBindings.Value[KeyBindingContext.Common];
+      ConsoleModiferDictionary commonKeyBindings = _keyBindings.Value[KeyBindingContext.Common];
       result = GetInputActionInternal (keyInfo, commonKeyBindings);
       return result ?? ActionType.None;
     }
@@ -92,7 +92,7 @@ namespace bonsai
           return $"[MISSING {keyBindingContext}.{action}]";
         }
 
-        string? modifier = GetModifierText (result.Modifier);
+        string modifier = GetModifierText (result.Modifier);
         string? key = (result.Key?.ToString() ?? result.KeyChar.ToString())?.ToLower();
         return modifier + key + ":" + description;
       }
@@ -148,11 +148,9 @@ namespace bonsai
       }
     }
 
-    private static Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)>
-        BuildKeyBindingDictionary (
-            IReadOnlyList<KeyBinding> rawBindings)
+    private static ConsoleModiferDictionary BuildKeyBindingDictionary (IReadOnlyList<KeyBinding> rawBindings)
     {
-      Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)> keyBindingDictionary = new();
+      ConsoleModiferDictionary keyBindingDictionary = new();
       List<IGrouping<ConsoleModifiers, KeyBinding>> groupedByModifier = rawBindings.GroupBy (k => k.Modifier).ToList();
 
       foreach (IGrouping<ConsoleModifiers, KeyBinding> group in groupedByModifier)
@@ -186,9 +184,7 @@ namespace bonsai
       return typeof(Settings).Assembly.GetManifestResourceStream ("bonsai.Resources.default_settings.json")!;
     }
 
-    private static ActionType? GetInputActionInternal (
-        ConsoleKeyInfo keyInfo,
-        Dictionary<ConsoleModifiers, (Dictionary<char, ActionType> ByChar, Dictionary<ConsoleKey, ActionType> ByKey)> keyBindings)
+    private static ActionType? GetInputActionInternal (ConsoleKeyInfo keyInfo, ConsoleModiferDictionary keyBindings)
     {
       if (!keyBindings.TryGetValue (
               keyInfo.Modifiers,
