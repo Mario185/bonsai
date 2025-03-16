@@ -31,7 +31,7 @@ namespace bonsai
 
                 foreach (KeyBindingContext context in Enum.GetValues<KeyBindingContext>())
                 {
-                  if (KeyBindings.TryGetValue (context, out IReadOnlyList<KeyBinding>? bindings))
+                  if (KeyBindings.TryGetValue (context, out List<KeyBinding>? bindings))
                   {
                     result[context] = BuildKeyBindingDictionary (bindings);
                   }
@@ -52,8 +52,9 @@ namespace bonsai
     public string Theme { get; set; } = "default.json";
 
     [JsonInclude]
-    public IReadOnlyDictionary<KeyBindingContext, IReadOnlyList<KeyBinding>> KeyBindings { get; private set; } =
-      new Dictionary<KeyBindingContext, IReadOnlyList<KeyBinding>>();
+    [JsonPropertyOrder (100)]
+    public Dictionary<KeyBindingContext, List<KeyBinding>> KeyBindings { get; private set; } =
+      new();
 
     public int MaxTotalScoreInDatabase { get; set; } = 2000;
 
@@ -83,7 +84,7 @@ namespace bonsai
 
     public string GetInstructionForAction (KeyBindingContext keyBindingContext, ActionType action, string description)
     {
-      if (KeyBindings.TryGetValue (keyBindingContext, out IReadOnlyList<KeyBinding>? inner))
+      if (KeyBindings.TryGetValue (keyBindingContext, out List<KeyBinding>? inner))
       {
         KeyBinding? result = inner.Where (k => k.Action == action).OrderByDescending (k => k.Key != null).FirstOrDefault();
 
@@ -122,21 +123,56 @@ namespace bonsai
         WriteDefaultSettingsToFile();
       }
 
+      Settings loadedSettings;
       using (FileStream stream = File.OpenRead (settingsPath))
       {
-        Instance = JsonSerializer.Deserialize<Settings> (stream, options)!;
-        if (string.IsNullOrWhiteSpace (Instance.Theme))
+        loadedSettings = JsonSerializer.Deserialize<Settings> (stream, options)!;
+        if (string.IsNullOrWhiteSpace (loadedSettings.Theme))
         {
-          Instance.Theme = "default.json";
+          loadedSettings.Theme = "default.json";
+        }
+      }
+
+      bool settingsModified = false;
+      using (Stream defaultSettingsStream = GetDefaultSettings())
+      {
+        Settings? defaultSettings = JsonSerializer.Deserialize<Settings> (defaultSettingsStream, options);
+        foreach (KeyValuePair<KeyBindingContext, List<KeyBinding>> kvp in defaultSettings!.KeyBindings)
+        {
+          if (!loadedSettings.KeyBindings.TryGetValue (kvp.Key, out List<KeyBinding>? loadedKeyBindings))
+          {
+            loadedKeyBindings = new List<KeyBinding>();
+            loadedSettings.KeyBindings[kvp.Key] = loadedKeyBindings;
+            settingsModified = true;
+          }
+
+          foreach (KeyBinding defaultKeybinding in kvp.Value)
+          {
+            if (loadedKeyBindings.All (v => v.Action != defaultKeybinding.Action))
+            {
+              loadedKeyBindings.Add (defaultKeybinding);
+              settingsModified = true;
+            }
+          }
+        }
+
+        if (settingsModified)
+        {
+          loadedSettings.Save();
+          LoadSettings();
+        }
+        else
+        {
+          Instance = loadedSettings;
         }
       }
     }
 
-    public static string Serialize ()
+    public void Save ()
     {
+      AbsolutePath settingsPath = GetSettingsFilePath();
       JsonSerializerOptions options = GetJsonSerializerOptions();
-
-      return JsonSerializer.Serialize (Instance, options);
+      File.WriteAllText (settingsPath, JsonSerializer.Serialize (this, options));
     }
 
     public static void WriteDefaultSettingsToFile ()
@@ -235,7 +271,11 @@ namespace bonsai
   public class KeyBinding
   {
     public ConsoleModifiers Modifier { get; set; }
+
+    [JsonIgnore (Condition = JsonIgnoreCondition.WhenWritingNull)]
     public char? KeyChar { get; set; }
+
+    [JsonIgnore (Condition = JsonIgnoreCondition.WhenWritingNull)]
     public ConsoleKey? Key { get; set; }
     public ActionType Action { get; set; }
   }
