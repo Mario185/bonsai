@@ -16,7 +16,6 @@ using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Git;
 using Nuke.Common.Utilities;
 using Serilog;
-using FileMode = System.IO.FileMode;
 
 public class ExtendedGitHubActionsAttribute : GitHubActionsAttribute
 {
@@ -73,24 +72,24 @@ partial class Build : NukeBuild
 
   [SuppressMessage ("CodeQuality", "IDE0051:Remove unused private members", Justification = "<Pending>")]
   // ReSharper disable once UnusedMember.Local
-  Target Clean => _ => _
+  Target Clean => d => d
       .Before (Restore)
       .Executes (() =>
       {
         GitTasks.Git ("clean -xfd -e *.vsidx -e build/* -e .nuke/temp/*");
       });
 
-  Target Restore => _ => _
+  Target Restore => d => d
       .Executes (() =>
       {
-        DotNetTasks.DotNetRestore (_ => _
+        DotNetTasks.DotNetRestore (s => s
             .SetForce (true)
             .SetForceEvaluate (true)
             .SetProjectFile (Solution)
         );
       });
 
-  Target Compile => _ => _
+  Target Compile => d => d
       .DependsOn (Restore)
       .Executes (() =>
       {
@@ -135,14 +134,14 @@ partial class Build : NukeBuild
 
         if (IsServerBuild)
         {
-          string assetsUrl = GitHubActions.Instance.GitHubEvent["release"]["upload_url"].ToString();
+          string assetsUrl = GitHubActions.Instance.GitHubEvent["release"]!["upload_url"]!.ToString();
           assetsUrl = assetsUrl.Split ('{')[0] + "?name=bonsai.exe";
 
           HttpClient client = new();
           client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue ("Bearer", GitHubActions.Instance.Token);
           client.DefaultRequestHeaders.Accept.Add (new MediaTypeWithQualityHeaderValue ("application/vnd.github+json"));
           client.DefaultRequestHeaders.Add ("User-Agent", "bonsai");
-          using (FileStream zipStream = new(s_releaseOutputRoot / "bonsai.exe", FileMode.Open))
+          await using (FileStream zipStream = new(s_releaseOutputRoot / "bonsai.exe", FileMode.Open))
           {
             StreamContent content = new(zipStream);
             content.Headers.ContentType = MediaTypeHeaderValue.Parse ("application/zip");
