@@ -6,15 +6,6 @@ namespace consoleTools.Tests
   {
     private readonly VerifySettings _verifySettings;
 
-    static ConsoleWriterTests()
-    {
-    
-    }
-
-    public StringBuilder ConsoleOutput { get; private set; }
-    public ConsoleWriter ConsoleWriterInstance { get; private set; }
-
-
     protected ConsoleWriterTests()
     {
       _verifySettings = new VerifySettings();
@@ -22,20 +13,22 @@ namespace consoleTools.Tests
       _verifySettings.UseDirectory(Path.Combine("verify_snapshots", GetType().Name));
     }
 
+    public StringBuilder ConsoleOutput { get; private set; }
+    public ConsoleWriter ConsoleWriterInstance { get; private set; }
+
     [SetUp]
     public void Setup()
     {
-
       ConsoleOutput = new StringBuilder();
       ConsoleWriterInstance = new ConsoleWriter();
-      var consoleOut = new StringWriter(ConsoleOutput);
+      StringWriter consoleOut = new(ConsoleOutput);
       Console.SetOut(consoleOut);
     }
 
     [TearDown]
     public void TearDown()
     {
-      var outputLengthBeforeDisposing = ConsoleOutput.Length;
+      int outputLengthBeforeDisposing = ConsoleOutput.Length;
       ConsoleWriterInstance.Dispose();
       Assert.That(ConsoleOutput.Length, Is.EqualTo(outputLengthBeforeDisposing), "Test forgot flushing the console writer");
     }

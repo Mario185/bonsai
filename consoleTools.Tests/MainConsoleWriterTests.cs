@@ -1,6 +1,4 @@
-﻿using consoleTools.SubWriter;
-
-namespace consoleTools.Tests
+﻿namespace consoleTools.Tests
 {
   public class MainConsoleWriterTests : ConsoleWriterTests
   {
@@ -21,7 +19,7 @@ namespace consoleTools.Tests
     [Test]
     public Task Write_CharArray()
     {
-      ConsoleWriterInstance.Write(new char[]{'A', 'B'}).Flush();
+      ConsoleWriterInstance.Write(new[] { 'A', 'B' }).Flush();
       return VerifyOutput();
     }
 
@@ -35,18 +33,19 @@ namespace consoleTools.Tests
     [Test]
     public Task DisposeFlushes()
     {
-      using (var writer = new ConsoleWriter())
+      using (ConsoleWriter writer = new())
       {
         writer.Write("DisposeFlush");
       }
+
       return VerifyOutput();
     }
 
     [Test]
-    [TestCase(0,4)]
-    [TestCase(1,4)]
-    [TestCase(4,4)]
-    [TestCase(10,1)]
+    [TestCase(0, 4)]
+    [TestCase(1, 4)]
+    [TestCase(4, 4)]
+    [TestCase(10, 1)]
     public Task WriteTruncated(int from, int len)
     {
       ConsoleWriterInstance.WriteTruncated("1234567890", from, len).Flush();
@@ -56,7 +55,7 @@ namespace consoleTools.Tests
     [Test]
     public Task WriteTruncatedWithEmptyString()
     {
-      ConsoleWriterInstance.WriteTruncated("",0,0).Flush();
+      ConsoleWriterInstance.WriteTruncated("", 0, 0).Flush();
       return VerifyOutput();
     }
 

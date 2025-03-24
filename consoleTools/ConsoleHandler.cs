@@ -17,7 +17,6 @@ namespace consoleTools
 #pragma warning restore IDE0079 // Remove unnecessary suppression
 
     static ConsoleHandler ()
-
     {
       if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
       {

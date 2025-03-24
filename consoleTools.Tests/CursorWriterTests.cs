@@ -78,8 +78,8 @@
     }
 
     [Test]
-    [TestCase(1,2)]
-    [TestCase(10,11)]
+    [TestCase(1, 2)]
+    [TestCase(10, 11)]
     public Task MoveTo(int x, int y)
     {
       ConsoleWriterInstance.Cursor.MoveTo(x, y).Flush();
