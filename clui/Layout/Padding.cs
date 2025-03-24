@@ -2,7 +2,7 @@
 
 namespace clui.Layout
 {
-  public record Padding
+  public class Padding
   {
     public Padding (int top, int left, int bottom, int right)
     {

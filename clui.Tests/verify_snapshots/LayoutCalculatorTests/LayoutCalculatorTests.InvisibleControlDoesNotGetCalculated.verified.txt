@@ -1,0 +1,20 @@
+﻿{
+  $type: Panel,
+  Width: {
+    $type: FixedSize,
+    Value: 5
+  },
+  Height: {
+    $type: FixedSize,
+    Value: 5
+  },
+  Padding: {
+    $type: Padding
+  },
+  Position: {
+    $type: Position,
+    X: 1,
+    Y: 1
+  },
+  Visible: false
+}

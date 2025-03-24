@@ -39,6 +39,8 @@ namespace clui
 
     public Renderer Renderer { get; } = new();
 
+    public RootControl RootControl => _rootControl;
+
     public void Dispose ()
     {
       GC.SuppressFinalize (this);

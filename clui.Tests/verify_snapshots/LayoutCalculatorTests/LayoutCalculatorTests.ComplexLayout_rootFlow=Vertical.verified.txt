@@ -1,0 +1,304 @@
+﻿{
+  $type: Panel,
+  Controls: {
+    $type: List<ControlBase>,
+    $values: [
+      {
+        $type: Panel,
+        Controls: {
+          $type: List<ControlBase>,
+          $values: [
+            {
+              $type: Panel,
+              Width: {
+                $type: FractionSize,
+                Value: 1
+              },
+              Height: {
+                $type: FractionSize,
+                Value: 1
+              },
+              CalculatedWidth: 51,
+              CalculatedHeight: 48,
+              Padding: {
+                $type: Padding
+              },
+              Position: {
+                $type: Position
+              },
+              Visible: true
+            },
+            {
+              $type: Panel,
+              Width: {
+                $type: FractionSize,
+                Value: 1
+              },
+              Height: {
+                $type: FractionSize,
+                Value: 1
+              },
+              Padding: {
+                $type: Padding
+              },
+              Position: {
+                $type: Position
+              },
+              Visible: false
+            },
+            {
+              $type: Panel,
+              Width: {
+                $type: FractionSize,
+                Value: 1
+              },
+              Height: {
+                $type: FractionSize,
+                Value: 1
+              },
+              CalculatedWidth: 50,
+              CalculatedHeight: 48,
+              Padding: {
+                $type: Padding
+              },
+              Position: {
+                $type: Position,
+                X: 51
+              },
+              Visible: true
+            }
+          ]
+        },
+        Width: {
+          $type: FractionSize,
+          Value: 1
+        },
+        Height: {
+          $type: FractionSize,
+          Value: 1
+        },
+        CalculatedWidth: 101,
+        CalculatedHeight: 48,
+        Padding: {
+          $type: Padding
+        },
+        Position: {
+          $type: Position
+        },
+        Visible: true,
+        Flow: Horizontal
+      },
+      {
+        $type: Panel,
+        Controls: {
+          $type: List<ControlBase>,
+          $values: [
+            {
+              $type: Panel,
+              Width: {
+                $type: FixedSize,
+                Value: 10
+              },
+              Height: {
+                $type: FixedSize,
+                Value: 10
+              },
+              CalculatedWidth: 10,
+              CalculatedHeight: 10,
+              Padding: {
+                $type: Padding
+              },
+              Position: {
+                $type: Position,
+                Y: 48
+              },
+              Visible: true
+            },
+            {
+              $type: Panel,
+              Width: {
+                $type: FixedSize,
+                Value: 10
+              },
+              Height: {
+                $type: FixedSize,
+                Value: 10
+              },
+              Padding: {
+                $type: Padding
+              },
+              Position: {
+                $type: Position
+              },
+              Visible: false
+            },
+            {
+              $type: Panel,
+              Width: {
+                $type: FixedSize,
+                Value: 10
+              },
+              Height: {
+                $type: FixedSize,
+                Value: 10
+              },
+              CalculatedWidth: 10,
+              CalculatedHeight: 10,
+              Padding: {
+                $type: Padding
+              },
+              Position: {
+                $type: Position,
+                X: 10,
+                Y: 48
+              },
+              Visible: true
+            }
+          ]
+        },
+        Width: {
+          $type: FractionSize,
+          Value: 1
+        },
+        Height: {
+          $type: FixedSize,
+          Value: 5
+        },
+        CalculatedWidth: 101,
+        CalculatedHeight: 5,
+        Padding: {
+          $type: Padding
+        },
+        Position: {
+          $type: Position,
+          Y: 48
+        },
+        Visible: true,
+        Flow: Horizontal
+      },
+      {
+        $type: Panel,
+        Controls: {
+          $type: List<ControlBase>,
+          $values: [
+            {
+              $type: Panel,
+              Width: {
+                $type: FractionSize,
+                Value: 1
+              },
+              Height: {
+                $type: FixedSize,
+                Value: 10
+              },
+              CalculatedWidth: 51,
+              CalculatedHeight: 10,
+              Padding: {
+                $type: Padding
+              },
+              Position: {
+                $type: Position,
+                Y: 53
+              },
+              Visible: true
+            },
+            {
+              $type: Panel,
+              Width: {
+                $type: FractionSize,
+                Value: 1
+              },
+              Height: {
+                $type: FixedSize,
+                Value: 10
+              },
+              Padding: {
+                $type: Padding
+              },
+              Position: {
+                $type: Position
+              },
+              Visible: false
+            },
+            {
+              $type: Panel,
+              Width: {
+                $type: FractionSize,
+                Value: 1
+              },
+              Height: {
+                $type: FixedSize,
+                Value: 10
+              },
+              CalculatedWidth: 50,
+              CalculatedHeight: 10,
+              Padding: {
+                $type: Padding
+              },
+              Position: {
+                $type: Position,
+                X: 51,
+                Y: 53
+              },
+              Visible: true
+            }
+          ]
+        },
+        Width: {
+          $type: FractionSize,
+          Value: 1
+        },
+        Height: {
+          $type: FractionSize,
+          Value: 1
+        },
+        CalculatedWidth: 101,
+        CalculatedHeight: 48,
+        Padding: {
+          $type: Padding
+        },
+        Position: {
+          $type: Position,
+          Y: 53
+        },
+        Visible: true,
+        Flow: Horizontal
+      },
+      {
+        $type: Panel,
+        Width: {
+          $type: FixedSize,
+          Value: 1
+        },
+        Height: {
+          $type: FixedSize,
+          Value: 1
+        },
+        Padding: {
+          $type: Padding
+        },
+        Position: {
+          $type: Position
+        },
+        Visible: false
+      }
+    ]
+  },
+  Width: {
+    $type: FractionSize,
+    Value: 1
+  },
+  Height: {
+    $type: FractionSize,
+    Value: 1
+  },
+  CalculatedWidth: 101,
+  CalculatedHeight: 101,
+  Padding: {
+    $type: Padding
+  },
+  Position: {
+    $type: Position
+  },
+  Visible: true
+}

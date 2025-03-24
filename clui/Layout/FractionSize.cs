@@ -2,7 +2,7 @@
 
 namespace clui.Layout
 {
-  public record FractionSize : LayoutSize
+  public class FractionSize : LayoutSize
   {
     public FractionSize (int value)
         : base (value)

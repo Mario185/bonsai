@@ -19,6 +19,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "_build", "build\_build.cspr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "consoleTools.Tests", "consoleTools.Tests\consoleTools.Tests.csproj", "{D0C4B873-508D-4246-A2C5-6F83B12C735B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "clui.Tests", "clui.Tests\clui.Tests.csproj", "{3585633A-8457-4072-BB7D-8892A377AB68}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{D0C4B873-508D-4246-A2C5-6F83B12C735B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0C4B873-508D-4246-A2C5-6F83B12C735B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0C4B873-508D-4246-A2C5-6F83B12C735B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3585633A-8457-4072-BB7D-8892A377AB68}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3585633A-8457-4072-BB7D-8892A377AB68}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3585633A-8457-4072-BB7D-8892A377AB68}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3585633A-8457-4072-BB7D-8892A377AB68}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

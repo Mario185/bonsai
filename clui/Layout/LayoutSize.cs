@@ -2,7 +2,7 @@
 
 namespace clui.Layout
 {
-  public abstract record LayoutSize
+  public abstract class LayoutSize
   {
     protected LayoutSize (int value)
     {
