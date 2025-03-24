@@ -66,7 +66,7 @@ namespace bonsai.FileSystemHandling
           }
           else
           {
-            writer.Style.ForegroundColor (textColor).ResetUnderscore();
+            writer.Style.ForegroundColor (textColor).ResetUnderline();
           }
 
           writer.Write (display[i]);

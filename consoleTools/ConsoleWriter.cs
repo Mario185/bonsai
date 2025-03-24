@@ -8,7 +8,7 @@ namespace consoleTools
   public sealed class ConsoleWriter : IDisposable
   {
     private static readonly Lock s_flushLock = new();
-    private readonly StringBuilder _commandBuffer = new(Console.WindowHeight * Console.WindowWidth * 4);
+    private readonly StringBuilder _commandBuffer = new();
 
     public ConsoleWriter ()
     {
@@ -23,6 +23,7 @@ namespace consoleTools
 
     public void Dispose ()
     {
+      Flush();
     }
 
     /// <summary>

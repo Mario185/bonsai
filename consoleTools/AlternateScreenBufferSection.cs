@@ -31,6 +31,7 @@ namespace consoleTools
       if (_instanceActivatedAlternateScreenBuffer)
       {
         _consoleWriter.Write (AlternateScreenBuffer.SwitchToMain).Flush();
+        s_isAlternateScreenBufferActive = false;
       }
 
       _consoleWriter.Dispose();

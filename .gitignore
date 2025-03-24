@@ -404,3 +404,6 @@ FodyWeavers.xsd
 *.sln.iml
 
 **/_release
+
+/manifests
+**/snapshots/*.received.txt

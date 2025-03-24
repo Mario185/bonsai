@@ -70,7 +70,7 @@ namespace consoleTools.SubWriter
       return this;
     }
 
-    public StyleWriter ResetUnderscore ()
+    public StyleWriter ResetUnderline ()
     {
       Writer.Write (StyleSequences.ResetUnderline);
       return this;

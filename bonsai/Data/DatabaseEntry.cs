@@ -64,7 +64,7 @@ namespace bonsai.Data
               writer.Style.ResetForegroundColor();
             }
 
-            writer.Style.ResetUnderscore();
+            writer.Style.ResetUnderline();
           }
 
           writer.Write (GetPrintableText()[i]);
