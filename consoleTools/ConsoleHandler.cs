@@ -18,7 +18,7 @@ namespace consoleTools
     private static readonly List<BufferSizeChangeCallback> s_bufferSizeChangeCallbacks = new();
     private static bool s_operationStarted;
 
-    private static IConsole s_consoleImplementation;
+    private static IConsole s_consoleImplementation = null!;
 
     public static void RegisterBufferSizeChangeCallback (BufferSizeChangeCallback callbackAction)
     {
