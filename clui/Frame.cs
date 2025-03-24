@@ -75,7 +75,7 @@ namespace clui
       _rootControl.Width = Width;
       _rootControl.Height = Height;
 
-      _layoutCalculator.CalculateRootControlLayout (_rootControl);
+      _layoutCalculator.CalculateRootControlLayout (_rootControl, Console.WindowWidth, Console.WindowHeight);
       _completeLayoutHasBeenCalculatedAtLeastOnce = true;
       Renderer.Render (_rootControl);
     }

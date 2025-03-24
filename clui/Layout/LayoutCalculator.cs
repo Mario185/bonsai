@@ -26,9 +26,9 @@ namespace clui.Layout
       }
     }
 
-    public void CalculateRootControlLayout (ControlBase rootControl)
+    public void CalculateRootControlLayout (ControlBase rootControl, int windowWidth, int windowHeight)
     {
-      CalculateRootControlSize (rootControl);
+      CalculateRootControlSize (rootControl, windowWidth, windowHeight);
     }
 
     private void CalculateChildrenHorizontalFlow (ControlBase container)
@@ -160,15 +160,15 @@ namespace clui.Layout
       // return new Position(container.Position.X + container.Padding.Left, container.Position.Y + container.Padding.Top + positionOffset);
     }
 
-    private void CalculateRootControlSize (ControlBase rootControl)
+    private void CalculateRootControlSize (ControlBase rootControl, int windowWidth, int windowHeight)
     {
       if (!rootControl.Visible)
       {
         return;
       }
 
-      int maxWidth = Console.WindowWidth - (rootControl.Position.X - 1);
-      int maxHeight = Console.WindowHeight - (rootControl.Position.Y - 1);
+      int maxWidth = windowWidth - (rootControl.Position.X - 1);
+      int maxHeight = windowHeight - (rootControl.Position.Y - 1);
 
       int width = rootControl.Width is FractionSize ? maxWidth : Math.Min (rootControl.Width.Value, maxWidth);
       int height = rootControl.Height is FractionSize ? maxHeight : Math.Min (rootControl.Height.Value, maxHeight);
