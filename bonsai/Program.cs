@@ -17,6 +17,7 @@ try
 
   Settings.LoadSettings();
   ThemeManger.LoadTheme (Settings.Instance.Theme);
+  ConsoleHandler.Initialize(new RealConsole());
   ConsoleHandler.StartOperation();
 
   if (args.Length == 0)
@@ -111,4 +112,14 @@ finally
 
   Console.InputEncoding = originalInputEncoding;
   Console.OutputEncoding = originalOutputEncoding;
+}
+
+public class RealConsole : IConsole
+{
+  public int WindowHeight => Console.WindowHeight;
+  public int WindowWidth => Console.WindowWidth;
+  public ConsoleKeyInfo ReadKey(bool intercept)
+  {
+    return Console.ReadKey(intercept);
+  }
 }

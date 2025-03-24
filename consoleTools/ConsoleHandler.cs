@@ -1,42 +1,31 @@
 ﻿using System;
-using System.Runtime.InteropServices;
+using System.Collections.Generic;
 using System.Threading;
-using consoleTools.Windows;
 
 namespace consoleTools
 {
+  public interface IConsole
+  {
+    int WindowHeight { get; }
+    int WindowWidth { get; }
+    ConsoleKeyInfo ReadKey(bool intercept);
+  }
+
   public static class ConsoleHandler
   {
     private static readonly Lock s_bufferSizeCallbackLock = new();
-    private static readonly CancellationTokenSource s_cancellationTokenSource;
+    private static CancellationTokenSource? s_cancellationTokenSource;
+    private static readonly List<BufferSizeChangeCallback> s_bufferSizeChangeCallbacks = new();
+    private static bool s_operationStarted;
 
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CA1859 // Use concrete types when possible for improved performance
-    private static readonly IConsoleHandler s_consoleHandlerImplementation;
-#pragma warning restore CA1859 // Use concrete types when possible for improved performance
-#pragma warning restore IDE0079 // Remove unnecessary suppression
-
-    static ConsoleHandler ()
-    {
-      if (RuntimeInformation.IsOSPlatform (OSPlatform.Windows))
-      {
-        s_consoleHandlerImplementation = new WindowsConsoleHandler (null, s_bufferSizeCallbackLock);
-      }
-
-      s_cancellationTokenSource = new CancellationTokenSource();
-
-      if (s_consoleHandlerImplementation == null)
-      {
-        throw new NotSupportedException ("OS " + RuntimeInformation.OSDescription + " is currently not supported.");
-      }
-    }
+    private static IConsole s_consoleImplementation;
 
     public static void RegisterBufferSizeChangeCallback (BufferSizeChangeCallback callbackAction)
     {
       ArgumentNullException.ThrowIfNull (callbackAction);
       using (s_bufferSizeCallbackLock.EnterScope())
       {
-        s_consoleHandlerImplementation.RegisterBufferSizeChange (callbackAction);
+        s_bufferSizeChangeCallbacks.Add(callbackAction);
       }
     }
 
@@ -45,23 +34,62 @@ namespace consoleTools
       ArgumentNullException.ThrowIfNull (callbackAction);
       using (s_bufferSizeCallbackLock.EnterScope())
       {
-        s_consoleHandlerImplementation.UnregisterBufferSizeChange (callbackAction);
+        s_bufferSizeChangeCallbacks.Remove(callbackAction);
       }
+    }
+
+    public static void Initialize(IConsole consoleImplementation)
+    {
+      s_consoleImplementation = consoleImplementation;
     }
 
     public static void StartOperation ()
     {
-      s_consoleHandlerImplementation.StartOperation (s_cancellationTokenSource.Token);
+      if (s_operationStarted)
+        return;
+
+      s_operationStarted = true;
+      s_cancellationTokenSource = new CancellationTokenSource();
+
+      ManualResetEventSlim threadStarted = new ManualResetEventSlim ();
+
+      var thread = new Thread(() => MonitorBufferSizeChange(threadStarted, s_cancellationTokenSource.Token));
+      thread.Start();
+      threadStarted.Wait();
     }
 
     public static void CancelOperation ()
     {
-      s_cancellationTokenSource.Cancel();
+      s_cancellationTokenSource?.Cancel();
+      s_operationStarted = false;
     }
 
-    public static ConsoleKeyInfo Read ()
+    public static ConsoleKeyInfo Read (bool intercept)
     {
-      return s_consoleHandlerImplementation.KeyQueue.Take (s_cancellationTokenSource.Token);
+      return s_consoleImplementation.ReadKey(intercept);
+    }
+
+    private static void MonitorBufferSizeChange(ManualResetEventSlim threadStarted, CancellationToken token)
+    {
+      var height = s_consoleImplementation.WindowHeight;
+      var width = s_consoleImplementation.WindowWidth;
+      threadStarted.Set();
+      while (!token.IsCancellationRequested)
+      {
+        Thread.Sleep(10);
+        if (height != s_consoleImplementation.WindowHeight || width != s_consoleImplementation.WindowWidth)
+        {
+          height = s_consoleImplementation.WindowHeight;
+          width = s_consoleImplementation.WindowWidth;
+          using (s_bufferSizeCallbackLock.EnterScope())
+          {
+            foreach (var bufferSizeChangeCallback in s_bufferSizeChangeCallbacks)
+            {
+              bufferSizeChangeCallback(width, height);
+            }
+          }
+        }
+      }
     }
   }
 }

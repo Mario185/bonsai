@@ -59,7 +59,7 @@ namespace bonsai.Apps
 
         while (!endLoop)
         {
-          ConsoleKeyInfo key = ConsoleHandler.Read();
+          ConsoleKeyInfo key = ConsoleHandler.Read(true);
 
           switch (Settings.Instance.GetInputActionType (key, KeyBindingContext.NavigationApp))
           {

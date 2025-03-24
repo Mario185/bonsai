@@ -40,7 +40,7 @@ namespace bonsai.Apps
         bool endLoop = false;
         while (!endLoop)
         {
-          ConsoleKeyInfo key = ConsoleHandler.Read();
+          ConsoleKeyInfo key = ConsoleHandler.Read(true);
 
           if (_searchTextBox.HandleInput (key))
           {
