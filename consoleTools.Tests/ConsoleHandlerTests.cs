@@ -2,10 +2,9 @@
 
 namespace consoleTools.Tests
 {
-  [TestFixture]
-  internal class ConsoleHandlerTests
+  public class ConsoleHandlerTests
   {
-    [Test]
+    [Fact]
     public void Read()
     {
       var consoleImplementation = new TestConsoleImplementation();
@@ -21,15 +20,16 @@ namespace consoleTools.Tests
       });
       readThread.Start();
 
-      consoleImplementation.KeyQueue.Add(new ConsoleKeyInfo('A', ConsoleKey.A, false, false,false));
-      resetEvent.Wait();
-
-      Assert.That(readValue.HasValue, Is.True);
-      Assert.That(readValue.Value.Key, Is.EqualTo(ConsoleKey.A));
-      Assert.That(readValue.Value.KeyChar, Is.EqualTo('A'));
+      consoleImplementation.KeyQueue.Add(new ConsoleKeyInfo('A', ConsoleKey.A, false, false,false), TestContext.Current.CancellationToken);
+      resetEvent.Wait(TestContext.Current.CancellationToken);
+      
+      Assert.True(readValue.HasValue);
+      
+      Assert.Equal(ConsoleKey.A, readValue.Value.Key );
+      Assert.Equal('A', readValue.Value.KeyChar);
     }
 
-    [Test]
+    [Fact]
     public void BufferSizeChange()
     {
       var consoleImplementation = new TestConsoleImplementation();
@@ -45,19 +45,20 @@ namespace consoleTools.Tests
       consoleImplementation.WindowHeight = 12;
       consoleImplementation.WindowWidth = 13;
 
-      resetEvent.Wait();
+      resetEvent.Wait(TestContext.Current.CancellationToken);
       resetEvent.Reset();
       
-      Assert.That(receivedHeight, Is.EqualTo(12));
-      Assert.That(receivedWidth, Is.EqualTo(13));
+
+      Assert.Equal(12, receivedHeight);
+      Assert.Equal(13, receivedWidth);
 
       ConsoleHandler.UnregisterBufferSizeChangeCallback(BufferSizeCallBack);
       consoleImplementation.WindowHeight = 16;
       consoleImplementation.WindowWidth = 17;
-      resetEvent.Wait(100);
+      resetEvent.Wait(100, TestContext.Current.CancellationToken);
 
-      Assert.That(receivedHeight, Is.EqualTo(12));
-      Assert.That(receivedWidth, Is.EqualTo(13));
+      Assert.Equal(12, receivedHeight);
+      Assert.Equal(13, receivedWidth);
 
       ConsoleHandler.CancelOperation();
 

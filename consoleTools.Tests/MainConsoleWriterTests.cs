@@ -2,35 +2,35 @@
 {
   public class MainConsoleWriterTests : ConsoleWriterTests
   {
-    [Test]
+    [Fact]
     public Task Write_String()
     {
       ConsoleWriterInstance.Write("Just write").Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task Write_Char()
     {
       ConsoleWriterInstance.Write('A').Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task Write_CharArray()
     {
       ConsoleWriterInstance.Write(new[] { 'A', 'B' }).Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task Write_ReadOnlySpanArray()
     {
       ConsoleWriterInstance.Write("Test".AsSpan()).Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task DisposeFlushes()
     {
       using (ConsoleWriter writer = new())
@@ -41,25 +41,25 @@
       return VerifyOutput();
     }
 
-    [Test]
-    [TestCase(0, 4)]
-    [TestCase(1, 4)]
-    [TestCase(4, 4)]
-    [TestCase(10, 1)]
+    [Theory]
+    [InlineData(0, 4)]
+    [InlineData(1, 4)]
+    [InlineData(4, 4)]
+    [InlineData(10, 1)]
     public Task WriteTruncated(int from, int len)
     {
       ConsoleWriterInstance.WriteTruncated("1234567890", from, len).Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task WriteTruncatedWithEmptyString()
     {
       ConsoleWriterInstance.WriteTruncated("", 0, 0).Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task AlternateScreenBuffer()
     {
       using (new AlternateScreenBufferSection())
@@ -70,7 +70,7 @@
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task AlternateScreenBuffer_TwiceDoesNothing()
     {
       using (new AlternateScreenBufferSection())
@@ -84,26 +84,26 @@
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public void SubWritersHaveSameInstance()
     {
-      Assert.That(ConsoleWriterInstance.Style, Is.SameAs(ConsoleWriterInstance.Cursor.Style));
-      Assert.That(ConsoleWriterInstance.Style, Is.SameAs(ConsoleWriterInstance.Text.Style));
-      Assert.That(ConsoleWriterInstance.Style, Is.SameAs(ConsoleWriterInstance.Style.Style));
-      Assert.That(ConsoleWriterInstance.Style.Writer, Is.SameAs(ConsoleWriterInstance.Text.Writer));
-      Assert.That(ConsoleWriterInstance.Style.Writer, Is.SameAs(ConsoleWriterInstance.Cursor.Writer));
+      Assert.Same(ConsoleWriterInstance.Style, (ConsoleWriterInstance.Cursor.Style));
+      Assert.Same(ConsoleWriterInstance.Style, (ConsoleWriterInstance.Text.Style));
+      Assert.Same(ConsoleWriterInstance.Style, (ConsoleWriterInstance.Style.Style));
+      Assert.Same(ConsoleWriterInstance.Style.Writer, (ConsoleWriterInstance.Text.Writer));
+      Assert.Same(ConsoleWriterInstance.Style.Writer, (ConsoleWriterInstance.Cursor.Writer));
 
-      Assert.That(ConsoleWriterInstance.Cursor, Is.SameAs(ConsoleWriterInstance.Cursor.Cursor));
-      Assert.That(ConsoleWriterInstance.Cursor, Is.SameAs(ConsoleWriterInstance.Text.Cursor));
-      Assert.That(ConsoleWriterInstance.Cursor, Is.SameAs(ConsoleWriterInstance.Style.Cursor));
-      Assert.That(ConsoleWriterInstance.Cursor.Writer, Is.SameAs(ConsoleWriterInstance.Text.Writer));
-      Assert.That(ConsoleWriterInstance.Cursor.Writer, Is.SameAs(ConsoleWriterInstance.Style.Writer));
+      Assert.Same(ConsoleWriterInstance.Cursor, (ConsoleWriterInstance.Cursor.Cursor));
+      Assert.Same(ConsoleWriterInstance.Cursor, (ConsoleWriterInstance.Text.Cursor));
+      Assert.Same(ConsoleWriterInstance.Cursor, (ConsoleWriterInstance.Style.Cursor));
+      Assert.Same(ConsoleWriterInstance.Cursor.Writer, (ConsoleWriterInstance.Text.Writer));
+      Assert.Same(ConsoleWriterInstance.Cursor.Writer, (ConsoleWriterInstance.Style.Writer));
 
-      Assert.That(ConsoleWriterInstance.Text, Is.SameAs(ConsoleWriterInstance.Cursor.Text));
-      Assert.That(ConsoleWriterInstance.Text, Is.SameAs(ConsoleWriterInstance.Text.Text));
-      Assert.That(ConsoleWriterInstance.Text, Is.SameAs(ConsoleWriterInstance.Style.Text));
-      Assert.That(ConsoleWriterInstance.Text.Writer, Is.SameAs(ConsoleWriterInstance.Cursor.Writer));
-      Assert.That(ConsoleWriterInstance.Text.Writer, Is.SameAs(ConsoleWriterInstance.Style.Writer));
+      Assert.Same(ConsoleWriterInstance.Text, (ConsoleWriterInstance.Cursor.Text));
+      Assert.Same(ConsoleWriterInstance.Text, (ConsoleWriterInstance.Text.Text));
+      Assert.Same(ConsoleWriterInstance.Text, (ConsoleWriterInstance.Style.Text));
+      Assert.Same(ConsoleWriterInstance.Text.Writer, (ConsoleWriterInstance.Cursor.Writer));
+      Assert.Same(ConsoleWriterInstance.Text.Writer, (ConsoleWriterInstance.Style.Writer));
     }
   }
 }

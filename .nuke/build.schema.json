@@ -27,7 +27,10 @@
         "Clean",
         "Compile",
         "Publish",
-        "Restore"
+        "Restore",
+        "RunCluiTests",
+        "RunConsoleToolsTests",
+        "RunTests"
       ]
     },
     "Verbosity": {

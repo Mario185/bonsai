@@ -93,12 +93,50 @@ partial class Build : NukeBuild
       .DependsOn (Restore)
       .Executes (() =>
       {
+        DotNetTasks.DotNetBuild(_ => _
+          .SetConfiguration(Configuration)
+          .SetProjectFile(Solution)
+        );
       });
+
+
+  Target RunTests => d => d
+    .DependsOn(Compile)
+    .DependsOn(RunCluiTests, RunConsoleToolsTests);
+
+  Target RunCluiTests => d => d
+    .DependsOn(Compile)
+    .ProceedAfterFailure()
+    .Executes(() =>
+    {
+      var settings = new DotNetTestSettings()
+        .EnableNoBuild()
+        .EnableNoRestore()
+        .SetConfiguration(Configuration)
+        //.AddLoggers("console;verbosity=detailed")
+        .SetProjectFile(Solution.clui_Tests);
+
+      DotNetTasks.DotNetTest(settings);
+    });
+
+  Target RunConsoleToolsTests => d => d
+    .DependsOn(Compile)
+    .ProceedAfterFailure()
+    .Executes(() =>
+    {
+      var settings = new DotNetRunSettings()
+        .EnableNoBuild()
+        .EnableNoRestore()
+        .SetConfiguration(Configuration)
+        .SetProjectFile(Solution.consoleTools_Tests);
+
+      DotNetTasks.DotNetRun(settings);
+    });
 
   // ReSharper disable once UnusedMember.Local
 
   Target Publish => d => d
-      .DependsOn (Restore)
+      .DependsOn (RunTests)
       .Executes (async () =>
       {
         IReadOnlyCollection<Output> result = GitTasks.Git ("tag --points-at HEAD").EnsureOnlyStd();
@@ -122,8 +160,8 @@ partial class Build : NukeBuild
         }
 
         DotNetTasks.DotNetPublish (c => c
-            .SetProject (Solution.bonsai)
-            .SetConfiguration (Configuration.Release)
+          .SetProject (Solution.bonsai)
+            .SetConfiguration (Configuration)
             .SetPublishSingleFile (true)
             .SetSelfContained (false)
             .SetOutput (s_releaseOutputRoot)

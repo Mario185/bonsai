@@ -4,77 +4,77 @@ namespace consoleTools.Tests
 {
   public class StyleConsoleWriterTests : ConsoleWriterTests
   {
-    [Test]
+    [Fact]
     public Task SetBackgroundColor()
     {
       ConsoleWriterInstance.Style.BackgroundColor(Color.DarkSalmon).Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task SetBackgroundColorNull()
     {
       ConsoleWriterInstance.Style.BackgroundColor(null).Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task ResetBackgroundColorNull()
     {
       ConsoleWriterInstance.Style.ResetBackgroundColor().Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task Bold()
     {
       ConsoleWriterInstance.Style.Bold().Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task ResetBold()
     {
       ConsoleWriterInstance.Style.ResetBold().Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task SetForegroundColor()
     {
       ConsoleWriterInstance.Style.ForegroundColor(Color.DarkSalmon).Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task SetForegroundColorNull()
     {
       ConsoleWriterInstance.Style.ForegroundColor(null).Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task ResetForegroundColorNull()
     {
       ConsoleWriterInstance.Style.ResetForegroundColor().Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task ResetStyles()
     {
       ConsoleWriterInstance.Style.ResetStyles().Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task Underline()
     {
       ConsoleWriterInstance.Style.Underline().Flush();
       return VerifyOutput();
     }
 
-    [Test]
+    [Fact]
     public Task ResetUnderline()
     {
       ConsoleWriterInstance.Style.ResetUnderline().Flush();
