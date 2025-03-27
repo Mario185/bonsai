@@ -57,6 +57,12 @@ public class ReleaseGitHubActionsDetailedTrigger : GitHubActionsDetailedTrigger
     WritePermissions = [GitHubActionsPermissions.Contents],
     EnableGitHubToken = true,
     InvokedTargets = [nameof(Publish)])]
+
+[GitHubActions("ci",
+  GitHubActionsImage.WindowsLatest,
+  On = [ GitHubActionsTrigger.Push],
+  InvokedTargets = [nameof(RunTests)]
+  )]
 partial class Build : NukeBuild
 {
   private static readonly AbsolutePath s_releaseOutputRoot = (RootDirectory / "_release").CreateOrCleanDirectory();
