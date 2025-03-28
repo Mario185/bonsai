@@ -1,4 +1,6 @@
-﻿namespace consoleTools.Tests
+﻿using consoleTools;
+
+namespace Tests.consoleTools
 {
   public class CursorWriterTests : ConsoleWriterTests
   {

@@ -28,8 +28,6 @@
         "Compile",
         "Publish",
         "Restore",
-        "RunCluiTests",
-        "RunConsoleToolsTests",
         "RunTests"
       ]
     },
@@ -111,9 +109,6 @@
             "Debug",
             "Release"
           ]
-        },
-        "RunTestsWithCodeCoverage": {
-          "type": "boolean"
         },
         "Solution": {
           "type": "string",

@@ -1,4 +1,6 @@
-﻿namespace consoleTools.Tests
+﻿using consoleTools;
+
+namespace Tests.consoleTools
 {
   public class MainConsoleWriterTests : ConsoleWriterTests
   {
@@ -87,23 +89,23 @@
     [Fact]
     public void SubWritersHaveSameInstance()
     {
-      Assert.Same(ConsoleWriterInstance.Style, (ConsoleWriterInstance.Cursor.Style));
-      Assert.Same(ConsoleWriterInstance.Style, (ConsoleWriterInstance.Text.Style));
-      Assert.Same(ConsoleWriterInstance.Style, (ConsoleWriterInstance.Style.Style));
-      Assert.Same(ConsoleWriterInstance.Style.Writer, (ConsoleWriterInstance.Text.Writer));
-      Assert.Same(ConsoleWriterInstance.Style.Writer, (ConsoleWriterInstance.Cursor.Writer));
+      Assert.Same(ConsoleWriterInstance.Style, ConsoleWriterInstance.Cursor.Style);
+      Assert.Same(ConsoleWriterInstance.Style, ConsoleWriterInstance.Text.Style);
+      Assert.Same(ConsoleWriterInstance.Style, ConsoleWriterInstance.Style.Style);
+      Assert.Same(ConsoleWriterInstance.Style.Writer, ConsoleWriterInstance.Text.Writer);
+      Assert.Same(ConsoleWriterInstance.Style.Writer, ConsoleWriterInstance.Cursor.Writer);
 
-      Assert.Same(ConsoleWriterInstance.Cursor, (ConsoleWriterInstance.Cursor.Cursor));
-      Assert.Same(ConsoleWriterInstance.Cursor, (ConsoleWriterInstance.Text.Cursor));
-      Assert.Same(ConsoleWriterInstance.Cursor, (ConsoleWriterInstance.Style.Cursor));
-      Assert.Same(ConsoleWriterInstance.Cursor.Writer, (ConsoleWriterInstance.Text.Writer));
-      Assert.Same(ConsoleWriterInstance.Cursor.Writer, (ConsoleWriterInstance.Style.Writer));
+      Assert.Same(ConsoleWriterInstance.Cursor, ConsoleWriterInstance.Cursor.Cursor);
+      Assert.Same(ConsoleWriterInstance.Cursor, ConsoleWriterInstance.Text.Cursor);
+      Assert.Same(ConsoleWriterInstance.Cursor, ConsoleWriterInstance.Style.Cursor);
+      Assert.Same(ConsoleWriterInstance.Cursor.Writer, ConsoleWriterInstance.Text.Writer);
+      Assert.Same(ConsoleWriterInstance.Cursor.Writer, ConsoleWriterInstance.Style.Writer);
 
-      Assert.Same(ConsoleWriterInstance.Text, (ConsoleWriterInstance.Cursor.Text));
-      Assert.Same(ConsoleWriterInstance.Text, (ConsoleWriterInstance.Text.Text));
-      Assert.Same(ConsoleWriterInstance.Text, (ConsoleWriterInstance.Style.Text));
-      Assert.Same(ConsoleWriterInstance.Text.Writer, (ConsoleWriterInstance.Cursor.Writer));
-      Assert.Same(ConsoleWriterInstance.Text.Writer, (ConsoleWriterInstance.Style.Writer));
+      Assert.Same(ConsoleWriterInstance.Text, ConsoleWriterInstance.Cursor.Text);
+      Assert.Same(ConsoleWriterInstance.Text, ConsoleWriterInstance.Text.Text);
+      Assert.Same(ConsoleWriterInstance.Text, ConsoleWriterInstance.Style.Text);
+      Assert.Same(ConsoleWriterInstance.Text.Writer, ConsoleWriterInstance.Cursor.Writer);
+      Assert.Same(ConsoleWriterInstance.Text.Writer, ConsoleWriterInstance.Style.Writer);
     }
   }
 }

@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace consoleTools.Tests
+namespace Tests.consoleTools
 {
   public class StyleConsoleWriterTests : ConsoleWriterTests
   {

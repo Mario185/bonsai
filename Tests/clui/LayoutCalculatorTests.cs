@@ -1,33 +1,12 @@
-﻿using Argon;
-using clui.Controls;
+﻿using clui.Controls;
 using clui.Extensions;
 using clui.Layout;
 
-namespace clui.Tests
+namespace Tests.clui
 {
-
-  public abstract class TestBase
+  public class LayoutCalculatorTests : VerifyTestBase
   {
-    protected VerifySettings VerifySettings { get; }
-
-    protected TestBase()
-    {
-      VerifySettings = new VerifySettings();
-      VerifySettings.AddExtraSettings(s => s.TypeNameHandling = TypeNameHandling.All);
-      VerifySettings.DisableDiff();
-      VerifySettings.UseDirectory(Path.Combine("verify_snapshots", GetType().Name));
-    }
-  }
-
-  public class LayoutCalculatorTests : TestBase
-  {
-    [SetUp]
-    public void Setup()
-    {
-      
-    }
-
-    [Test]
+    [Fact]
     public Task SimpleFraction()
     {
       LayoutCalculator calculator = new();
@@ -41,7 +20,7 @@ namespace clui.Tests
       return Verify(rootPanel, GetSettingsWithIgnoredMembers());
     }
 
-    [Test]
+    [Fact]
     public Task SimpleFixedSize()
     {
       LayoutCalculator calculator = new();
@@ -55,7 +34,7 @@ namespace clui.Tests
       return Verify(rootPanel, GetSettingsWithIgnoredMembers());
     }
 
-    [Test]
+    [Fact]
     public Task InvisibleControlDoesNotGetCalculated()
     {
       LayoutCalculator calculator = new();
@@ -70,9 +49,9 @@ namespace clui.Tests
       return Verify(rootPanel, GetSettingsWithIgnoredMembers());
     }
 
-    [Test]
-    [TestCase(ChildControlFlow.Vertical)]
-    [TestCase(ChildControlFlow.Horizontal)]
+    [Theory]
+    [InlineData(ChildControlFlow.Vertical)]
+    [InlineData(ChildControlFlow.Horizontal)]
     public Task ComplexLayout(ChildControlFlow rootFlow)
     {
       LayoutCalculator calculator = new();

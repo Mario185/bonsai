@@ -34,7 +34,7 @@ partial class Build : NukeBuild
   private static readonly AbsolutePath s_artifactsPath = (RootDirectory / "_artifacts").CreateOrCleanDirectory();
   
   
-  private static readonly AbsolutePath s_consoleToolsTestResultPath = (s_artifactsPath / "consoleTools_Tests.zip");
+  private static readonly AbsolutePath s_consoleToolsTestResultPath = (s_artifactsPath / "tests.zip");
 
 
 
@@ -79,27 +79,7 @@ partial class Build : NukeBuild
         );
       });
 
-
   Target RunTests => d => d
-    .DependsOn(Compile)
-    .DependsOn(RunCluiTests, RunConsoleToolsTests);
-
-  Target RunCluiTests => d => d
-    .DependsOn(Compile)
-    .ProceedAfterFailure()
-    .Executes(() =>
-    {
-      var settings = new DotNetTestSettings()
-        .EnableNoBuild()
-        .EnableNoRestore()
-        .SetConfiguration(Configuration)
-        //.AddLoggers("console;verbosity=detailed")
-        .SetProjectFile(Solution.clui_Tests);
-
-      DotNetTasks.DotNetTest(settings);
-    });
-
-  Target RunConsoleToolsTests => d => d
     .DependsOn(Compile)
     .ProceedAfterFailure()
     .Requires(() => ReportGeneratorTool)
@@ -110,13 +90,13 @@ partial class Build : NukeBuild
         .EnableNoRestore()
         .SetConfiguration(Configuration)
         .AddCodeCoverageParameter()
-        .SetProjectFile(Solution.consoleTools_Tests);
+        .SetProjectFile(Solution.Tests);
 
       DotNetTasks.DotNetRun(settings);
 
-      CreateCoverageReportOnDemand(Solution.consoleTools_Tests);
+      CreateCoverageReportOnDemand(Solution.Tests);
 
-      var testResultsPath = Solution.consoleTools_Tests.GetOutputPath(Configuration) / "TestResults";
+      var testResultsPath = Solution.Tests.GetOutputPath(Configuration) / "TestResults";
       testResultsPath.ZipTo(s_consoleToolsTestResultPath);
 
     })

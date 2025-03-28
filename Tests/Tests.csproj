@@ -37,6 +37,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\clui\clui.csproj" />
     <ProjectReference Include="..\consoleTools\consoleTools.csproj" />
   </ItemGroup>
 </Project>

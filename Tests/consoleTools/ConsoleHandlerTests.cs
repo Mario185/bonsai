@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
+using consoleTools;
 
-namespace consoleTools.Tests
+namespace Tests.consoleTools
 {
   public class ConsoleHandlerTests
   {
@@ -20,12 +21,12 @@ namespace consoleTools.Tests
       });
       readThread.Start();
 
-      consoleImplementation.KeyQueue.Add(new ConsoleKeyInfo('A', ConsoleKey.A, false, false,false), TestContext.Current.CancellationToken);
+      consoleImplementation.KeyQueue.Add(new ConsoleKeyInfo('A', ConsoleKey.A, false, false, false), TestContext.Current.CancellationToken);
       resetEvent.Wait(TestContext.Current.CancellationToken);
-      
+
       Assert.True(readValue.HasValue);
-      
-      Assert.Equal(ConsoleKey.A, readValue.Value.Key );
+
+      Assert.Equal(ConsoleKey.A, readValue.Value.Key);
       Assert.Equal('A', readValue.Value.KeyChar);
     }
 
@@ -44,8 +45,8 @@ namespace consoleTools.Tests
         ConsoleHandler.Initialize(consoleImplementation);
         ConsoleHandler.StartOperation();
 
-        
-        
+
+
         ConsoleHandler.RegisterBufferSizeChangeCallback(BufferSizeCallBack);
         consoleImplementation.WindowHeight = 12;
         consoleImplementation.WindowWidth = 13;

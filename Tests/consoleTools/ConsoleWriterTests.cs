@@ -1,17 +1,12 @@
 ﻿using System.Text;
+using consoleTools;
 
-namespace consoleTools.Tests
+namespace Tests.consoleTools
 {
-  public abstract class ConsoleWriterTests : IDisposable
+  public abstract class ConsoleWriterTests : VerifyTestBase, IDisposable
   {
-    private readonly VerifySettings _verifySettings;
-
     protected ConsoleWriterTests()
     {
-      _verifySettings = new VerifySettings();
-      _verifySettings.DisableDiff();
-      _verifySettings.UseDirectory(Path.Combine("verify_snapshots", GetType().Name));
-
       ConsoleOutput = new StringBuilder();
       ConsoleWriterInstance = new ConsoleWriter();
       StringWriter consoleOut = new(ConsoleOutput);
@@ -23,14 +18,14 @@ namespace consoleTools.Tests
 
     protected Task VerifyOutput()
     {
-      return Verify(ConsoleOutput, _verifySettings);
+      return Verify(ConsoleOutput, VerifySettings);
     }
 
     public void Dispose()
     {
       int outputLengthBeforeDisposing = ConsoleOutput.Length;
       ConsoleWriterInstance.Dispose();
-      
+
       Assert.Equal(outputLengthBeforeDisposing, ConsoleOutput.Length);
     }
   }
