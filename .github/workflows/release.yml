@@ -40,3 +40,8 @@ jobs:
         run: ./build.cmd Publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: 'Publish: consoleTools_Tests.zip'
+        uses: actions/upload-artifact@v4
+        with:
+          name: consoleTools_Tests.zip
+          path: _artifacts/consoleTools_Tests.zip

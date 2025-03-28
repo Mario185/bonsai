@@ -6,58 +6,23 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text.RegularExpressions;
+using GitHubActionExtensions;
 using Nuke.Common;
 using Nuke.Common.CI.GitHubActions;
-using Nuke.Common.CI.GitHubActions.Configuration;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Git;
-using Nuke.Common.Utilities;
 using Serilog;
-
-public class ExtendedGitHubActionsAttribute : GitHubActionsAttribute
-{
-  public ExtendedGitHubActionsAttribute (string name, GitHubActionsImage image, params GitHubActionsImage[] images)
-      : base (name, image, images)
-  {
-  }
-
-  public bool OnReleasePublished { get; set; }
-
-  protected override IEnumerable<GitHubActionsDetailedTrigger> GetTriggers ()
-  {
-    if (OnReleasePublished)
-    {
-      return base.GetTriggers().Append (new ReleaseGitHubActionsDetailedTrigger());
-    }
-
-    return base.GetTriggers();
-  }
-}
-
-public class ReleaseGitHubActionsDetailedTrigger : GitHubActionsDetailedTrigger
-{
-  public override void Write (CustomFileWriter writer)
-  {
-    writer.WriteLine ("release:");
-    using (writer.Indent())
-    {
-      writer.WriteLine ("types: [published]");
-    }
-  }
-}
 
 [ExtendedGitHubActions (
     "release",
     GitHubActionsImage.WindowsLatest,
-    //On = [ GitHubActionsTrigger.WorkflowDispatch ],
     OnReleasePublished = true,
     WritePermissions = [GitHubActionsPermissions.Contents],
     EnableGitHubToken = true,
     InvokedTargets = [nameof(Publish)])]
-
 [GitHubActions("ci",
   GitHubActionsImage.WindowsLatest,
   On = [ GitHubActionsTrigger.Push],
@@ -66,11 +31,20 @@ public class ReleaseGitHubActionsDetailedTrigger : GitHubActionsDetailedTrigger
 partial class Build : NukeBuild
 {
   private static readonly AbsolutePath s_releaseOutputRoot = (RootDirectory / "_release").CreateOrCleanDirectory();
+  private static readonly AbsolutePath s_artifactsPath = (RootDirectory / "_artifacts").CreateOrCleanDirectory();
+  
+  
+  private static readonly AbsolutePath s_consoleToolsTestResultPath = (s_artifactsPath / "consoleTools_Tests.zip");
+
+
 
   [Parameter ("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
   [SuppressMessage ("CodeQuality", "IDE0052:Remove unread private members", Justification = "Nuke")]
   // ReSharper disable once UnusedMember.Local
   readonly Configuration Configuration = IsLocalBuild ? Configuration.Debug : Configuration.Release;
+
+  [NuGetPackage("ReportGenerator", "ReportGenerator.exe")]
+  private readonly Tool ReportGeneratorTool = default!;
 
   [Required]
   [Solution (GenerateProjects = true)]
@@ -99,7 +73,7 @@ partial class Build : NukeBuild
       .DependsOn (Restore)
       .Executes (() =>
       {
-        DotNetTasks.DotNetBuild(_ => _
+        DotNetTasks.DotNetBuild(s => s
           .SetConfiguration(Configuration)
           .SetProjectFile(Solution)
         );
@@ -128,16 +102,32 @@ partial class Build : NukeBuild
   Target RunConsoleToolsTests => d => d
     .DependsOn(Compile)
     .ProceedAfterFailure()
+    .Requires(() => ReportGeneratorTool)
     .Executes(() =>
     {
       var settings = new DotNetRunSettings()
         .EnableNoBuild()
         .EnableNoRestore()
         .SetConfiguration(Configuration)
+        .AddCodeCoverageParameter()
         .SetProjectFile(Solution.consoleTools_Tests);
 
       DotNetTasks.DotNetRun(settings);
-    });
+
+      CreateCoverageReportOnDemand(Solution.consoleTools_Tests);
+
+      var testResultsPath = Solution.consoleTools_Tests.GetOutputPath(Configuration) / "TestResults";
+      testResultsPath.ZipTo(s_consoleToolsTestResultPath);
+
+    })
+    .Produces(s_consoleToolsTestResultPath);
+
+  private void CreateCoverageReportOnDemand(Project project)
+  {
+    Log.Information($"Starting {nameof(ReportGeneratorTool)} for project {project.Name} ...");
+    ReportGeneratorTool.Invoke("-reports:TestResults\\coverage.xml -targetdir:TestResults\\coveragereport", project.GetOutputPath(Configuration));
+    Log.Information($"{nameof(ReportGeneratorTool)} for project {project.Name} finished.");
+  }
 
   // ReSharper disable once UnusedMember.Local
 

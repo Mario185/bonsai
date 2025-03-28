@@ -32,41 +32,68 @@ namespace consoleTools.Tests
     [Fact]
     public void BufferSizeChange()
     {
-      var consoleImplementation = new TestConsoleImplementation();
-      ConsoleHandler.Initialize(consoleImplementation);
-      ConsoleHandler.StartOperation();
-      
-      ManualResetEventSlim resetEvent = new();
-
       int receivedWidth = 0;
       int receivedHeight = 0;
+      ManualResetEventSlim resetEvent = new();
 
-      ConsoleHandler.RegisterBufferSizeChangeCallback(BufferSizeCallBack);
-      consoleImplementation.WindowHeight = 12;
-      consoleImplementation.WindowWidth = 13;
+      try
+      {
 
-      resetEvent.Wait(TestContext.Current.CancellationToken);
-      resetEvent.Reset();
-      
 
-      Assert.Equal(12, receivedHeight);
-      Assert.Equal(13, receivedWidth);
+        var consoleImplementation = new TestConsoleImplementation();
+        ConsoleHandler.Initialize(consoleImplementation);
+        ConsoleHandler.StartOperation();
 
-      ConsoleHandler.UnregisterBufferSizeChangeCallback(BufferSizeCallBack);
-      consoleImplementation.WindowHeight = 16;
-      consoleImplementation.WindowWidth = 17;
-      resetEvent.Wait(100, TestContext.Current.CancellationToken);
+        
+        
+        ConsoleHandler.RegisterBufferSizeChangeCallback(BufferSizeCallBack);
+        consoleImplementation.WindowHeight = 12;
+        consoleImplementation.WindowWidth = 13;
 
-      Assert.Equal(12, receivedHeight);
-      Assert.Equal(13, receivedWidth);
+        Assert.True(resetEvent.Wait(1000, TestContext.Current.CancellationToken));
+        resetEvent.Reset();
 
-      ConsoleHandler.CancelOperation();
+
+        Assert.Equal(12, receivedHeight);
+        Assert.Equal(13, receivedWidth);
+
+        ConsoleHandler.UnregisterBufferSizeChangeCallback(BufferSizeCallBack);
+        consoleImplementation.WindowHeight = 16;
+        consoleImplementation.WindowWidth = 17;
+        resetEvent.Wait(100, TestContext.Current.CancellationToken);
+
+        Assert.Equal(12, receivedHeight);
+        Assert.Equal(13, receivedWidth);
+
+      }
+      finally
+      {
+        ConsoleHandler.CancelOperation();
+      }
+
 
       void BufferSizeCallBack(int width, int height)
       {
         receivedHeight = height;
         receivedWidth = width;
         resetEvent.Set();
+      }
+    }
+
+    [Fact]
+    public void StartOperationTwiceThrowsException()
+    {
+      try
+      {
+        var consoleImplementation = new TestConsoleImplementation();
+        ConsoleHandler.Initialize(consoleImplementation);
+        ConsoleHandler.StartOperation();
+
+        Assert.Throws<InvalidOperationException>(ConsoleHandler.StartOperation);
+      }
+      finally
+      {
+        ConsoleHandler.CancelOperation();
       }
     }
   }

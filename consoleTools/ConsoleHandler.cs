@@ -46,7 +46,7 @@ namespace consoleTools
     public static void StartOperation ()
     {
       if (s_operationStarted)
-        return;
+        throw new InvalidOperationException($"{nameof(StartOperation)} has already been called.");
 
       s_operationStarted = true;
       s_cancellationTokenSource = new CancellationTokenSource();
@@ -60,8 +60,11 @@ namespace consoleTools
 
     public static void CancelOperation ()
     {
-      s_cancellationTokenSource?.Cancel();
-      s_operationStarted = false;
+      if (s_operationStarted)
+      {
+        s_cancellationTokenSource!.Cancel();
+        s_operationStarted = false;
+      }
     }
 
     public static ConsoleKeyInfo Read (bool intercept)

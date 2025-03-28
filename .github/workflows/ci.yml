@@ -33,3 +33,8 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('**/global.json', '**/*.csproj', '**/Directory.Packages.props') }}
       - name: 'Run: RunTests'
         run: ./build.cmd RunTests
+      - name: 'Publish: consoleTools_Tests.zip'
+        uses: actions/upload-artifact@v4
+        with:
+          name: consoleTools_Tests.zip
+          path: _artifacts/consoleTools_Tests.zip

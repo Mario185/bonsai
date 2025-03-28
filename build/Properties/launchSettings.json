@@ -1,0 +1,39 @@
+{
+  "profiles": {
+    "Clean": {
+      "commandName": "Project",
+      "commandLineArgs": "--target Clean --verbosity normal",
+      "dotnetRunMessages": true
+    },
+    "Compile": {
+      "commandName": "Project",
+      "commandLineArgs": "--target Compile --verbosity normal",
+      "dotnetRunMessages": true
+    },
+    "Publish": {
+      "commandName": "Project",
+      "commandLineArgs": "--target Publish --verbosity normal",
+      "dotnetRunMessages": true
+    },
+    "Restore": {
+      "commandName": "Project",
+      "commandLineArgs": "--target Restore --verbosity normal",
+      "dotnetRunMessages": true
+    },
+    "RunCluiTests": {
+      "commandName": "Project",
+      "commandLineArgs": "--target RunCluiTests --verbosity normal",
+      "dotnetRunMessages": true
+    },
+    "RunConsoleToolsTests": {
+      "commandName": "Project",
+      "commandLineArgs": "--target RunConsoleToolsTests --verbosity normal --RunTestsWithCodeCoverage",
+      "dotnetRunMessages": true
+    },
+    "RunTests": {
+      "commandName": "Project",
+      "commandLineArgs": "--target RunTests --verbosity normal",
+      "dotnetRunMessages": true
+    }
+  }
+}
