@@ -91,18 +91,21 @@ partial class Build : NukeBuild
         .SetConfiguration(Configuration)
         .AddCodeCoverageParameter()
         .SetProjectFile(Solution.Tests);
+      try
+      {
+        DotNetTasks.DotNetRun(settings);
+      }
+      finally
+      {
+        CreateCoverageReport(Solution.Tests);
 
-      DotNetTasks.DotNetRun(settings);
-
-      CreateCoverageReportOnDemand(Solution.Tests);
-
-      var testResultsPath = Solution.Tests.GetOutputPath(Configuration) / "TestResults";
-      testResultsPath.ZipTo(s_consoleToolsTestResultPath);
-
+        var testResultsPath = Solution.Tests.GetOutputPath(Configuration) / "TestResults";
+        testResultsPath.ZipTo(s_consoleToolsTestResultPath);
+      }
     })
     .Produces(s_consoleToolsTestResultPath);
 
-  private void CreateCoverageReportOnDemand(Project project)
+  private void CreateCoverageReport(Project project)
   {
     Log.Information($"Starting {nameof(ReportGeneratorTool)} for project {project.Name} ...");
     ReportGeneratorTool.Invoke("-reports:TestResults\\coverage.xml -targetdir:TestResults\\coveragereport", project.GetOutputPath(Configuration));
@@ -113,11 +116,12 @@ partial class Build : NukeBuild
 
   Target Publish => d => d
       .DependsOn (RunTests)
+      .OnlyWhenDynamic(() => SucceededTargets.Contains(RunTests), "Tests succeeded")
       .Executes (async () =>
       {
         IReadOnlyCollection<Output> result = GitTasks.Git ("tag --points-at HEAD").EnsureOnlyStd();
 
-        string versionNumber = "0.0.1";
+        string versionNumber = "0.0.0";
         if (IsServerBuild)
         {
           Match[] matches = result.Select (r => ReleaseVersionTagRegex().Match (r.Text)).Where (m => m.Success).ToArray();
@@ -138,8 +142,8 @@ partial class Build : NukeBuild
         DotNetTasks.DotNetPublish (c => c
           .SetProject (Solution.bonsai)
             .SetConfiguration (Configuration)
-            .SetPublishSingleFile (true)
-            .SetSelfContained (false)
+            .EnablePublishSingleFile()
+            .DisableSelfContained()
             .SetOutput (s_releaseOutputRoot)
             .SetProperty ("FileVersion", versionNumber)
             .SetProperty ("AssemblyVersion", versionNumber)

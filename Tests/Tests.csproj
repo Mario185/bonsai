@@ -40,4 +40,8 @@
     <ProjectReference Include="..\clui\clui.csproj" />
     <ProjectReference Include="..\consoleTools\consoleTools.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="clui\verify_snapshots\PanelTests\" />
+  </ItemGroup>
 </Project>
