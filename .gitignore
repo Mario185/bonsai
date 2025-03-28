@@ -407,4 +407,4 @@ FodyWeavers.xsd
 **/_artifacts
 
 /manifests
-**/snapshots/*.received.txt
+**/verify_snapshots/**/*.received.txt
