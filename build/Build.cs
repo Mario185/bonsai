@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using GitHubActionExtensions;
 using Nuke.Common;
 using Nuke.Common.CI.GitHubActions;
@@ -14,6 +17,7 @@ using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Git;
+using Nuke.Common.Utilities;
 using Serilog;
 
 [ExtendedGitHubActions (
@@ -101,9 +105,65 @@ partial class Build : NukeBuild
 
         var testResultsPath = Solution.Tests.GetOutputPath(Configuration) / "TestResults";
         testResultsPath.ZipTo(s_consoleToolsTestResultPath);
+
+        var coverageXmlPath = testResultsPath / "coverage.xml";
+        PrintCoverageSummary(coverageXmlPath);
+
+        Log.Information(coverageXmlPath);
+
       }
     })
     .Produces(s_consoleToolsTestResultPath);
+
+  static void PrintCoverageSummary(AbsolutePath coverageXmlPath)
+  {
+    XDocument coverageXml = XDocument.Load(coverageXmlPath);
+
+    List<CoverageResult> coverageResults = new List<CoverageResult>();
+
+    
+    foreach (var module in coverageXml.XPathSelectElements("results/modules/module"))
+    {
+      var name = module.Attribute("name")!.Value;
+      var blockCoverage = decimal.Parse(module.Attribute("block_coverage")!.Value, CultureInfo.InvariantCulture);
+      var lineCoverage = decimal.Parse(module.Attribute("line_coverage")!.Value, CultureInfo.InvariantCulture);
+
+      coverageResults.Add(new CoverageResult(name, blockCoverage, lineCoverage));
+    }
+    
+    StringBuilder coverage = new StringBuilder();
+    coverage.AppendLine("\r\n\r\n");
+    coverage.AppendLine("Test coverage summary:");
+
+    var maxModuleLength = coverageResults.Max(c => c.Module.Length);
+
+    string header = "Module".PadRight(maxModuleLength + 4) + "Block coverage    Line coverage";
+    coverage.AppendLine(new string('\u2550', header.Length));
+    coverage.AppendLine("\u001b[36m" + header + "\u001b[0m");
+    coverage.AppendLine(new string('\u2500', header.Length));
+    foreach(var result in coverageResults)
+    {
+
+      coverage.Append(result.Module.PadRight(maxModuleLength + 12));
+      coverage.Append(GetColor(result.BlockCoverage) + result.BlockCoveragePadded + "\u001b[0m");
+      coverage.AppendLine(GetColor(result.LineCoverage) + result.LineCoveragePadded.PadLeft(17) + "\u001b[0m");
+    }
+
+    coverage.AppendLine(new string('\u2550', header.Length));
+
+    Log.Information(coverage.ToString());
+  }
+
+  private static string GetColor(decimal value)
+  {
+    if (value < 90)
+      return "\u001b[31m"; // red
+
+    if (value < 100)
+      return "\u001b[33m"; // yellow
+
+    return "\u001b[32m"; // green
+  }
 
   private void CreateCoverageReport(Project project)
   {
@@ -179,4 +239,10 @@ partial class Build : NukeBuild
 
   [GeneratedRegex ("^(release_)(?<version>[0-9]{1,}[.][0-9]{1,}[.][0-9]{1,})$")]
   private static partial Regex ReleaseVersionTagRegex ();
+}
+
+public record CoverageResult(string Module, decimal BlockCoverage, decimal LineCoverage)
+{
+  public string BlockCoveragePadded => BlockCoverage.ToString(CultureInfo.InvariantCulture).PadLeft(6);
+  public string LineCoveragePadded => LineCoverage.ToString(CultureInfo.InvariantCulture).PadLeft(6);
 }

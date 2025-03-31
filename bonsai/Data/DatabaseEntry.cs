@@ -16,7 +16,7 @@ namespace bonsai.Data
     private SearchMatch[]? _searchMatches = [];
     private string? _printableText;
 
-    public DatabaseEntry (string path, bool isDirectory)
+    public DatabaseEntry(string path, bool isDirectory)
     {
       Path = path;
       IsDirectory = isDirectory;
@@ -40,24 +40,26 @@ namespace bonsai.Data
     public bool IsDirectory { get; }
     public DateTime LastUsed { get; set; }
 
-    public void Write (ConsoleWriter writer, int maxLength, bool isFocusedItem)
+    public void Write(ConsoleWriter writer, int maxLength, bool isFocusedItem)
     {
       if (BonsaiContext.Current?.IsFilteringActive == true)
       {
         int totalLength = GetPrintableText().Length;
         int searchableTextLength = SearchableText.Length;
         int indexOfSearchableText = totalLength - searchableTextLength;
-        for (int i = 0; i < totalLength; i++)
+
+        int effectiveMaxLength = Math.Min(totalLength, maxLength);
+        for (int i = 0; i < effectiveMaxLength; i++)
         {
-          if (i >= indexOfSearchableText && IsIndexInMatch (i - indexOfSearchableText))
+          if (i >= indexOfSearchableText && IsIndexInMatch(i - indexOfSearchableText))
           {
-            writer.Style.ForegroundColor (Color.LightGreen).Underline();
+            writer.Style.ForegroundColor(Color.LightGreen).Underline();
           }
           else
           {
             if (isFocusedItem)
             {
-              writer.Style.ForegroundColor (ThemeManger.Instance.SelectionForegroundColor);
+              writer.Style.ForegroundColor(ThemeManger.Instance.SelectionForegroundColor);
             }
             else
             {
@@ -67,19 +69,19 @@ namespace bonsai.Data
             writer.Style.ResetUnderline();
           }
 
-          writer.Write (GetPrintableText()[i]);
+          writer.Write(GetPrintableText()[i]);
         }
       }
       else
       {
-        writer.WriteTruncated (GetPrintableText(), 0, maxLength);
+        writer.WriteTruncated(GetPrintableText(), 0, maxLength);
       }
     }
 
     [JsonIgnore]
     public string SearchableText => Path;
 
-    private bool IsIndexInMatch (int index)
+    private bool IsIndexInMatch(int index)
     {
       if (_searchMatches == null || _searchMatches.Length == 0)
       {
@@ -88,7 +90,7 @@ namespace bonsai.Data
 
       for (int i = 0; i < _searchMatches.Length; i++)
       {
-        SearchMatch? match = _searchMatches[i];
+        SearchMatch match = _searchMatches[i];
         if (match.MatchStartAt <= index && index < match.MatchEndAt)
         {
           return true;
@@ -98,12 +100,12 @@ namespace bonsai.Data
       return false;
     }
 
-    private string GetPrintableText ()
+    private string GetPrintableText()
     {
       return _printableText ??= $"{LastUsed:yyyy-MM-dd HH:mm} {Score,6} {Path}";
     }
 
-    public void SetSearchMatches (SearchMatch[] matches)
+    public void SetSearchMatches(SearchMatch[] matches)
     {
       _searchMatches = matches;
     }
