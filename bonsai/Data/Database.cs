@@ -158,7 +158,7 @@ namespace bonsai.Data
         }
         else
         {
-          fileSystemItem = new FileItem (entry.Path, Path.GetFileName (entry.Path), 0);
+          fileSystemItem = new FileItem (Path.GetDirectoryName(entry.Path), Path.GetFileName (entry.Path), 0);
         }
 
         fileSystemItem.SetSearchMatches (matches);
