@@ -17,7 +17,10 @@ try
 
   Settings.LoadSettings();
   ThemeManger.LoadTheme (Settings.Instance.Theme);
-  ConsoleHandler.Initialize(new RealConsole());
+
+  IConsole console = Console.IsInputRedirected || Console.IsOutputRedirected ? new FakeConsole() : new RealConsole();
+
+  ConsoleHandler.Initialize(console);
   ConsoleHandler.StartOperation();
 
   if (args.Length == 0)
@@ -118,6 +121,16 @@ public class RealConsole : IConsole
 {
   public int WindowHeight => Console.WindowHeight;
   public int WindowWidth => Console.WindowWidth;
+  public ConsoleKeyInfo ReadKey(bool intercept)
+  {
+    return Console.ReadKey(intercept);
+  }
+}
+
+public class FakeConsole : IConsole
+{
+  public int WindowHeight { get; } = 10;
+  public int WindowWidth { get; } = 10;
   public ConsoleKeyInfo ReadKey(bool intercept)
   {
     return Console.ReadKey(intercept);
