@@ -10,6 +10,11 @@
       "commandLineArgs": "--target Compile --verbosity normal",
       "dotnetRunMessages": true
     },
+    "CreateWingetManifest": {
+      "commandName": "Project",
+      "commandLineArgs": "--target CreateWingetManifest --verbosity normal",
+      "dotnetRunMessages": true
+    },
     "Publish": {
       "commandName": "Project",
       "commandLineArgs": "--target Publish --verbosity normal",
@@ -18,16 +23,6 @@
     "Restore": {
       "commandName": "Project",
       "commandLineArgs": "--target Restore --verbosity normal",
-      "dotnetRunMessages": true
-    },
-    "RunCluiTests": {
-      "commandName": "Project",
-      "commandLineArgs": "--target RunCluiTests --verbosity normal",
-      "dotnetRunMessages": true
-    },
-    "RunConsoleToolsTests": {
-      "commandName": "Project",
-      "commandLineArgs": "--target RunConsoleToolsTests --verbosity normal --RunTestsWithCodeCoverage",
       "dotnetRunMessages": true
     },
     "RunTests": {

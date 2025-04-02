@@ -45,3 +45,8 @@ jobs:
         with:
           name: tests.zip
           path: _artifacts/tests.zip
+      - name: 'Publish: winget_manifest.zip'
+        uses: actions/upload-artifact@v4
+        with:
+          name: winget_manifest.zip
+          path: _artifacts/winget_manifest.zip

@@ -4,12 +4,14 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using GitHubActionExtensions;
+using Newtonsoft.Json.Linq;
 using Nuke.Common;
 using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.IO;
@@ -37,10 +39,10 @@ partial class Build : NukeBuild
   private static readonly AbsolutePath s_releaseOutputRoot = (RootDirectory / "_release").CreateOrCleanDirectory();
   private static readonly AbsolutePath s_artifactsPath = (RootDirectory / "_artifacts").CreateOrCleanDirectory();
   
-  
   private static readonly AbsolutePath s_consoleToolsTestResultPath = (s_artifactsPath / "tests.zip");
+  private static readonly AbsolutePath s_wingetManifestZip = (s_artifactsPath / "winget_manifest.zip");
 
-
+  private static string s_gitHubBonsaiDownloadUrl;
 
   [Parameter ("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
   [SuppressMessage ("CodeQuality", "IDE0052:Remove unread private members", Justification = "Nuke")]
@@ -115,6 +117,112 @@ partial class Build : NukeBuild
     })
     .Produces(s_consoleToolsTestResultPath);
 
+  Target Publish => d => d
+      .DependsOn (RunTests)
+      .OnlyWhenDynamic(() => SucceededTargets.Contains(RunTests), "Tests succeeded")
+      .Triggers(CreateWingetManifest)
+      .Executes (async () =>
+      {
+        string versionNumber = GetVersionNumber();
+
+        DotNetTasks.DotNetPublish (c => c
+          .SetProject (Solution.bonsai)
+            .SetConfiguration (Configuration)
+            .EnablePublishSingleFile()
+            .DisableSelfContained()
+            .SetOutput (s_releaseOutputRoot)
+            .SetProperty ("FileVersion", versionNumber)
+            .SetProperty ("AssemblyVersion", versionNumber)
+            .SetProperty ("InformationalVersion", versionNumber)
+        );
+
+        if (IsServerBuild)
+        {
+          string assetsUrl = GitHubActions.Instance.GitHubEvent["release"]!["upload_url"]!.ToString();
+          assetsUrl = assetsUrl.Split ('{')[0] + "?name=bonsai.exe";
+
+          HttpClient client = new();
+          client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue ("Bearer", GitHubActions.Instance.Token);
+          client.DefaultRequestHeaders.Accept.Add (new MediaTypeWithQualityHeaderValue ("application/vnd.github+json"));
+          client.DefaultRequestHeaders.Add ("User-Agent", "bonsai");
+          await using (FileStream zipStream = new(s_releaseOutputRoot / "bonsai.exe", FileMode.Open))
+          {
+            StreamContent content = new(zipStream);
+            content.Headers.ContentType = MediaTypeHeaderValue.Parse ("application/zip");
+            HttpResponseMessage response = await client.PostAsync (assetsUrl, content);
+            Log.Information ("Upload response: " + response.StatusCode);
+
+            var uploadResponseMessage = await response.Content.ReadAsStringAsync();
+            Log.Information ("Upload message:" + uploadResponseMessage );
+
+            var responseJsonObject = JObject.Parse(uploadResponseMessage);
+            s_gitHubBonsaiDownloadUrl = responseJsonObject["browser_download_url"].ToString();
+            
+            if (!response.IsSuccessStatusCode)
+            {
+              Log.Error ("Upload failed.");
+              throw new Exception ("Uploading assets failed.");
+            }
+          }
+        }
+      });
+
+  Target CreateWingetManifest => d => d
+    .OnlyWhenDynamic(() => SucceededTargets.Contains(Publish), "Publish succeeds")
+    .OnlyWhenStatic(() => IsServerBuild, "Is server build")
+    .Executes(async () =>
+    {
+      var wingetCreateDownloadUrl = "https://aka.ms/wingetcreate/latest";
+      Log.Information($"Downloading wingetcreate from {wingetCreateDownloadUrl}");
+      var wingetcreateToolPath = TemporaryDirectory / "wingetcreate.exe";
+      using (var client = new HttpClient())
+      {
+        var result = await client.GetAsync("https://aka.ms/wingetcreate/latest");
+        using (var downloadStream = result.Content.ReadAsStream())
+        using (var fileStream = new FileStream(wingetcreateToolPath, FileMode.Create))
+        {
+          downloadStream.CopyTo(fileStream);
+        }
+      }
+
+      Log.Information($"Download finished.");
+
+      var versionNumber = GetVersionNumber();
+      AbsolutePath wingetManifestOutputPath = s_artifactsPath / "winget";
+      var wingetArgs = $"update donmar.bonsai -u {s_gitHubBonsaiDownloadUrl} -v {versionNumber} -o \"{wingetManifestOutputPath}\"";
+      var process = ProcessTasks.StartProcess(wingetcreateToolPath, wingetArgs);
+      process.AssertZeroExitCode();
+
+      (wingetManifestOutputPath / "manifests" / "d" / "donmar" / "bonsai").ZipTo(s_wingetManifestZip);
+    })
+    .Produces(s_wingetManifestZip);
+
+
+  static string GetVersionNumber()
+  {
+    IReadOnlyCollection<Output> result = GitTasks.Git("tag --points-at HEAD").EnsureOnlyStd();
+
+    string versionNumber = "0.0.0";
+    if (IsServerBuild)
+    {
+      Match[] matches = result.Select(r => ReleaseVersionTagRegex().Match(r.Text)).Where(m => m.Success).ToArray();
+
+      if (matches.Length == 0)
+      {
+        throw new Exception("No release version tag found. Create a tag in this format \"release_1.2.3\"");
+      }
+
+      if (matches.Length > 1)
+      {
+        throw new Exception("Multiple release version tags found. Tags: " + string.Join(", ", matches.Select(m => m.Value.ToString())));
+      }
+
+      versionNumber = matches[0].Groups["version"].Value;
+    }
+
+    return versionNumber;
+  }
+
   static void PrintCoverageSummary(AbsolutePath coverageXmlPath)
   {
     XDocument coverageXml = XDocument.Load(coverageXmlPath);
@@ -147,7 +255,7 @@ partial class Build : NukeBuild
     }
     else
     {
-      
+
       File.WriteAllText(s_artifactsPath / "testcoverage.md", coverageMarkdown.ToString());
     }
   }
@@ -167,69 +275,6 @@ partial class Build : NukeBuild
     Log.Information($"{nameof(ReportGeneratorTool)} for project {project.Name} finished.");
   }
 
-  // ReSharper disable once UnusedMember.Local
-
-  Target Publish => d => d
-      .DependsOn (RunTests)
-      .OnlyWhenDynamic(() => SucceededTargets.Contains(RunTests), "Tests succeeded")
-      .Executes (async () =>
-      {
-        IReadOnlyCollection<Output> result = GitTasks.Git ("tag --points-at HEAD").EnsureOnlyStd();
-
-        string versionNumber = "0.0.0";
-        if (IsServerBuild)
-        {
-          Match[] matches = result.Select (r => ReleaseVersionTagRegex().Match (r.Text)).Where (m => m.Success).ToArray();
-
-          if (matches.Length == 0)
-          {
-            throw new Exception ("No release version tag found. Create a tag in this format \"release_1.2.3\"");
-          }
-
-          if (matches.Length > 1)
-          {
-            throw new Exception ("Multiple release version tags found. Tags: " + string.Join (", ", matches.Select (m => m.Value.ToString())));
-          }
-
-          versionNumber = matches[0].Groups["version"].Value;
-        }
-
-        DotNetTasks.DotNetPublish (c => c
-          .SetProject (Solution.bonsai)
-            .SetConfiguration (Configuration)
-            .EnablePublishSingleFile()
-            .DisableSelfContained()
-            .SetOutput (s_releaseOutputRoot)
-            .SetProperty ("FileVersion", versionNumber)
-            .SetProperty ("AssemblyVersion", versionNumber)
-            .SetProperty ("InformationalVersion", versionNumber)
-        );
-
-        if (IsServerBuild)
-        {
-          string assetsUrl = GitHubActions.Instance.GitHubEvent["release"]!["upload_url"]!.ToString();
-          assetsUrl = assetsUrl.Split ('{')[0] + "?name=bonsai.exe";
-
-          HttpClient client = new();
-          client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue ("Bearer", GitHubActions.Instance.Token);
-          client.DefaultRequestHeaders.Accept.Add (new MediaTypeWithQualityHeaderValue ("application/vnd.github+json"));
-          client.DefaultRequestHeaders.Add ("User-Agent", "bonsai");
-          await using (FileStream zipStream = new(s_releaseOutputRoot / "bonsai.exe", FileMode.Open))
-          {
-            StreamContent content = new(zipStream);
-            content.Headers.ContentType = MediaTypeHeaderValue.Parse ("application/zip");
-            HttpResponseMessage response = await client.PostAsync (assetsUrl, content);
-            Log.Information ("Upload response: " + response.StatusCode);
-            Log.Information ("Upload message:" + await response.Content.ReadAsStringAsync());
-
-            if (!response.IsSuccessStatusCode)
-            {
-              Log.Error ("Upload failed.");
-              throw new Exception ("Uploading assets failed.");
-            }
-          }
-        }
-      });
   public static int Main () => Execute<Build> (x => x.Compile);
 
   [GeneratedRegex ("^(release_)(?<version>[0-9]{1,}[.][0-9]{1,}[.][0-9]{1,})$")]
