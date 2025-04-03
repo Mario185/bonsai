@@ -1,11 +1,12 @@
-﻿using System.Text;
+﻿using System.Runtime.CompilerServices;
+using System.Text;
 using consoleTools;
 
-namespace Tests.consoleTools
+namespace Tests
 {
-  public abstract class ConsoleWriterTests : VerifyTestBase, IDisposable
+  public abstract class ConsoleOutputRedirectingTest : VerifyTestBase, IDisposable
   {
-    protected ConsoleWriterTests()
+    protected ConsoleOutputRedirectingTest()
     {
       ConsoleOutput = new StringBuilder();
       ConsoleWriterInstance = new ConsoleWriter();
@@ -16,9 +17,10 @@ namespace Tests.consoleTools
     public StringBuilder ConsoleOutput { get; private set; }
     public ConsoleWriter ConsoleWriterInstance { get; private set; }
 
-    protected Task VerifyOutput()
+    protected Task VerifyOutput([CallerFilePath] string callerFilePath = "")
     {
-      return Verify(ConsoleOutput, VerifySettings);
+      // ReSharper disable once ExplicitCallerInfoArgument
+      return Verify(ConsoleOutput, VerifySettings, callerFilePath );
     }
 
     public void Dispose()
