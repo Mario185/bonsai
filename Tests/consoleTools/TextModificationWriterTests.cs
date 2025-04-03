@@ -2,7 +2,7 @@
 
 namespace Tests.consoleTools
 {
-  public class TextModificationWriterTests : ConsoleWriterTests
+  public class TextModificationWriterTests : ConsoleOutputRedirectingTest
   {
     [Theory]
     [InlineData(1)]

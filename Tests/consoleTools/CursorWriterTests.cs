@@ -2,7 +2,7 @@
 
 namespace Tests.consoleTools
 {
-  public class CursorWriterTests : ConsoleWriterTests
+  public class CursorWriterTests : ConsoleOutputRedirectingTest
   {
     [Fact]
     public Task DisableBlinking()
