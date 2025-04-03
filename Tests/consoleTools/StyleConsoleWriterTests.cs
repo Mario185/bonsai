@@ -2,7 +2,7 @@
 
 namespace Tests.consoleTools
 {
-  public class StyleConsoleWriterTests : ConsoleWriterTests
+  public class StyleConsoleWriterTests : ConsoleOutputRedirectingTest
   {
     [Fact]
     public Task SetBackgroundColor()

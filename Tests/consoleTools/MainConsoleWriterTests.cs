@@ -2,7 +2,7 @@
 
 namespace Tests.consoleTools
 {
-  public class MainConsoleWriterTests : ConsoleWriterTests
+  public class MainConsoleWriterTests : ConsoleOutputRedirectingTest
   {
     [Fact]
     public Task Write_String()
