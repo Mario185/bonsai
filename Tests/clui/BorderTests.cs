@@ -47,6 +47,7 @@ namespace Tests.clui
 
       border.TextColor = setTextColor ? Color.DarkSalmon : null;
       border.TextBackgroundColor = setTextColor ? Color.Aqua : null;
+      border.BorderColor = Color.Brown;
 
       border.CalculatedHeight = 25;
       border.CalculatedWidth = 25;
@@ -61,6 +62,22 @@ namespace Tests.clui
       Assert.Equal(1, border.Padding.Left);
 
       return VerifyOutput();
+    }
+
+    [Fact]
+    public void RenderWithInvalidTextPositionThrowsException()
+    {
+      Border border = new Border(10.AsFixed(), 10.AsFixed());
+      border.TextPosition = (BorderTextPosition)(-1);
+      border.Text = "BORDERTEXT";
+
+      border.CalculatedHeight = 25;
+      border.CalculatedWidth = 25;
+
+      border.OnLayoutCalculated();
+      
+      Assert.Throws<ArgumentOutOfRangeException>(() => border.Render(ConsoleWriterInstance));
+      ConsoleWriterInstance.Flush();
     }
 
     [Fact]
