@@ -42,6 +42,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="clui\verify_snapshots\BorderTests\" />
     <Folder Include="clui\verify_snapshots\PanelTests\" />
   </ItemGroup>
 </Project>
