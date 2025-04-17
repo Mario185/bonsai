@@ -1,4 +1,5 @@
-﻿using clui.Controls;
+﻿using System.Drawing;
+using clui.Controls;
 using clui.Extensions;
 
 namespace Tests.clui
@@ -17,28 +18,83 @@ namespace Tests.clui
       border.Render(ConsoleWriterInstance);
       ConsoleWriterInstance.Flush();
 
+      Assert.Equal(1, border.Padding.Top);
+      Assert.Equal(1, border.Padding.Right);
+      Assert.Equal(1, border.Padding.Bottom);
+      Assert.Equal(1, border.Padding.Left);
+
       return VerifyOutput();
     }
 
     [Theory]
-    [InlineData(BorderTextPosition.TopLeft)]
-    [InlineData(BorderTextPosition.TopMiddle)]
-    [InlineData(BorderTextPosition.TopRight)]
-    [InlineData(BorderTextPosition.BottomLeft)]
-    [InlineData(BorderTextPosition.BottomMiddle)]
-    [InlineData(BorderTextPosition.BottomRight)]
-    public Task RenderWithText(BorderTextPosition textPosition)
+    [InlineData(BorderTextPosition.TopLeft, false)]
+    [InlineData(BorderTextPosition.TopMiddle, false)]
+    [InlineData(BorderTextPosition.TopRight, false)]
+    [InlineData(BorderTextPosition.BottomLeft, false)]
+    [InlineData(BorderTextPosition.BottomMiddle, false)]
+    [InlineData(BorderTextPosition.BottomRight, false)]
+    [InlineData(BorderTextPosition.TopLeft, true)]
+    [InlineData(BorderTextPosition.TopMiddle, true)]
+    [InlineData(BorderTextPosition.TopRight, true)]
+    [InlineData(BorderTextPosition.BottomLeft, true)]
+    [InlineData(BorderTextPosition.BottomMiddle, true)]
+    [InlineData(BorderTextPosition.BottomRight, true)]
+    public Task RenderWithText(BorderTextPosition textPosition, bool setTextColor)
     {
       Border border = new Border(10.AsFixed(), 10.AsFixed());
       border.TextPosition = textPosition;
       border.Text = "BORDERTEXT";
+
+      border.TextColor = setTextColor ? Color.DarkSalmon : null;
+      border.TextBackgroundColor = setTextColor ? Color.Aqua : null;
+
       border.CalculatedHeight = 25;
       border.CalculatedWidth = 25;
 
       border.OnLayoutCalculated();
       border.Render(ConsoleWriterInstance);
       ConsoleWriterInstance.Flush();
+
+      Assert.Equal(1, border.Padding.Top);
+      Assert.Equal(1, border.Padding.Right);
+      Assert.Equal(1, border.Padding.Bottom);
+      Assert.Equal(1, border.Padding.Left);
+
+      return VerifyOutput();
+    }
+
+    [Fact]
+    public Task RenderWithNoBorder()
+    {
+      Border border = new Border(10.AsFixed(), 10.AsFixed(), null,null,null,null,null,null,null,null);
       
+      border.CalculatedHeight = 25;
+      border.CalculatedWidth = 25;
+
+      border.OnLayoutCalculated();
+      border.Render(ConsoleWriterInstance);
+      ConsoleWriterInstance.Flush();
+
+      Assert.Equal(0, border.Padding.Top);
+      Assert.Equal(0, border.Padding.Right);
+      Assert.Equal(0, border.Padding.Bottom);
+      Assert.Equal(0, border.Padding.Left);
+
+      return VerifyOutput();
+    }
+
+    [Fact]
+    public Task VisbleFalseDoesNotRenderAnything()
+    {
+      Border border = new Border(10.AsFixed(), 10.AsFixed(), null, null, null, null, null, null, null, null);
+      border.Visible = false;
+      border.CalculatedHeight = 25;
+      border.CalculatedWidth = 25;
+
+      border.OnLayoutCalculated();
+      border.Render(ConsoleWriterInstance);
+      ConsoleWriterInstance.Flush();
+
       return VerifyOutput();
     }
   }
