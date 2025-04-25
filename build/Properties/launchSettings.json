@@ -29,6 +29,15 @@
       "commandName": "Project",
       "commandLineArgs": "--target RunTests --verbosity normal",
       "dotnetRunMessages": true
+    },
+    "WSL": {
+      "commandName": "WSL2",
+      "distributionName": ""
+    },
+    "Test": {
+      "commandName": "Project",
+      "commandLineArgs": "--target Test --verbosity normal",
+      "dotnetRunMessages": true
     }
   }
 }

@@ -10,6 +10,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using DefaultNamespace;
 using GitHubActionExtensions;
 using Newtonsoft.Json.Linq;
 using Nuke.Common;
@@ -64,6 +65,19 @@ partial class Build : NukeBuild
       {
         GitTasks.Git ("clean -xfd -e *.vsidx -e build/* -e .nuke/temp/*");
       });
+
+  Target Test => d =>
+  d.Executes(() => 
+  {
+    var apiHelper = new GitHubRestApiHelper("Mario185", "bonsai");
+
+    var result = apiHelper.GetReleaseByTag("release_0.1.1");
+    var body = result.RootElement.GetProperty("body").GetString();
+    var id = result.RootElement.GetProperty("id").GetInt32();
+
+    var downloadsBatch = "![GitHub Downloads (specific asset, specific tag)](https://img.shields.io/github/downloads/Mario185/bonsai/release_0.1.1/bonsai.exe?style=flat-square&logo=github)";
+    apiHelper.UpdateReleaseBodyByID(id, body + "\r\n\r\n" + downloadsBatch, "");
+  });
 
   Target Restore => d => d
       .Executes (() =>
@@ -155,6 +169,9 @@ partial class Build : NukeBuild
           {
             StreamContent content = new(zipStream);
             content.Headers.ContentType = MediaTypeHeaderValue.Parse ("application/zip");
+            HttpRequestMessage message = new HttpRequestMessage(HttpMethod.Post, assetsUrl);
+            message.Content = content;
+
             HttpResponseMessage response = await client.PostAsync (assetsUrl, content);
             Log.Information ("Upload response: " + response.StatusCode);
 

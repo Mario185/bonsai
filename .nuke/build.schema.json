@@ -29,7 +29,8 @@
         "CreateWingetManifest",
         "Publish",
         "Restore",
-        "RunTests"
+        "RunTests",
+        "Test"
       ]
     },
     "Verbosity": {
