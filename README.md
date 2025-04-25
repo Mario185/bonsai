@@ -4,7 +4,8 @@ A simple cli tool that provides a better 'change directory' and file execution e
 
 Also a user interface for explorer like navigation is included (themeable).
 
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Mario185/bonsai/total?logo=github&style=flat-squared)
+![GitHub Downloads (specific asset, all releases)](https://img.shields.io/github/downloads/Mario185/bonsai/bonsai.exe?logo=github&style=flat-squared)
+![GitHub Downloads (specific asset, latest release)](https://img.shields.io/github/downloads/Mario185/bonsai/latest/bonsai.exe?sort=date&style=flat-square&logo=github)
 ![GitHub License](https://img.shields.io/github/license/Mario185/bonsai)
 ![GitHub Release](https://img.shields.io/github/v/release/Mario185/bonsai?include_prereleases)
 
