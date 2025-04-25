@@ -83,6 +83,12 @@ partial class Build : NukeBuild
           .SetConfiguration(Configuration)
           .SetProjectFile(Solution)
         );
+
+        if (IsServerBuild)
+        {
+          Log.Information("GitHubEvent data:\r\n" + GitHubActions.Instance.GitHubEvent);
+        }
+
       });
 
   Target RunTests => d => d
