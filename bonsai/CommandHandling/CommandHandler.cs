@@ -53,5 +53,10 @@ namespace bonsai.CommandHandling
 
       return null;
     }
+
+    public static string GetDefaultChangeDirectoryCommand(string path)
+    {
+      return new DirectoryCommand(path, "Change location", true).GetExecutableAction();
+    }
   }
 }

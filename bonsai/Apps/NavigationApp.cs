@@ -29,9 +29,12 @@ namespace bonsai.Apps
     protected override string? RunInternal ()
     {
       Directory.SetCurrentDirectory (_currentDirectory);
-      (bool success, string? result) = IsExistingPath (_currentDirectory, _originalArg);
+      (bool success, bool isDirectory, string result) = IsExistingPath (_currentDirectory, _originalArg);
       if (success)
       {
+        if (isDirectory && !Settings.Instance.ShowCommandSelectionForDirectNavigation)
+          return CommandHandler.GetDefaultChangeDirectoryCommand(result);
+
         return CommandHandler.GetCommandAndShowSelectionUiOnDemand (result);
       }
 
@@ -143,9 +146,9 @@ namespace bonsai.Apps
       return list;
     }
 
-    private static (bool success, string result) IsExistingPath (string currentDirectory, string originalArg)
+    private static (bool success, bool isDirectory, string result) IsExistingPath (string currentDirectory, string originalArg)
     {
-      string? path = originalArg;
+      string path = originalArg;
       if (!Path.IsPathFullyQualified (path))
       {
         path = Path.GetFullPath (originalArg, currentDirectory);
@@ -153,15 +156,15 @@ namespace bonsai.Apps
 
       if (Directory.Exists (path))
       {
-        return (true, path);
+        return (true, true, path);
       }
 
       if (File.Exists (path))
       {
-        return (true, path);
+        return (true, false, path);
       }
 
-      return (false, string.Empty);
+      return (false, false, string.Empty);
     }
   }
 }

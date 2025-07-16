@@ -33,7 +33,7 @@ try
 
   string tempFilePath = string.Empty;
   string currentDirectory;
-  AppBase? appToStart = null;
+  AppBase? appToStart;
   switch (command)
   {
     case "init":
