@@ -238,6 +238,8 @@ namespace bonsai
 
     public int MaxEntryAgeInDays { get; set; } = 300;
 
+    public bool ShowCommandSelectionForDirectNavigation { get; set; }
+
     [JsonInclude]
     public IReadOnlyList<FileCommand> FileCommands { get; private set; } = new List<FileCommand>();
 
