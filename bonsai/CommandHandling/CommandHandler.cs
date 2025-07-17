@@ -56,6 +56,7 @@ namespace bonsai.CommandHandling
 
     public static string GetDefaultChangeDirectoryCommand(string path)
     {
+      Database.Instance.AddOrUpdate(path, true);
       return new DirectoryCommand(path, "Change location", true).GetExecutableAction();
     }
   }
