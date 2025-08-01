@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using consoleTools.VirtualTerminalSequences;
 
 namespace consoleTools
@@ -12,10 +13,11 @@ namespace consoleTools
     private static bool s_isAlternateScreenBufferActive;
 
     private readonly bool _instanceActivatedAlternateScreenBuffer;
-    private readonly ConsoleWriter _consoleWriter = new();
+    private readonly ConsoleWriter _consoleWriter;
 
-    public AlternateScreenBufferSection ()
+    public AlternateScreenBufferSection (TextWriter? consoleOutWriter = null)
     {
+      _consoleWriter = new ConsoleWriter(consoleOutWriter);
       if (s_isAlternateScreenBufferActive)
       {
         return;

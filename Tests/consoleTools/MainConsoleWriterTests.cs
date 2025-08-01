@@ -35,7 +35,7 @@ namespace Tests.consoleTools
     [Fact]
     public Task DisposeFlushes()
     {
-      using (ConsoleWriter writer = new())
+      using (ConsoleWriter writer = new(FakedConsoleOutputWriter))
       {
         writer.Write("DisposeFlush");
       }
@@ -64,7 +64,7 @@ namespace Tests.consoleTools
     [Fact]
     public Task AlternateScreenBuffer()
     {
-      using (new AlternateScreenBufferSection())
+      using (new AlternateScreenBufferSection(FakedConsoleOutputWriter))
       {
         // do nothing
       }
@@ -75,9 +75,9 @@ namespace Tests.consoleTools
     [Fact]
     public Task AlternateScreenBuffer_TwiceDoesNothing()
     {
-      using (new AlternateScreenBufferSection())
+      using (new AlternateScreenBufferSection(FakedConsoleOutputWriter))
       {
-        using (new AlternateScreenBufferSection())
+        using (new AlternateScreenBufferSection(FakedConsoleOutputWriter))
         {
           // do nothing
         }

@@ -8,27 +8,27 @@ namespace Tests
   {
     protected ConsoleOutputRedirectingTest()
     {
-      ConsoleOutput = new StringBuilder();
-      ConsoleWriterInstance = new ConsoleWriter();
-      StringWriter consoleOut = new(ConsoleOutput);
-      Console.SetOut(consoleOut);
+      FakedConsoleOutput = new StringBuilder();
+      FakedConsoleOutputWriter = new(FakedConsoleOutput);
+      ConsoleWriterInstance = new ConsoleWriter(FakedConsoleOutputWriter);
     }
 
-    public StringBuilder ConsoleOutput { get; private set; }
-    public ConsoleWriter ConsoleWriterInstance { get; private set; }
+    public StringBuilder FakedConsoleOutput { get; }
+    public StringWriter FakedConsoleOutputWriter { get; }
+    public ConsoleWriter ConsoleWriterInstance { get; }
 
     protected Task VerifyOutput([CallerFilePath] string callerFilePath = "")
     {
       // ReSharper disable once ExplicitCallerInfoArgument
-      return Verify(ConsoleOutput, VerifySettings, callerFilePath );
+      return Verify(FakedConsoleOutput, VerifySettings, callerFilePath );
     }
 
     public void Dispose()
     {
-      int outputLengthBeforeDisposing = ConsoleOutput.Length;
+      int outputLengthBeforeDisposing = FakedConsoleOutput.Length;
       ConsoleWriterInstance.Dispose();
 
-      Assert.Equal(outputLengthBeforeDisposing, ConsoleOutput.Length);
+      Assert.Equal(outputLengthBeforeDisposing, FakedConsoleOutput.Length);
     }
   }
 }

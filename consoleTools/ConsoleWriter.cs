@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using System.Threading;
 using consoleTools.SubWriter;
@@ -7,11 +8,13 @@ namespace consoleTools
 {
   public sealed class ConsoleWriter : IDisposable
   {
+    private readonly TextWriter _consoleOut;
     private static readonly Lock s_flushLock = new();
     private readonly StringBuilder _commandBuffer = new();
 
-    public ConsoleWriter ()
+    public ConsoleWriter (TextWriter? consoleOut = null)
     {
+      _consoleOut = consoleOut ?? Console.Out;
       Style = new StyleWriter (this);
       Cursor = new CursorWriter (this);
       Text = new TextModificationWriter (this);
@@ -35,10 +38,10 @@ namespace consoleTools
       {
         foreach (ReadOnlyMemory<char> chunk in _commandBuffer.GetChunks())
         {
-          Console.Out.Write (chunk.Span);
+          _consoleOut.Write (chunk.Span);
         }
 
-        Console.Out.Flush();
+        _consoleOut.Flush();
       }
 
       ClearCommandBuffer();
