@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using clui.Layout;
 using consoleTools;
 
@@ -17,6 +16,8 @@ namespace clui.Controls
     public bool TruncateLeft { get; set; }
 
     public FormattedLine?[]? Lines { get; set; }
+
+    public bool DisableTruncating { get; set; }
 
     internal override void Render (ConsoleWriter consoleWriter)
     {
@@ -64,7 +65,7 @@ namespace clui.Controls
 
             consoleWriter.Cursor.MoveAbsoluteHorizontally (Position.X + formattedLine.Indent);
 
-            if (lineText.Length + formattedLine.Indent > CalculatedWidth!)
+            if (!DisableTruncating && lineText.Length + formattedLine.Indent > CalculatedWidth!)
             {
               if (TruncateLeft)
               {

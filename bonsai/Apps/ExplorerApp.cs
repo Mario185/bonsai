@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Runtime.InteropServices;
-using bonsai.CommandHandling;
+﻿using bonsai.CommandHandling;
+using bonsai.FilePreview;
 using bonsai.FileSystemHandling;
 using bonsai.Theme;
 using clui.Controls;
 using consoleTools;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace bonsai.Apps
 {
@@ -19,6 +21,9 @@ namespace bonsai.Apps
       public int? ListCurrentVisibleFromIndex { get; set; }
       public string? SearchText { get; set; }
     }
+
+    private bool _hasFilePreviewMoreLines;
+    private int _filePreviewCurrentStartLine;
 
     private readonly FileSystemWorker _fileSystemWorker = new();
     private readonly Stack<State> _state = new();
@@ -155,6 +160,29 @@ namespace bonsai.Apps
                 }
 
                 continue;
+              case ActionType.ToggleFilePreview:
+                _uiBuilder.ToggleFilePreview();
+                _hasFilePreviewMoreLines = false;
+                _filePreviewCurrentStartLine = 0;
+                UpdateFilePreview(_uiBuilder.FileSystemList.FocusedItem);
+                continue;
+
+              case ActionType.FilePreviewScrollDown:
+                if (_uiBuilder.IsFilePreviewVisible() && _hasFilePreviewMoreLines)
+                {
+                  _filePreviewCurrentStartLine++;
+                  UpdateFilePreview(_uiBuilder.FileSystemList.FocusedItem);
+                }
+                continue;
+
+              case ActionType.FilePreviewScrollUp:
+                if (_uiBuilder.IsFilePreviewVisible() && _filePreviewCurrentStartLine > 0)
+                {
+                  _filePreviewCurrentStartLine--;
+                  UpdateFilePreview(_uiBuilder.FileSystemList.FocusedItem);
+                }
+                continue;
+
               case ActionType.ToggleIncludeSubDirectories:
                 if (_fileSystemWorker.CurrentDirectory != null)
                 {
@@ -185,6 +213,7 @@ namespace bonsai.Apps
       }
     }
 
+   
     private void SearchTextBox_OnTextChanged (object sender, string text)
     {
       _fileSystemWorker.ApplyFilter (text, _regexSearchEnabled);
@@ -295,6 +324,49 @@ namespace bonsai.Apps
     private void FileSystemList_OnSelectionChanged (object sender, FileSystemItem selectedItem)
     {
       UpdateDetails (selectedItem);
+      _hasFilePreviewMoreLines = false;
+      _filePreviewCurrentStartLine = 0;
+      UpdateFilePreview(selectedItem);
+    }
+
+    private void UpdateFilePreview(FileSystemItem? selectedItem)
+    {
+      if (!_uiBuilder.IsFilePreviewVisible())
+        return;
+
+      _uiBuilder.FilePreviewLabel.DisableTruncating = false;
+      var previewHandler = new BatPreviewHandler();
+      if (!BatPreviewHandler.IsAvailable)
+      {
+        _uiBuilder.FilePreviewLabel.Lines = [new FormattedLine("Preview is not available because bat is not installed.")];
+        _uiBuilder.RenderPartial(_uiBuilder.FilePreviewLabel);
+        return;
+      }
+
+      if (selectedItem == null || selectedItem is not FileItem fileItem)
+      {
+        _uiBuilder.FilePreviewLabel.Lines = [new FormattedLine("No file selected.")];
+        _uiBuilder.RenderPartial(_uiBuilder.FilePreviewLabel);
+        return;
+      }
+
+      var fileInfo = new FileInfo(fileItem.FullName);
+      if (!fileInfo.Exists)
+      {
+        _uiBuilder.FilePreviewLabel.Lines = [new FormattedLine("Selected file does not exist.")];
+        _uiBuilder.RenderPartial(_uiBuilder.FilePreviewLabel);
+        return;
+      }
+
+
+      _uiBuilder.FilePreviewLabel.DisableTruncating = true;
+
+      var result = previewHandler.LoadPreview(fileInfo.FullName, _filePreviewCurrentStartLine, _uiBuilder.FilePreviewLabel.CalculatedWidth!.Value, _uiBuilder.FilePreviewLabel.CalculatedHeight!.Value);
+
+      _hasFilePreviewMoreLines = (result.Count > _uiBuilder.FilePreviewLabel.CalculatedHeight!.Value);
+      
+      _uiBuilder.FilePreviewLabel.Lines = result.Take(_uiBuilder.FilePreviewLabel.CalculatedHeight!.Value).Select(v => new FormattedLine(v)).ToArray();
+      _uiBuilder.RenderPartial(_uiBuilder.FilePreviewLabel.Parent!);
     }
 
     private void UpdateDetails (FileSystemItem? selectedItem)

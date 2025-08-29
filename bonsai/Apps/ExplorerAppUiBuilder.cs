@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using bonsai.FileSystemHandling;
 using bonsai.Theme;
@@ -12,6 +11,7 @@ namespace bonsai.Apps
   internal class ExplorerAppUiBuilder : Frame
   {
     private Border _detailsBorder = null!;
+    private Border _filePreviewBorder = null!;
     private Label _regexLabel = null!;
     private Panel _rootPanel = null!;
 
@@ -24,6 +24,7 @@ namespace bonsai.Apps
     public Label CurrentDirectoryLabel { get; private set; } = null!;
 
     public MultiLIneLabel DetailsLabel { get; private set; } = null!;
+    public MultiLIneLabel FilePreviewLabel { get; private set; } = null!;
 
     public Panel GitPanel { get; private set; } = null!;
 
@@ -129,9 +130,23 @@ namespace bonsai.Apps
                        {
                            BorderColor = ThemeManger.Instance.BorderColor,
                            Visible = false
+                          
                        };
 
       DetailsLabel = new MultiLIneLabel (1.AsFraction(), 1.AsFraction());
+
+
+      _filePreviewBorder = new Border(5.AsFraction(), 1.AsFraction())
+                        {
+                          BorderColor = ThemeManger.Instance.BorderColor,
+                          Visible = false
+      };
+
+      FilePreviewLabel = new MultiLIneLabel(1.AsFraction(), 1.AsFraction());
+      FilePreviewLabel.DisableTruncating = true;
+      FilePreviewLabel.Lines = [];
+      _filePreviewBorder.AddControls(FilePreviewLabel);
+
 
       GitPanel = new Panel (1.AsFraction(), 1.AsFraction());
       Border seperator = new(
@@ -156,7 +171,7 @@ namespace bonsai.Apps
       GitPanel.AddControls (seperator, multilineLabel2);
       _detailsBorder.AddControls (DetailsLabel, GitPanel);
 
-      centerPanel.AddControls (FileSystemListBorder, _detailsBorder);
+      centerPanel.AddControls (FileSystemListBorder, _detailsBorder, _filePreviewBorder);
       return centerPanel;
     }
 
@@ -213,12 +228,29 @@ namespace bonsai.Apps
     public void ToggleDetails ()
     {
       _detailsBorder.Visible = !_detailsBorder.Visible;
+      if (_filePreviewBorder.Visible && _detailsBorder.Visible)
+        _filePreviewBorder.Visible = false;
+
       RenderPartial (_detailsBorder.Parent!);
+    }
+
+    public void ToggleFilePreview()
+    {
+      _filePreviewBorder.Visible = !_filePreviewBorder.Visible;
+      if (_filePreviewBorder.Visible && _detailsBorder.Visible)
+        _detailsBorder.Visible = false;
+
+      RenderPartial(_filePreviewBorder.Parent!);
     }
 
     public bool AreDetailsVisible ()
     {
       return _detailsBorder.Visible;
+    }
+
+    public bool IsFilePreviewVisible()
+    {
+      return _filePreviewBorder.Visible;
     }
 
     public void SetEnableRegExSearch (bool enabled)

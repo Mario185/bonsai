@@ -326,6 +326,9 @@ namespace bonsai
     IncrementScore,
     DecrementScore,
     SaveDatabaseChanges,
-    DeleteDatabaseEntry
+    DeleteDatabaseEntry,
+    ToggleFilePreview,
+    FilePreviewScrollDown,
+    FilePreviewScrollUp
   }
 }

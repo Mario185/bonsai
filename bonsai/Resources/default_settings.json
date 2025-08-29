@@ -71,6 +71,21 @@
         "modifier": "Control",
         "key": "R",
         "action": "ToggleRegexSearch"
+      },
+      {
+        "modifier": "Control",
+        "key": "P",
+        "action": "ToggleFilePreview"
+      },
+      {
+        "modifier": "Control",
+        "key": "UpArrow",
+        "action": "FilePreviewScrollUp"
+      },
+      {
+        "modifier": "Control",
+        "key": "DownArrow",
+        "action": "FilePreviewScrollDown"
       }
     ],
     "NavigationApp": [
