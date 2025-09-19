@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using bonsai.JsonConverter;
+using bonsai.JsonSerialization;
 using bonsai.Utilities;
 using consoleTools;
 
@@ -23,7 +23,7 @@ namespace bonsai.Theme
         new(() => Instance.FileIcons.Extensions.GetAlternateLookup<ReadOnlySpan<char>>());
 
     [JsonConstructor]
-    private ThemeManger ()
+    public ThemeManger ()
     {
     }
 
@@ -108,10 +108,9 @@ namespace bonsai.Theme
         themeFilePath = null;
       }
 
-      JsonSerializerOptions options = GetJsonSerializerOptions();
       using (Stream stream = themeFilePath == null ? GetThemeFromResources (theme) : File.OpenRead (themeFilePath))
       {
-        Instance = JsonSerializer.Deserialize<ThemeManger> (stream, options)!;
+        Instance = JsonSerializer.Deserialize<ThemeManger> (stream, ThemeManagerGenerationContext.Default.ThemeManger)!;
       }
     }
 
@@ -155,18 +154,6 @@ namespace bonsai.Theme
     {
       return typeof(ThemeManger).Assembly.GetManifestResourceInfo (c_manifestResourceNamePrefix + theme.ToLower (CultureInfo.InvariantCulture))
              != null;
-    }
-
-    private static JsonSerializerOptions GetJsonSerializerOptions ()
-    {
-      JsonSerializerOptions options = new()
-                                      {
-                                          PropertyNameCaseInsensitive = true,
-                                          PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                                          WriteIndented = true,
-                                          Converters = { new ColorJsonConverter() }
-                                      };
-      return options;
     }
 
     private static Stream GetThemeFromResources (string theme)

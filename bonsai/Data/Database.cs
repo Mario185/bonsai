@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using bonsai.FileSystemHandling;
+using bonsai.JsonSerialization;
 using bonsai.Utilities;
 
 namespace bonsai.Data
@@ -18,10 +19,10 @@ namespace bonsai.Data
     public static Database Instance => s_instance.Value;
 
     [JsonInclude]
-    public List<DatabaseEntry> Entries { get; private set; } = new();
+    public List<DatabaseEntry> Entries { get; set; } = new();
 
     [JsonInclude]
-    public int TopScore { get; private set; }
+    public int TopScore { get; set; }
 
     public void AddOrUpdate (string fullPath, bool isDirectory, bool autoSave = true)
     {
@@ -85,8 +86,7 @@ namespace bonsai.Data
 
     public static void Save ()
     {
-      JsonSerializerOptions options = GetJsonSerializerOptions();
-      File.WriteAllText (GetDatabaseFilePath(), JsonSerializer.Serialize (Instance, options));
+      File.WriteAllText (GetDatabaseFilePath(), JsonSerializer.Serialize (Instance, DatabaseGenerationContext.Default.Database));
     }
 
     public void UpdateEntry (DatabaseEntry entry, bool autoSave = true)
@@ -188,22 +188,8 @@ namespace bonsai.Data
       return databaseFilePath;
     }
 
-    private static JsonSerializerOptions GetJsonSerializerOptions ()
-    {
-      JsonSerializerOptions options = new()
-                                      {
-                                          PropertyNameCaseInsensitive = true,
-                                          PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                                          WriteIndented = true
-                                      };
-
-      return options;
-    }
-
     private static Database Load ()
     {
-      JsonSerializerOptions options = GetJsonSerializerOptions();
-
       AbsolutePath databaseFilePath = GetDatabaseFilePath();
       if (!File.Exists (databaseFilePath))
       {
@@ -212,7 +198,7 @@ namespace bonsai.Data
 
       using (FileStream stream = File.OpenRead (databaseFilePath))
       {
-        return JsonSerializer.Deserialize<Database> (stream, options)!;
+        return JsonSerializer.Deserialize<Database> (stream, DatabaseGenerationContext.Default.Database)!;
       }
     }
   }

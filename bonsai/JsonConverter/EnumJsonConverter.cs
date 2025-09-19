@@ -4,12 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace bonsai.JsonConverter
 {
-  public class EnumJsonConverter<T> : JsonConverter<T>
+  internal abstract class EnumJsonConverter<T> : JsonConverter<T>
       where T : struct, Enum
   {
     private readonly T _defaultValue;
 
-    public EnumJsonConverter (T defaultValue)
+    protected EnumJsonConverter (T defaultValue)
     {
       _defaultValue = defaultValue;
     }

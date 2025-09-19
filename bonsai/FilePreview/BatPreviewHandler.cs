@@ -53,16 +53,18 @@ namespace bonsai.FilePreview
 
       var lines = new List<string>();
       bool hasErrorWhileReading = false;
+      string complete = "";
       using (var process = new Process())
       {
         process.StartInfo = pi;
         // Capture both stdout and stderr
         process.OutputDataReceived += (sender, e) =>
         {
-          if (!hasErrorWhileReading && e.Data != null)
+          complete += e.Data + Environment.NewLine;
+          if (!hasErrorWhileReading && e.Data != null && e.Data.StartsWith('\u001b'))
           {
-            var secondEscape = e.Data.IndexOf('\e', 1);
-            if (e.Data[secondEscape - 1] != ' ')
+            var secondEscape = e.Data.Length > 1 ? e.Data.IndexOf('\u001b', 1) : -1;
+            if (secondEscape > -1 && e.Data[secondEscape - 1] != ' ')
             {
               lines.Add(e.Data);
             }

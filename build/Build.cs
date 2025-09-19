@@ -134,9 +134,9 @@ partial class Build : NukeBuild
         DotNetTasks.DotNetPublish (c => c
           .SetProject (Solution.bonsai)
             .SetConfiguration (Configuration)
-            .EnablePublishSingleFile()
-            .DisableSelfContained()
-            .SetOutput (s_releaseOutputRoot)
+            .SetOutput (s_releaseOutputRoot)  
+            //.EnablePublishSingleFile()
+            .SetProperty("PublishAot", true)
             .SetProperty ("FileVersion", versionNumber)
             .SetProperty ("AssemblyVersion", versionNumber)
             .SetProperty ("InformationalVersion", versionNumber)

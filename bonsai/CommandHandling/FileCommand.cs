@@ -21,7 +21,7 @@ namespace bonsai.CommandHandling
     }
 
     [JsonInclude]
-    public string Extension { get; private set; }
+    public string Extension { get; set; }
 
     public FileCommand CloneForExecution (string path)
     {

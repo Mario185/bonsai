@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using bonsai.CommandHandling;
-using bonsai.JsonConverter;
+using bonsai.JsonSerialization;
 using bonsai.Utilities;
 using ConsoleModiferDictionary =
   System.Collections.Generic.Dictionary<System.ConsoleModifiers, (System.Collections.Generic.Dictionary<char, bonsai.ActionType> ByChar,
@@ -22,8 +22,6 @@ namespace bonsai
 
     public static void LoadSettings()
     {
-      JsonSerializerOptions options = GetJsonSerializerOptions();
-
       AbsolutePath settingsPath = GetSettingsFilePath();
       if (!File.Exists(settingsPath))
       {
@@ -33,7 +31,7 @@ namespace bonsai
       Settings loadedSettings;
       using (FileStream stream = File.OpenRead(settingsPath))
       {
-        loadedSettings = JsonSerializer.Deserialize<Settings>(stream, options)!;
+        loadedSettings = JsonSerializer.Deserialize<Settings>(stream, SettingsGenerationContext.Default.Settings)!;
         if (string.IsNullOrWhiteSpace(loadedSettings.Theme))
         {
           loadedSettings.Theme = "default.json";
@@ -92,7 +90,7 @@ namespace bonsai
 
       using (Stream defaultSettingsStream = GetDefaultSettings())
       {
-        defaultSettings = JsonSerializer.Deserialize<Settings>(defaultSettingsStream, GetJsonSerializerOptions())!;
+        defaultSettings = JsonSerializer.Deserialize<Settings>(defaultSettingsStream, SettingsGenerationContext.Default.Settings)!;
       }
 
       foreach (KeyValuePair<KeyBindingContext, List<KeyBinding>> kvp in defaultSettings.KeyBindings)
@@ -147,23 +145,6 @@ namespace bonsai
       }
 
       return null;
-    }
-
-    private static JsonSerializerOptions GetJsonSerializerOptions()
-    {
-      JsonSerializerOptions options = new()
-      {
-        PropertyNameCaseInsensitive = true,
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true,
-        Converters =
-        {
-          new ColorJsonConverter(), new EnumJsonConverter<ActionType>(ActionType.None),
-          new EnumJsonConverter<ConsoleModifiers>(ConsoleModifiers.None),
-          new EnumJsonConverter<ConsoleKey>(ConsoleKey.None)
-        }
-      };
-      return options;
     }
 
     private static string GetModifierText(ConsoleModifiers modifier)
@@ -229,7 +210,7 @@ namespace bonsai
 
     [JsonInclude]
     [JsonPropertyOrder(100)]
-    public Dictionary<KeyBindingContext, List<KeyBinding>> KeyBindings { get; private set; } =
+    public Dictionary<KeyBindingContext, List<KeyBinding>> KeyBindings { get; set; } =
       new();
 
     public int MaxTotalScoreInDatabase { get; set; } = 2000;
@@ -241,10 +222,10 @@ namespace bonsai
     public bool ShowCommandSelectionForDirectNavigation { get; set; }
 
     [JsonInclude]
-    public IReadOnlyList<FileCommand> FileCommands { get; private set; } = new List<FileCommand>();
+    public IReadOnlyList<FileCommand> FileCommands { get; set; } = new List<FileCommand>();
 
     [JsonInclude]
-    public IReadOnlyList<DirectoryCommand> DirectoryCommands { get; private set; } = new List<DirectoryCommand>();
+    public IReadOnlyList<DirectoryCommand> DirectoryCommands { get; set; } = new List<DirectoryCommand>();
 
     public ActionType GetInputActionType(ConsoleKeyInfo keyInfo, KeyBindingContext keyBindingContext)
     {
@@ -282,8 +263,7 @@ namespace bonsai
     public void Save()
     {
       AbsolutePath settingsPath = GetSettingsFilePath();
-      JsonSerializerOptions options = GetJsonSerializerOptions();
-      File.WriteAllText(settingsPath, JsonSerializer.Serialize(this, options));
+      File.WriteAllText(settingsPath, JsonSerializer.Serialize(this, SettingsGenerationContext.Default.Settings));
     }
   }
 

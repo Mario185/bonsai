@@ -21,10 +21,10 @@ namespace bonsai.CommandHandling
     }
 
     [JsonInclude]
-    public string Action { get; private set; }
+    public string Action { get; set; }
 
     [JsonInclude]
-    public string DisplayName { get; private set; }
+    public string DisplayName { get; set; }
 
     public void Write (ConsoleWriter writer, int maxLength, bool isFocusedItem)
     {
