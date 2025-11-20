@@ -34,14 +34,14 @@ namespace clui.Controls
     public Border (
         LayoutSize width,
         LayoutSize height,
-        char? topLeftCorner = '┌',
+        char? topLeftCorner = '╭',
         char? topFiller = '─',
-        char? topRightCorner = '┐',
+        char? topRightCorner = '╮',
         char? leftFiller = '│',
         char? rightFiller = '│',
-        char? bottomLeftCorner = '└',
+        char? bottomLeftCorner = '╰',
         char? bottomFiller = '─',
-        char? bottomRightCorner = '┘'
+        char? bottomRightCorner = '╯'
     )
         : base (width, height)
     {
