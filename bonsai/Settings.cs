@@ -152,9 +152,9 @@ namespace bonsai
       return modifier switch
       {
         ConsoleModifiers.None => "",
-        ConsoleModifiers.Alt => "alt+",
-        ConsoleModifiers.Control => "ctrl+",
-        ConsoleModifiers.Shift => "shift+",
+        ConsoleModifiers.Alt => "⌥",
+        ConsoleModifiers.Control => "^",
+        ConsoleModifiers.Shift => "⇧",
         _ => ""
       };
     }
@@ -253,11 +253,22 @@ namespace bonsai
         }
 
         string modifier = GetModifierText(result.Modifier);
-        string? key = (result.Key?.ToString() ?? result.KeyChar.ToString())?.ToLower();
-        return modifier + key + ":" + description;
+        string key = GetKeySymbol(result);
+
+        return $"[{modifier}{key}] {description}";
       }
 
       return string.Empty;
+    }
+
+    private string GetKeySymbol(KeyBinding keyBinding)
+    {
+      if (keyBinding.Key.HasValue && s_keySymbols.TryGetValue(keyBinding.Key.Value, out string? value))
+      {
+        return value;
+      }
+
+      return (keyBinding.Key?.ToString() ?? keyBinding.KeyChar.ToString()) ?? string.Empty;
     }
 
     public void Save()
@@ -265,6 +276,80 @@ namespace bonsai
       AbsolutePath settingsPath = GetSettingsFilePath();
       File.WriteAllText(settingsPath, JsonSerializer.Serialize(this, SettingsGenerationContext.Default.Settings));
     }
+
+    private static readonly Dictionary<ConsoleKey, string> s_keySymbols = new()
+{
+    // Control keys
+    { ConsoleKey.Enter,          "↵" },
+    { ConsoleKey.Escape,         "⎋" },
+    { ConsoleKey.Backspace,      "⌫" },
+    { ConsoleKey.Tab,            "↹" },
+    { ConsoleKey.Spacebar,       "␣" },
+
+    // Arrows
+    { ConsoleKey.UpArrow,        "↑" },
+    { ConsoleKey.DownArrow,      "↓" },
+    { ConsoleKey.LeftArrow,      "←" },
+    { ConsoleKey.RightArrow,     "→" },
+
+    // Function keys
+    { ConsoleKey.F1,  "F1" }, { ConsoleKey.F2,  "F2" },
+    { ConsoleKey.F3,  "F3" }, { ConsoleKey.F4,  "F4" },
+    { ConsoleKey.F5,  "F5" }, { ConsoleKey.F6,  "F6" },
+    { ConsoleKey.F7,  "F7" }, { ConsoleKey.F8,  "F8" },
+    { ConsoleKey.F9,  "F9" }, { ConsoleKey.F10, "F10" },
+    { ConsoleKey.F11, "F11" }, { ConsoleKey.F12, "F12" },
+
+    // Digits
+    { ConsoleKey.D0, "0" }, { ConsoleKey.D1, "1" },
+    { ConsoleKey.D2, "2" }, { ConsoleKey.D3, "3" },
+    { ConsoleKey.D4, "4" }, { ConsoleKey.D5, "5" },
+    { ConsoleKey.D6, "6" }, { ConsoleKey.D7, "7" },
+    { ConsoleKey.D8, "8" }, { ConsoleKey.D9, "9" },
+
+    // Letters (A–Z): single character already
+    { ConsoleKey.A, "a" }, { ConsoleKey.B, "b" }, { ConsoleKey.C, "c" },
+    { ConsoleKey.D, "d" }, { ConsoleKey.E, "e" }, { ConsoleKey.F, "f" },
+    { ConsoleKey.G, "g" }, { ConsoleKey.H, "h" }, { ConsoleKey.I, "i" },
+    { ConsoleKey.J, "j" }, { ConsoleKey.K, "k" }, { ConsoleKey.L, "l" },
+    { ConsoleKey.M, "m" }, { ConsoleKey.N, "n" }, { ConsoleKey.O, "o" },
+    { ConsoleKey.P, "p" }, { ConsoleKey.Q, "q" }, { ConsoleKey.R, "r" },
+    { ConsoleKey.S, "s" }, { ConsoleKey.T, "t" }, { ConsoleKey.U, "u" },
+    { ConsoleKey.V, "v" }, { ConsoleKey.W, "w" }, { ConsoleKey.X, "x" },
+    { ConsoleKey.Y, "y" }, { ConsoleKey.Z, "z" },
+
+    // Numpad
+    { ConsoleKey.NumPad0, "0" }, { ConsoleKey.NumPad1, "1" },
+    { ConsoleKey.NumPad2, "2" }, { ConsoleKey.NumPad3, "3" },
+    { ConsoleKey.NumPad4, "4" }, { ConsoleKey.NumPad5, "5" },
+    { ConsoleKey.NumPad6, "6" }, { ConsoleKey.NumPad7, "7" },
+    { ConsoleKey.NumPad8, "8" }, { ConsoleKey.NumPad9, "8" },
+
+    { ConsoleKey.Add,      "+" },
+    { ConsoleKey.Subtract, "−" },
+    { ConsoleKey.Multiply, "×" },
+    { ConsoleKey.Divide,   "÷" },
+    { ConsoleKey.Decimal,  "." },
+
+    // Punctuation / OEM keys (these vary by keyboard)
+    { ConsoleKey.OemPlus,        "+" },
+    { ConsoleKey.OemMinus,       "−" },
+    { ConsoleKey.OemComma,       "," },
+    { ConsoleKey.OemPeriod,      "." },
+    
+    // Misc navigation
+    { ConsoleKey.Home,      "POS1" },
+    { ConsoleKey.End,       "END" },
+    { ConsoleKey.PageUp,    "PgU" },
+    { ConsoleKey.PageDown,  "PdD" },
+    { ConsoleKey.Insert,    "Ins" },
+    { ConsoleKey.Delete,    "Del" },
+
+    // Print/Break
+    { ConsoleKey.PrintScreen, "PrtSc" },
+    { ConsoleKey.Pause,       "Pause" },
+};
+
   }
 
   public class KeyBinding

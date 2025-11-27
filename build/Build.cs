@@ -17,6 +17,7 @@ using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
+using Nuke.Common.Tools.Coverlet;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Git;
 using Nuke.Common.Utilities;
@@ -97,7 +98,14 @@ partial class Build : NukeBuild
     .Requires(() => ReportGeneratorTool)
     .Executes(() =>
     {
-      var settings = new DotNetRunSettings()
+      var settings = new DotNetTestSettings()
+        .EnableNoBuild()
+        .EnableNoRestore()
+        .EnableCollectCoverage()
+        .SetConfiguration(Configuration)
+        .SetProjectFile(Solution.Tests);
+
+      var settings1 = new DotNetRunSettings()
         .EnableNoBuild()
         .EnableNoRestore()
         .SetConfiguration(Configuration)
@@ -105,19 +113,19 @@ partial class Build : NukeBuild
         .SetProjectFile(Solution.Tests);
       try
       {
-        DotNetTasks.DotNetRun(settings);
+        DotNetTasks.DotNetTest(settings);
       }
       finally
       {
-        CreateCoverageReport(Solution.Tests);
+        //CreateCoverageReport(Solution.Tests);
 
         var testResultsPath = Solution.Tests.GetOutputPath(Configuration) / "TestResults";
         testResultsPath.ZipTo(s_consoleToolsTestResultPath);
 
-        var coverageXmlPath = testResultsPath / "coverage.xml";
-        PrintCoverageSummary(coverageXmlPath);
+        //var coverageXmlPath = testResultsPath / "coverage.xml";
+        //PrintCoverageSummary(coverageXmlPath);
 
-        Log.Information(coverageXmlPath);
+        //Log.Information(coverageXmlPath);
 
       }
     })

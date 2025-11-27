@@ -190,7 +190,7 @@ namespace bonsai.Apps
 
       Label titleLabel = new(1.AsFraction(), 1.AsFixed());
 
-      _border = new Border (1.AsFraction(), 1.AsFraction())
+      _border = new Border (1.AsFraction(), 1.AsFraction(), bottomLeftCorner: '├', bottomRightCorner: '┤')
                 {
                     BorderColor = ThemeManger.Instance.BorderColor,
                     TextPosition = BorderTextPosition.BottomLeft
@@ -204,16 +204,38 @@ namespace bonsai.Apps
                        };
       topPanel.AddControls (titleLabel);
 
-      string increment = Settings.Instance.GetInstructionForAction (KeyBindingContext.EditDatabaseApp, ActionType.IncrementScore, "increment");
-      string decrement = Settings.Instance.GetInstructionForAction (KeyBindingContext.EditDatabaseApp, ActionType.DecrementScore, "decrement");
-      string delete = Settings.Instance.GetInstructionForAction (KeyBindingContext.EditDatabaseApp, ActionType.DeleteDatabaseEntry, "delete");
-      string save = Settings.Instance.GetInstructionForAction (KeyBindingContext.EditDatabaseApp, ActionType.SaveDatabaseChanges, "save and exit");
+      string[] instructions =
+      [
+        Settings.Instance.GetInstructionForAction(KeyBindingContext.EditDatabaseApp, ActionType.IncrementScore,
+          "increment"),
+        Settings.Instance.GetInstructionForAction(KeyBindingContext.EditDatabaseApp, ActionType.DecrementScore,
+          "decrement"),
+        Settings.Instance.GetInstructionForAction(KeyBindingContext.EditDatabaseApp, ActionType.DeleteDatabaseEntry,
+          "delete"),
+        Settings.Instance.GetInstructionForAction(KeyBindingContext.EditDatabaseApp, ActionType.SaveDatabaseChanges,
+          "save and exit")
+      ];
 
-      Label instructionsLabel = new(1.AsFraction(), 1.AsFixed())
-                                {
-                                    Text = $"{increment}   {decrement}   {delete}   {save}",
-                                    TextColor = Color.CadetBlue
-                                };
+      Border instructionsBorder = new Border(1.AsFraction(), 2.AsFixed(), topLeftCorner:null, topRightCorner:null, topFiller:null);
+
+      Panel instructionsPanel = new(1.AsFraction(), 1.AsFixed())
+      {
+        Flow = ChildControlFlow.Horizontal
+      };
+
+      instructionsBorder.AddControls(instructionsPanel);
+
+      foreach (var instruction in instructions)
+      {
+        Label instructionsLabel = new((instruction.Length + 2).AsFixed(), 1.AsFixed())
+        {
+          Text = instruction,
+          TextColor = Color.CadetBlue
+        };
+        instructionsPanel.AddControls(instructionsLabel);
+      }
+
+      
 
       _listControl = new ScrollableList<DatabaseEntry> (
           ThemeManger.Instance.SelectionForegroundColor,
@@ -244,7 +266,7 @@ namespace bonsai.Apps
 
       _searchTextBox = new TextBox (1.AsFraction(), 1.AsFixed());
       searchPanel.AddControls (searchLabel, _searchTextBox);
-      rootPanel.AddControls (topPanel, searchPanel, _border, instructionsLabel);
+      rootPanel.AddControls (topPanel, searchPanel, _border, instructionsBorder);
 
       frame.EnableBufferSizeChangeWatching();
 

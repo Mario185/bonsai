@@ -8,8 +8,8 @@
   "searchLabelBackgroundColor": null,
   "topBarTextColor": "#c0c7d3",
   "topBarBackgroundColor": "#292F3A",
-  "OptionEnabledColor": "#3fb944",
-  "OptionDisabledColor": "#808080",
+  "optionEnabledColor": "#3fb944",
+  "optionDisabledColor": "#808080",
   "folderIcons": {
     "defaultIcon": "",
     "symlink": "",

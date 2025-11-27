@@ -95,6 +95,19 @@ namespace bonsai.Apps
                        {
                            Flow = ChildControlFlow.Horizontal
                        };
+
+      var leftBorder = new Label(1.AsFixed(), 1.AsFixed())
+      {
+        TextColor = ThemeManger.Instance.TopBarBackgroundColor,
+      };
+      leftBorder.Text = "\ue0b6";
+
+      var rightBorder = new Label(1.AsFixed(), 1.AsFixed())
+      {
+        TextColor = ThemeManger.Instance.TopBarBackgroundColor,
+      };
+      rightBorder.Text = "\ue0b4";
+
       CurrentDirectoryLabel = new Label (1.AsFraction(), 1.AsFixed())
                               {
                                   TruncateLeft = true,
@@ -102,7 +115,7 @@ namespace bonsai.Apps
                                   BackgroundColor = ThemeManger.Instance.TopBarBackgroundColor
                               };
 
-      topPanel.AddControls (CurrentDirectoryLabel);
+      topPanel.AddControls (leftBorder, CurrentDirectoryLabel, rightBorder);
       return topPanel;
     }
 
