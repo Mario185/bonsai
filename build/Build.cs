@@ -108,15 +108,15 @@ partial class Build : NukeBuild
       }
       finally
       {
-        CreateCoverageReport(Solution.Tests);
+        //CreateCoverageReport(Solution.Tests);
 
         var testResultsPath = Solution.Tests.GetOutputPath(Configuration) / "TestResults";
         testResultsPath.ZipTo(s_consoleToolsTestResultPath);
 
-        var coverageXmlPath = testResultsPath / "coverage.xml";
-        PrintCoverageSummary(coverageXmlPath);
+        //var coverageXmlPath = testResultsPath / "coverage.xml";
+        //PrintCoverageSummary(coverageXmlPath);
 
-        Log.Information(coverageXmlPath);
+        //Log.Information(coverageXmlPath);
 
       }
     })
