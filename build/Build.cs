@@ -98,14 +98,7 @@ partial class Build : NukeBuild
     .Requires(() => ReportGeneratorTool)
     .Executes(() =>
     {
-      var settings = new DotNetTestSettings()
-        .EnableNoBuild()
-        .EnableNoRestore()
-        .EnableCollectCoverage()
-        .SetConfiguration(Configuration)
-        .SetProjectFile(Solution.Tests);
-
-      var settings1 = new DotNetRunSettings()
+      var settings = new DotNetRunSettings()
         .EnableNoBuild()
         .EnableNoRestore()
         .SetConfiguration(Configuration)
@@ -113,19 +106,19 @@ partial class Build : NukeBuild
         .SetProjectFile(Solution.Tests);
       try
       {
-        DotNetTasks.DotNetTest(settings);
+        DotNetTasks.DotNetRun(settings);
       }
       finally
       {
-        //CreateCoverageReport(Solution.Tests);
+        CreateCoverageReport(Solution.Tests);
 
         var testResultsPath = Solution.Tests.GetOutputPath(Configuration) / "TestResults";
         testResultsPath.ZipTo(s_consoleToolsTestResultPath);
 
-        //var coverageXmlPath = testResultsPath / "coverage.xml";
-        //PrintCoverageSummary(coverageXmlPath);
+        var coverageXmlPath = testResultsPath / "coverage.xml";
+        PrintCoverageSummary(coverageXmlPath);
 
-        //Log.Information(coverageXmlPath);
+        Log.Information(coverageXmlPath);
 
       }
     })
