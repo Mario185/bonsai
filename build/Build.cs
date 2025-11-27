@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -17,7 +16,6 @@ using Nuke.Common.CI.GitHubActions;
 using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tooling;
-using Nuke.Common.Tools.Coverlet;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Tools.Git;
 using Nuke.Common.Utilities;
@@ -31,7 +29,7 @@ using Serilog;
     EnableGitHubToken = true,
     InvokedTargets = [nameof(Publish)])]
 [GitHubActions("ci",
-  GitHubActionsImage.WindowsLatest,
+  GitHubActionsImage.WindowsLatest, GitHubActionsImage.UbuntuLatest,
   On = [ GitHubActionsTrigger.Push],
   InvokedTargets = [nameof(RunTests)]
   )]
