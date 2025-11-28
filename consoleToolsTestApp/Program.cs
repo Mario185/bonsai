@@ -1,4 +1,7 @@
-﻿using consoleTools;
+﻿using System.Globalization;
+using clui.New;
+using consoleTools;
+using consoleToolsTestApp;
 
 using (var consoleWriter = new ConsoleWriter())
 {
@@ -25,6 +28,12 @@ using (var consoleWriter = new ConsoleWriter())
   consoleWriter.Cursor.PreviousLineBeginning().Writer.Write("aaa").Cursor.NextLineBeginning();
 
 }
+
+var appliation = new CluiApplication();
+
+
+
+MainWindow w = new MainWindow();
 
 
 

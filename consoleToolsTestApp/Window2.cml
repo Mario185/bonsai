@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Window xmlns="https://github.com/Mario185/bonsai/clui/1.0">
+  <Border Name="Border1" Flow="Horizontal" ></Border>
+  <Label Name="Label1" />
+  <Panel Name="Panel1">
+    <Panel>
+      <Border Name="Border2"></Border>
+    </Panel>
+  </Panel>
+  <TextBox Name="TextBox1"> </TextBox>
+</Window>

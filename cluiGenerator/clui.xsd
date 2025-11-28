@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:m="https://github.com/Mario185/bonsai/clui/1.0"
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified"
+  targetNamespace="https://github.com/Mario185/bonsai/clui/1.0"
+  xml:lang="en">
+
+  <xs:complexType name="BaseControl">
+    <xs:attribute name="Name" type="xs:string" use="optional"/>
+    <xs:attribute name="Visible" type="xs:boolean" use="optional"/>
+  </xs:complexType>
+  
+  <xs:complexType name="ContainerControl">
+    <xs:complexContent>
+      <xs:extension base="m:BaseControl">
+        <xs:choice maxOccurs="unbounded">
+          <xs:element name="Label" type="m:Label" maxOccurs="unbounded" />
+          <xs:element name="TextBox" type="m:TextBox" maxOccurs="unbounded" />
+          <xs:element name="Panel" type="m:Panel" maxOccurs="unbounded" />
+          <xs:element name="Border" type="m:Border" maxOccurs="unbounded" />
+        </xs:choice>
+        <xs:attribute name="Flow" type="m:FlowType" use="optional"/>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Panel">
+    <xs:complexContent>
+      <xs:extension base="m:ContainerControl">
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Border">
+    <xs:complexContent>
+      <xs:extension base="m:ContainerControl">
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+ 
+  
+  <xs:complexType name="Label">
+    <xs:complexContent>
+      <xs:extension base="m:BaseControl">
+
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="TextBox">
+    <xs:complexContent>
+      <xs:extension base="m:BaseControl">
+
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:simpleType name="FlowType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Horizontal"/>
+      <xs:enumeration value="Vertical"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="Window" type="m:ContainerControl">
+
+  </xs:element>
+  
+</xs:schema>

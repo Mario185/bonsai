@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 18
-VisualStudioVersion = 18.0.11205.157 d18.0
+VisualStudioVersion = 18.0.11205.157
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bonsai", "bonsai\bonsai.csproj", "{A48EE8DE-036C-48D5-A5D0-AD50FB1A7897}"
 EndProject
@@ -21,6 +21,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{88EA5E7B-079E-4BEC-AE62-48612BBBF707}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "consoleToolsTestApp", "consoleToolsTestApp\consoleToolsTestApp.csproj", "{E346625D-14C0-44A5-98E7-DCD2033F2A03}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "cluiGenerator", "cluiGenerator\cluiGenerator.csproj", "{F5282C04-DC07-421D-8DB2-18A871A3AD76}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,10 @@ Global
 		{E346625D-14C0-44A5-98E7-DCD2033F2A03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E346625D-14C0-44A5-98E7-DCD2033F2A03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E346625D-14C0-44A5-98E7-DCD2033F2A03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5282C04-DC07-421D-8DB2-18A871A3AD76}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5282C04-DC07-421D-8DB2-18A871A3AD76}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5282C04-DC07-421D-8DB2-18A871A3AD76}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5282C04-DC07-421D-8DB2-18A871A3AD76}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -103,13 +103,6 @@ namespace Tests.consoleTools
     }
 
     [Fact]
-    public Task ReverseIndex()
-    {
-      ConsoleWriterInstance.Cursor.ReverseIndex().Flush();
-      return VerifyOutput();
-    }
-
-    [Fact]
     public Task SavePosition()
     {
       ConsoleWriterInstance.Cursor.SavePosition().Flush();

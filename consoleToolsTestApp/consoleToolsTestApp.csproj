@@ -8,7 +8,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Window2.cml" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <CluiGenerator Include="MainWindow.cml"></CluiGenerator>
+    <CluiGenerator Include="Window2.cml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\clui\clui.csproj" />
     <ProjectReference Include="..\consoleTools\consoleTools.csproj" />
   </ItemGroup>
 
+  <Import Project="D:\github\bonsai\cluiGenerator\cluiGenerator.targets" />
 </Project>
