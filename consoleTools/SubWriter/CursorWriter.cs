@@ -122,20 +122,29 @@ namespace consoleTools.SubWriter
     }
 
     /// <summary>
-    ///   <inheritdoc cref="CursorSequences.ReverseIndex" />
-    /// </summary>
-    public CursorWriter ReverseIndex ()
-    {
-      Writer.Write (CursorSequences.ReverseIndex);
-      return this;
-    }
-
-    /// <summary>
     ///   <inheritdoc cref="CursorSequences.SavePosition" />
     /// </summary>
     public CursorWriter SavePosition ()
     {
       Writer.Write (CursorSequences.SavePosition);
+      return this;
+    }
+
+    /// <summary>
+    ///   <inheritdoc cref="CursorSequences.NextLineBeginning" />
+    /// </summary>
+    public CursorWriter NextLineBeginning()
+    {
+      Writer.Write(CursorSequences.NextLineBeginning);
+      return this;
+    }
+
+    /// <summary>
+    ///   Moves the cursor to the beginning of the previous line
+    /// </summary>
+    public CursorWriter PreviousLineBeginning()
+    {
+      MoveUp().MoveAbsoluteHorizontally(0);
       return this;
     }
 

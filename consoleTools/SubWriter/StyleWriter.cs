@@ -35,6 +35,42 @@ namespace consoleTools.SubWriter
       return this;
     }
 
+    /// <summary>
+    ///   <inheritdoc cref="StyleSequences.Dim" />
+    /// </summary>
+    public StyleWriter Dim()
+    {
+      Writer.Write(StyleSequences.Dim);
+      return this;
+    }
+
+    /// <summary>
+    ///   <inheritdoc cref="StyleSequences.Blink" />
+    /// </summary>
+    public StyleWriter Blink()
+    {
+      Writer.Write(StyleSequences.Blink);
+      return this;
+    }
+
+    /// <summary>
+    ///   <inheritdoc cref="StyleSequences.Reverse" />
+    /// </summary>
+    public StyleWriter Reverse()
+    {
+      Writer.Write(StyleSequences.Reverse);
+      return this;
+    }
+
+    /// <summary>
+    ///   <inheritdoc cref="StyleSequences.Hidden" />
+    /// </summary>
+    public StyleWriter Hidden()
+    {
+      Writer.Write(StyleSequences.Hidden);
+      return this;
+    }
+
     public StyleWriter ForegroundColor (Color? color)
     {
       if (!color.HasValue)

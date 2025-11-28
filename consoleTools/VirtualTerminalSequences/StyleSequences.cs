@@ -10,7 +10,25 @@ namespace consoleTools.VirtualTerminalSequences
     /// </summary>
     public const string Bold = CommonSequences.ESC + "[1m";
 
-    public const string Flashing = CommonSequences.ESC + "[5m";
+    /// <summary>
+    /// Adds dim style
+    /// </summary>
+    public const string Dim = CommonSequences.ESC + "[2m";
+
+    /// <summary>
+    /// Adds blinking style
+    /// </summary>
+    public const string Blink = CommonSequences.ESC + "[5m";
+
+    /// <summary>
+    /// Adds reverse style
+    /// </summary>
+    public const string Reverse = CommonSequences.ESC + "[7m";
+
+    /// <summary>
+    /// Adds hidden style
+    /// </summary>
+    public const string Hidden = CommonSequences.ESC + "[8m";
 
     /// <summary>
     ///   Returns all attributes to the default state prior to modification

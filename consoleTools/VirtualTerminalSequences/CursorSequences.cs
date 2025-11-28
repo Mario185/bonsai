@@ -42,10 +42,9 @@ namespace consoleTools.VirtualTerminalSequences
     public const string RestorePosition = CommonSequences.ESC + "8";
 
     /// <summary>
-    ///   Reverse Index – Performs the reverse operation of \n, moves cursor up one line, maintains horizontal position,
-    ///   scrolls buffer if necessary
+    /// Moves the cursor to the beginning of the next line
     /// </summary>
-    public const string ReverseIndex = CommonSequences.ESC + "M";
+    public const string NextLineBeginning = CommonSequences.ESC + "E";
 
     /// <summary>
     ///   Save Cursor Position in Memory
