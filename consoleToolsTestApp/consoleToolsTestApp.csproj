@@ -7,10 +7,6 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Window2.cml" />
-  </ItemGroup>
-
 
   <ItemGroup>
     <CluiGenerator Include="MainWindow.cml"></CluiGenerator>

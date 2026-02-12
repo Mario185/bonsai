@@ -3,11 +3,21 @@
 <Window xmlns="https://github.com/Mario185/bonsai/clui/1.0">
   <Border Name="Border1"  ></Border>
   <Label Name="Label1"/>
+  <Label Name="label_1"/>
   <Panel Name="Panel1">
     <Panel>
-      <Border Name="Border2"></Border>
+      <Border Flow="Horizontal" Name="Border2"></Border>
     </Panel>
   </Panel>
   <TextBox Name="TextBox1" />
+  <Label  />
+  <Border />
+  <Label  />
+  <Border />
+
+  <Label  />
+  <Border />
+  <Label  />
+  <Border />
   
 </Window>

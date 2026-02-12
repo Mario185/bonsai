@@ -12,15 +12,15 @@ namespace consoleToolsTestApp
 
     protected void Initialize()
     {
-      global::clui.New.Panel panel_0 = new();
+      global::clui.New.Panel panel_1 = new();
 
-      this.Controls.Add(Border1);
-      this.Controls.Add(Label1);
-      this.Controls.Add(Panel1);
-      this.Controls.Add(TextBox1);
+      this.Controls.Add(this.Border1);
+      this.Controls.Add(this.Label1);
+      this.Controls.Add(this.Panel1);
+      this.Controls.Add(this.TextBox1);
 
-      Panel1.Controls.Add(panel_0);
-      panel_0.Controls.Add(Border2);
+      this.Panel1.Controls.Add(panel_1);
+      panel_1.Controls.Add(this.Border2);
 
     }
   }

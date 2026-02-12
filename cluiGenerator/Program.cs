@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -21,7 +22,7 @@ static void CreateDesignerFile(string sourceFileName)
 
 
   var windowElement = XDocument.Load(sourceFileName).Root!;
-  var controls = Recuresive(windowElement, null);
+  var controls = Recursive(windowElement, null);
 
 
   StringBuilder propertyWriter = new StringBuilder();
@@ -42,11 +43,11 @@ static void CreateDesignerFile(string sourceFileName)
 
     if (control.Parent == null)
     {
-      addWriter.AppendLine($"      this.Controls.Add({control.Name});");
+      addWriter.AppendLine($"      this.Controls.Add({control.GetThisQualifiedName()});");
     }
     else
     {
-      addWriter1.AppendLine($"      {control.Parent.Name}.Controls.Add({control.Name});");
+      addWriter1.AppendLine($"      {control.Parent.GetThisQualifiedName()}.Controls.Add({control.GetThisQualifiedName()});");
     }
   }
 
@@ -73,7 +74,7 @@ static void CreateDesignerFile(string sourceFileName)
 
 
 
-static List<ControlPoco> Recuresive(XElement element, ControlPoco? parent)
+static List<ControlPoco> Recursive(XElement element, ControlPoco? parent)
 {
   List<ControlPoco> result = new List<ControlPoco>();
   foreach (var child in element.Elements())
@@ -83,7 +84,7 @@ static List<ControlPoco> Recuresive(XElement element, ControlPoco? parent)
 
     if (string.IsNullOrWhiteSpace(name))
     {
-      name = child.Name.LocalName.ToLower() + "_" + ControlPoco.controlNumberCounter++;
+      name = "ctrl_" + child.Name.LocalName.ToLower() + "_" + ControlPoco.GetControlCount(child);
     }
 
     switch (child.Name.LocalName)
@@ -98,7 +99,7 @@ static List<ControlPoco> Recuresive(XElement element, ControlPoco? parent)
         };
         result.Add(panelPoco);
 
-        result.AddRange(Recuresive(child, panelPoco));
+        result.AddRange(Recursive(child, panelPoco));
 
         break;
 
@@ -112,7 +113,7 @@ static List<ControlPoco> Recuresive(XElement element, ControlPoco? parent)
         };
         result.Add(borderPoco);
 
-        result.AddRange(Recuresive(child, borderPoco));
+        result.AddRange(Recursive(child, borderPoco));
 
         break;
 
@@ -176,7 +177,12 @@ static void CreateUserFile(string sourceFileName)
 
 public class ControlPoco
 {
-  public static int controlNumberCounter = 0;
+  private static readonly ConcurrentDictionary<string, int> _controlCount = new();
+  public static int GetControlCount(XElement element)
+  {
+    return _controlCount.AddOrUpdate(element.Name.LocalName, s => 1, (s, i) => i + 1);
+  }
+
   public bool IsPublic { get; set; }
   public required string Name { get; init; }
 
@@ -184,4 +190,6 @@ public class ControlPoco
 
   public ControlPoco? Parent { get; init; }
   public List<ControlPoco> Controls { get; set; } = new();
+
+  public string GetThisQualifiedName() => IsPublic ? "this." + Name : Name;
 }
