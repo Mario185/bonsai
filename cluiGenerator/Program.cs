@@ -7,11 +7,27 @@ using System.Text;
 using System.Xml.Linq;
 using clui.New;
 
-CreateUserFile(args[0]);
-CreateDesignerFile(args[0]);
+
+string projectDir = args[0];
+string rootNameSpace = args[1];
+string cmlFile = args[2];
+
+var fileDirectory = Path.GetDirectoryName(cmlFile)!;
 
 
-static void CreateDesignerFile(string sourceFileName)
+var directoryNs = string.Join(".",
+  Path.GetRelativePath(projectDir, fileDirectory).Split(Path.DirectorySeparatorChar, StringSplitOptions.RemoveEmptyEntries));
+
+
+
+var x = fileDirectory.Substring(projectDir.Length);
+
+var fileNs = (rootNameSpace + "." + directoryNs).Trim(".").ToString();
+CreateUserFile(fileNs, cmlFile);
+CreateDesignerFile(fileNs, cmlFile);
+
+
+static void CreateDesignerFile(string ns, string sourceFileName)
 {
   var designerFileName = sourceFileName + ".designer.cs";
 
@@ -54,7 +70,7 @@ static void CreateDesignerFile(string sourceFileName)
   var content = $$"""
                    using global::clui.New;
                    
-                   namespace consoleToolsTestApp
+                   namespace {{ns}}
                    {
                      public partial class {{name}}: global::clui.New.Window
                      {
@@ -142,7 +158,7 @@ static List<ControlPoco> Recursive(XElement element, ControlPoco? parent)
   return result;
 }
 
-static void CreateUserFile(string sourceFileName)
+static void CreateUserFile(string ns, string sourceFileName)
 {
   var userFileName = sourceFileName + ".cs";
 
@@ -159,7 +175,7 @@ static void CreateUserFile(string sourceFileName)
   var content = $$"""
                 using clui.New;
 
-                namespace consoleToolsTestApp
+                namespace {{ns}}
                 {
                   public partial class {{name}} : Window
                   {

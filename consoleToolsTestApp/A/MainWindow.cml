@@ -13,9 +13,4 @@
   <TextBox Name="TextBox2" />
   <TextBox Name="TextBox3" />
   <TextBox Name="TextBox4" />
-  <TextBox Name="TextBox5" />
-  
-  <TextBox Name="TextBox6" />
-  
-    
 </Window>

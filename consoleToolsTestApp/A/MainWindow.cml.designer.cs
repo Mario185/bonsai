@@ -1,6 +1,6 @@
 using global::clui.New;
 
-namespace consoleToolsTestApp
+namespace consoleToolsTestApp.A
 {
   public partial class MainWindow: global::clui.New.Window
   {
@@ -13,8 +13,6 @@ namespace consoleToolsTestApp
     public global::clui.New.TextBox TextBox2 { get; } = new();
     public global::clui.New.TextBox TextBox3 { get; } = new();
     public global::clui.New.TextBox TextBox4 { get; } = new();
-    public global::clui.New.TextBox TextBox5 { get; } = new();
-    public global::clui.New.TextBox TextBox6 { get; } = new();
 
     protected void Initialize()
     {
@@ -28,8 +26,6 @@ namespace consoleToolsTestApp
       this.Controls.Add(this.TextBox2);
       this.Controls.Add(this.TextBox3);
       this.Controls.Add(this.TextBox4);
-      this.Controls.Add(this.TextBox5);
-      this.Controls.Add(this.TextBox6);
 
       this.Panel1.Controls.Add(ctrl_panel_1);
       ctrl_panel_1.Controls.Add(this.Border2);

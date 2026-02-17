@@ -7,12 +7,30 @@
     <AvailableItemName Include="CluiGenerator" />
   </ItemGroup>
 
+  <ItemGroup>
+    
+    <Compile Update="**\*.cml.cs">
+      <DependentUpon>%(Filename)</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+
+    <Compile Update="**.cml.designer.cs">
+      <DependentUpon>%(Filename.Replace('.designer',''))</DependentUpon>
+      <AutoGen>true</AutoGen>
+      <DesignTime>True</DesignTime>
+    </Compile>
+
+  </ItemGroup>
+
   <PropertyGroup>
     <CluiGeneratorPath Condition="$(CluiGeneratorPath) == ''">D:\github\bonsai\cluiGenerator\bin\Debug\net10.0\cluiGenerator.exe</CluiGeneratorPath>
   </PropertyGroup>
 
-  <Target Name="ExecuteCluiGenerator" BeforeTargets="BeforeCompile;Rebuild" Inputs="%(CluiGenerator.Identity)" Outputs="%(CluiGenerator.Identity).cml.cs')">
-    <Exec Command="$(CluiGeneratorPath) %(CluiGenerator.FullPath)"/>
+  <Target Name="ExecuteCluiGenerator" BeforeTargets="CoreCompile" Inputs="%(CluiGenerator.Identity)" Outputs="%(CluiGenerator.Identity).designer.cs">
+    <Exec Command="$(CluiGeneratorPath) $(MSBuildProjectDirectory) $(RootNamespace) %(CluiGenerator.FullPath)"/>
+    <!--<Message Text="Clui item: %(CluiGenerator.Identity).designer.cs" Importance="High" />
+    <Message Text="Project default namespace: $(RootNamespace)" Importance="High" />
+    <Message Text="Project Directory: $(MSBuildProjectDirectory)" Importance="High" />-->
   </Target>
 
 </Project>
