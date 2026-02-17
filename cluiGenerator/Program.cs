@@ -164,7 +164,11 @@ static void CreateUserFile(string ns, string sourceFileName)
 
   if (File.Exists(userFileName))
   {
-    File.Move(userFileName, userFileName);
+    // Maybe i dont need this.
+    // the intention was to touch the file so it gets an updated change date
+    // so that the build task would not be triggered because the file is newer then the cml file
+    // self. but because i only look for the designer file it should be fine
+    //File.Move(userFileName, userFileName);
     return;
   }
 
